@@ -28,22 +28,30 @@ public function create()
 
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'tanggal' => 'required|date',
-            'nama_pembeli' => 'required|string',
-            'jumlah_ayam_dibeli' => 'required|integer',
-            'berat_total' => 'required|numeric',
-            'harga_asli' => 'required|integer',
-            'diskon' => 'required|integer',
-            'harga_total' => 'required|integer',
-        ]);
+{
+    // Validasi
+    $validated = $request->validate([
+        'tanggal' => 'required|date',
+        'nama_pembeli' => 'required|string',
+        'jumlah_ayam_dibeli' => 'required|integer|min:1',
+        'harga_asli' => 'required|integer',
+        'harga_total' => 'required|integer',
+        'berat_total' => 'required|integer',
+        'diskon' => 'required|boolean'
+    ]);
 
-        DataPenjualan::create($validated);
+    // Simpan data penjualan
+    DataPenjualan::create($validated);
 
-        return redirect()->route('penjualan.index')->with('success', 'Data berhasil disimpan.');
+    // Update stok ayam
+    $latestSummary = Summary::latest()->first();
+    if ($latestSummary) {
+        $latestSummary->stok_ayam -= $validated['jumlah_ayam_dibeli'];
+        $latestSummary->save();
     }
 
+    return redirect()->back()->with('success', 'Data penjualan berhasil disimpan dan stok diperbarui!');
+}
     public function destroy($id)
 {
     $data = DataPenjualan::findOrFail($id);
