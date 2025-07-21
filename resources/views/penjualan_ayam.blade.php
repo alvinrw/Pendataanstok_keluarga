@@ -288,7 +288,7 @@
                 <div class="stock-info">
                     <div class="stock-card">
                         <h4>Total Ayam</h4>
-                        <p id="total-ayam">10</p>
+                        <p id="total-ayam">{{ $stokAyam }}</p>
                     </div>
     
                 </div>

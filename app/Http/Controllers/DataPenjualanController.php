@@ -4,19 +4,28 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DataPenjualan;
+use App\Models\Summary;
 
 class DataPenjualanController extends Controller
 {
     public function index()
     {
+      
         $data = DataPenjualan::all();
-        return view('penjualan_ayam', compact('data'));
+$stokAyam = Summary::sum('stok_ayam');
+
+return view('penjualan_ayam', compact('data', 'stokAyam'));
+
+
     }
 
-    public function create()
-    {
-        return view('penjualan_ayam');
-    }
+public function create()
+{
+    $data = DataPenjualan::all();
+    $stokAyam = Summary::sum('stok_ayam');
+    return view('penjualan_ayam', compact('data', 'stokAyam'));
+}
+
 
     public function store(Request $request)
     {
