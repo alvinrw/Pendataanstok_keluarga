@@ -454,24 +454,24 @@
             <a href="/" class="back-btn">← Kembali ke Menu Utama</a>
             <!-- Improved Stock Section -->
             <div class="stock-section">
-                <h3>📦 Stok Ayam Saat Ini</h3>
+                <h3>📦 Stok Ayam terjual Saat Ini</h3>
                 <div class="stock-grid">
                     <div class="stock-card total-ayam">
                         <div class="icon">🐔</div>
                         <h4>Total Ayam</h4>
-                        <p id="total-ayam">20</p>
+                        <p id="total-ayam">0</p>
                         <div class="subtitle">Ekor ayam tersedia</div>
                     </div>
                     <div class="stock-card total-berat">
                         <div class="icon">⚖️</div>
                         <h4>Total Berat</h4>
-                        <p id="total-berat">10 gram</p>
+                        <p id="total-berat">0 gram</p>
                         <div class="subtitle">Gram total berat</div>
                     </div>
                     <div class="stock-card estimasi-nilai">
                         <div class="icon">💰</div>
                         <h4>Estimasi Nilai</h4>
-                        <p id="estimasi-nilai">Rp800</p>
+                        <p id="estimasi-nilai">Rp 0</p>
                         <div class="subtitle">Nilai estimasi stok</div>
                     </div>
                 </div>
@@ -559,7 +559,7 @@
                             <span class="filter-stat">🐔 <strong id="filter-total-ayam">0</strong> ayam</span>
                             <span class="filter-stat">⚖️ <strong id="filter-total-berat">0</strong> gram</span>
                             <span class="filter-stat">💰 <strong id="filter-total-uang">Rp 0</strong></span>
-                                                </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -593,55 +593,39 @@
             return number.toLocaleString('id-ID');
         }
 
-        // Populate table
-        function populateTable() {
-            const tableBody = document.getElementById('table-body');
-            const filterSummary = document.getElementById('filter-summary');
-            
-            if (filteredData.length === 0) {
-                filterSummary.style.display = 'none';
-                
-                if (dataAyam.length > 0) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="8" class="no-data">
-                                <h3>🔍 Tidak ada data sesuai filter</h3>
-                                <p>Coba ubah kriteria filter untuk melihat data lainnya</p>
-                            </td>
-                        </tr>
-                    `;
-                } else {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="8" class="no-data">
-                                <h3>📭 Tidak ada data penjualan</h3>
-                                <p>Silakan tambahkan data penjualan atau sesuaikan filter</p>
-                            </td>
-                        </tr>
-                    `;
+        // Function to calculate and update stock display
+        function updateStockDisplay() {
+            const rows = document.querySelectorAll('#table-body tr');
+            let totalAyam = 0;
+            let totalBerat = 0;
+            let totalHarga = 0;
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 7) {
+                    // Extract data from table cells
+                    const jumlahAyam = parseInt(cells[3].textContent) || 0;
+                    const beratText = cells[4].textContent.replace(' gram', '');
+                    const berat = parseInt(beratText) || 0;
+                    const hargaText = cells[6].textContent.replace('Rp ', '').replace(/\./g, '');
+                    const harga = parseInt(hargaText) || 0;
+
+                    totalAyam += jumlahAyam;
+                    totalBerat += berat;
+                    totalHarga += harga;
                 }
-                return;
-            }
+            });
 
-            filterSummary.style.display = 'block';
-            updateFilterSummary();
+            // Update the stock display cards
+            document.getElementById('total-ayam').textContent = totalAyam;
+            document.getElementById('total-berat').textContent = formatNumber(totalBerat) + ' gram';
+            document.getElementById('estimasi-nilai').textContent = formatCurrency(totalHarga);
+        }
 
-            tableBody.innerHTML = filteredData.map((item, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${formatDate(item.tanggal)}</td>
-                    <td>${item.pembeli}</td>
-                    <td>${item.jumlah}</td>
-                    <td>${formatNumber(item.totalBerat)} gram</td>
-                    <td>${formatCurrency(item.harga)}</td>
-                    <td>
-                        <span class="status-badge ${item.diskon === 'ya' ? 'status-diskon' : 'status-normal'}">
-                            ${item.diskon === 'ya' ? 'Diskon 5%' : 'Normal'}
-                        </span>
-                    </td>
-                    <td><strong>${formatCurrency(item.totalAkhir)}</strong></td>
-                </tr>
-            `).join('');
+        // Populate table (tidak digunakan untuk Laravel data, hanya untuk filter)
+        function populateTable() {
+            // Function ini tidak dipanggil karena kita menggunakan data dari Laravel
+            // Hanya untuk kompatibilitas dengan kode yang sudah ada
         }
 
         // Update filter summary
@@ -711,12 +695,18 @@
             document.getElementById('filter-tanggal-dari').value = lastMonth.toISOString().split('T')[0];
             document.getElementById('filter-tanggal-sampai').value = today.toISOString().split('T')[0];
             
+            // Update stock display when page loads
             updateStockDisplay();
-            populateTable();
+            // Tidak memanggil populateTable() karena data sudah ada dari Laravel
         }
 
         // Initialize on page load
         window.onload = init;
+
+        // Also update stock display whenever DOM content is loaded (for Laravel data)
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStockDisplay();
+        });
     </script>
 </body>
 </html>
