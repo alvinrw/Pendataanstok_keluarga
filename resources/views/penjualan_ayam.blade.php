@@ -290,15 +290,7 @@
                         <h4>Total Ayam</h4>
                         <p id="total-ayam">10</p>
                     </div>
-                    <div class="stock-card">
-                        <h4>Total Berat</h4>
-                       <p id="total-berat">200 gram</p>
-                    </div>
-                    <div class="stock-card">
-                        <h4>Estimasi Nilai</h4>
-                        <p id="estimasi-nilai">Rp akeh</p>
-
-                    </div>
+    
                 </div>
             </div>
 

@@ -98,6 +98,10 @@
             border-color: #FF9800;
         }
 
+        .stat-card.total-weight {
+            border-color: #9C27B0;
+        }
+
         .stat-icon {
             font-size: 3em;
             margin-bottom: 15px;
@@ -114,6 +118,10 @@
 
         .total-revenue .stat-icon {
             color: #FF9800;
+        }
+
+        .total-weight .stat-icon {
+            color: #9C27B0;
         }
 
         .stat-value {
@@ -144,110 +152,6 @@
         .update-stock-btn:hover {
             background: #1976D2;
             transform: translateY(-2px);
-        }
-
-        .table-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .table-header h2 {
-            color: #333;
-            font-size: 1.8em;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            font-weight: 600;
-            font-size: 1.1em;
-        }
-
-        td {
-            font-size: 1em;
-            color: #555;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .weight-category {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .stock-number {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #2196F3;
-        }
-
-        .sold-number {
-            font-weight: bold;
-            color: #FF9800;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-edit {
-            background: #2196F3;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #1976D2;
-        }
-
-        .btn-delete {
-            background: #f44336;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #d32f2f;
         }
 
         /* Modal Styles */
@@ -396,15 +300,6 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .table-header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
 
             .modal-content {
                 margin: 10% auto;
@@ -415,31 +310,37 @@
 </head>
 <body>
     <div class="container">
-    <button class="back-button" onclick="window.location.href='/'">← Kembali ke Menu Utama</button>
+        <button class="back-button" onclick="window.location.href='/'">← Kembali ke Menu Utama</button>
         <div class="header">
             <h1>🐔 Dashboard Penjualan Ayam</h1>
             <p>Rekapan penjualan dan stok ayam harian</p>
         </div>
 
         <div class="stats-grid">
-            {{-- <div class="stat-card total-sales">
+            <div class="stat-card total-sales">
                 <span class="stat-icon">📊</span>
-                <div class="stat-value" id="totalSales">{{ $finalAyam}}</div>
-                <div class="stat-label">Total Penjualan (Ekor)</div>
-            </div> --}}
+                <div class="stat-value" id="totalSales">125</div>
+                <div class="stat-label">Total Stok Terjual (Ekor)</div>
+            </div>
 
             <div class="stat-card available-stock">
                 <span class="stat-icon">🐔</span>
-                <div class="stat-value" id="availableStock">10</div>
+                <div class="stat-value" id="availableStock">87</div>
                 <div class="stat-label">Stok Tersedia (Ekor)</div>
                 <button class="update-stock-btn" onclick="openStockModal()">Update Stok</button>
             </div>
 
-            {{-- <div class="stat-card total-revenue">
+            <div class="stat-card total-weight">
+                <span class="stat-icon">⚖️</span>
+                <div class="stat-value" id="totalWeight">104.5</div>
+                <div class="stat-label">Total Berat Terjual (Kg)</div>
+            </div>
+
+            <div class="stat-card total-revenue">
                 <span class="stat-icon">💰</span>
-                <div class="stat-value" id="totalRevenue">Rp 2.450.000</div>
-                <div class="stat-label">Total Pendapatan</div>
-            </div> --}}
+                <div class="stat-value" id="totalRevenue">Rp 3.675.000</div>
+                <div class="stat-label">Total Uang Terkumpul</div>
+            </div>
         </div>
     </div>
 
@@ -453,27 +354,12 @@
             <div class="modal-body">
                 <div class="current-stock">
                     <div class="current-stock-label">Stok Saat Ini</div>
-                    <div class="current-stock-value" id="currentStockDisplay">7</div>
+                    <div class="current-stock-value" id="currentStockDisplay">87</div>
                 </div>
                 <div class="form-group">
                     <label for="newStockInput">Jumlah Stok Baru</label>
                     <input type="number" id="newStockInput" placeholder="Masukkan jumlah stok baru" min="0">
                 </div>
-
-{{-- <form action="{{ route('update.stok') }}" method="POST">
-    @csrf
-    <div class="form-group">
-        <label for="newStockInput">Jumlah Stok Baru</label>
-        <input type="number" id="newStockInput" name="jumlah_stok" placeholder="Masukkan jumlah stok baru" min="0" required>
-    </div>
-
-    <div class="modal-footer">
-        <button class="modal-btn modal-btn-secondary" type="button" onclick="closeStockModal()">Batal</button>
-        <button class="modal-btn modal-btn-primary" type="submit">Update Stok</button>
-    </div>
-</form> --}}
-
-                
             </div>
             <div class="modal-footer">
                 <button class="modal-btn modal-btn-secondary" onclick="closeStockModal()">Batal</button>
@@ -483,53 +369,83 @@
     </div>
 
     <script>
-        // Data penjualan
+        // Data penjualan dengan harga per kg
         let salesData = [
             {
                 id: 1,
-                weight: "0.6",
+                weight: 0.6,
                 stock: 15,
                 sold: 12,
+                pricePerKg: 28000
             },
             {
                 id: 2,
-                weight: "0.7",
+                weight: 0.7,
                 stock: 20,
                 sold: 18,
+                pricePerKg: 28500
             },
             {
                 id: 3,
-                weight: "0.8",
+                weight: 0.8,
                 stock: 18,
                 sold: 25,
+                pricePerKg: 29000
             },
             {
                 id: 4,
-                weight: "0.9",
+                weight: 0.9,
                 stock: 12,
                 sold: 30,
+                pricePerKg: 29500
             },
             {
                 id: 5,
-                weight: "1.0",
+                weight: 1.0,
                 stock: 10,
                 sold: 35,
+                pricePerKg: 30000
             },
             {
                 id: 6,
-                weight: "1+",
+                weight: 1.2,
                 stock: 12,
                 sold: 5,
+                pricePerKg: 30500
             }
         ];
+
+        // Fungsi untuk format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
 
         // Fungsi untuk menghitung total statistik
         function calculateStats() {
             const totalSales = salesData.reduce((sum, item) => sum + item.sold, 0);
             const totalStock = salesData.reduce((sum, item) => sum + item.stock, 0);
+            
+            // Hitung total berat terjual
+            const totalWeight = salesData.reduce((sum, item) => {
+                return sum + (item.sold * item.weight);
+            }, 0);
+            
+            // Hitung total pendapatan
+            const totalRevenue = salesData.reduce((sum, item) => {
+                const itemRevenue = item.sold * item.weight * item.pricePerKg;
+                return sum + itemRevenue;
+            }, 0);
 
+            // Update tampilan
             document.getElementById('totalSales').textContent = totalSales;
             document.getElementById('availableStock').textContent = totalStock;
+            document.getElementById('totalWeight').textContent = totalWeight.toFixed(1);
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
             document.getElementById('currentStockDisplay').textContent = totalStock;
         }
 
@@ -564,28 +480,38 @@
                 return;
             }
 
-            // Update total stok (dalam implementasi nyata, ini bisa lebih kompleks)
+            // Update total stok (distribusi proporsional ke semua kategori)
             const currentTotal = salesData.reduce((sum, item) => sum + item.stock, 0);
             const difference = newStock - currentTotal;
             
-            // Distribusi stok baru ke kategori pertama (contoh sederhana)
-            if (salesData.length > 0) {
-                salesData[0].stock = Math.max(0, salesData[0].stock + difference);
+            if (currentTotal > 0) {
+                salesData.forEach(item => {
+                    const proportion = item.stock / currentTotal;
+                    const additionalStock = Math.round(difference * proportion);
+                    item.stock = Math.max(0, item.stock + additionalStock);
+                });
+            } else if (difference > 0) {
+                // Jika stok sebelumnya 0, distribusi merata
+                const stockPerCategory = Math.floor(newStock / salesData.length);
+                const remainder = newStock % salesData.length;
+                
+                salesData.forEach((item, index) => {
+                    item.stock = stockPerCategory + (index < remainder ? 1 : 0);
+                });
             }
 
-            // // Update tampilan
-            // calculateStats();
+            // Update tampilan
+            calculateStats();
             
-            // // Tutup modal
-            // closeStockModal();
+            // Tutup modal
+            closeStockModal();
             
-            // // Tampilkan notifikasi
-            // showNotification(`Stok berhasil diupdate menjadi ${newStock} ekor!`);
+            // Tampilkan notifikasi
+            showNotification(`Stok berhasil diupdate menjadi ${newStock} ekor!`);
         }
 
         // Fungsi untuk menampilkan notifikasi
         function showNotification(message) {
-            // Buat elemen notifikasi
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -599,6 +525,7 @@
                 z-index: 1001;
                 transform: translateX(300px);
                 transition: transform 0.3s ease;
+                font-weight: 500;
             `;
             notification.textContent = message;
             
@@ -613,14 +540,11 @@
             setTimeout(() => {
                 notification.style.transform = 'translateX(300px)';
                 setTimeout(() => {
-                    document.body.removeChild(notification);
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
                 }, 300);
             }, 3000);
-        }
-
-        // Fungsi untuk kembali ke halaman utama
-        function goBack() {
-            alert('Kembali ke halaman utama (fungsi belum diimplementasikan).');
         }
 
         // Event listener untuk menutup modal ketika klik di luar
@@ -639,7 +563,7 @@
         });
 
         // Render statistik saat halaman dimuat
-        // calculateStats();
+        calculateStats();
     </script>
 </body>
 </html>
