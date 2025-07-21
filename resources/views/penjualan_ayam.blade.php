@@ -78,6 +78,17 @@
             text-align: center;
         }
 
+        .stock-section.empty {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
         .stock-section h3 {
             font-size: 1.5rem;
             margin-bottom: 15px;
@@ -116,6 +127,11 @@
             margin-bottom: 20px;
         }
 
+        .form-section.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
         .form-section h3 {
             color: #2c3e50;
             margin-bottom: 20px;
@@ -147,6 +163,11 @@
         .form-group select:focus {
             outline: none;
             border-color: #4facfe;
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+            background-color: #fdf2f2;
         }
 
         .form-row {
@@ -227,9 +248,15 @@
             margin-top: 20px;
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .alert {
@@ -237,6 +264,12 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-weight: bold;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .alert-success {
@@ -249,6 +282,67 @@
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* Modal styles for stock empty notification */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content h3 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -280,17 +374,16 @@
         </div>
 
         <div class="content">
-           <a href="/" class="back-btn">← Kembali ke Menu Utama</a>
+            <a href="/" class="back-btn">← Kembali ke Menu Utama</a>
 
             <!-- Stock Section -->
-            <div class="stock-section">
+            <div class="stock-section" id="stock-section">
                 <h3>📊 Stok Ayam Saat Ini</h3>
                 <div class="stock-info">
                     <div class="stock-card">
                         <h4>Total Ayam</h4>
                         <p id="total-ayam">{{ $stokAyam }}</p>
                     </div>
-    
                 </div>
             </div>
 
@@ -298,7 +391,7 @@
             <div id="alert-section"></div>
 
             <!-- Form Section -->
-            <div class="form-section">
+            <div class="form-section" id="form-section">
                 <h3>📝 Form Input Penjualan</h3>
                 <form id="form-penjualan" method="POST" action="{{ route('penjualan.store') }}">
                     @csrf
@@ -318,6 +411,7 @@
                         <div class="form-group">
                             <label for="jumlah_ayam">Jumlah Ayam Dipesan:</label>
                             <input type="number" id="jumlah_ayam" name="jumlah_ayam_dibeli" min="1" placeholder="0" required>
+                            <small id="stock-warning" style="color: #e74c3c; font-size: 0.9rem; display: none;"></small>
                         </div>
                         <div class="form-group">
                             <label for="harga_total">Harga Total:</label>
@@ -365,9 +459,10 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="submit-btn">💾 Simpan Data Penjualan</button>
+                    <button type="submit" class="submit-btn" id="submit-btn">💾 Simpan Data Penjualan</button>
 
                     @csrf
+
                     <input type="hidden" name="berat_total" id="berat_total">
                     <input type="hidden" name="harga_asli" id="harga_asli">
                     <input type="hidden" name="harga_total" id="harga_total_final">
@@ -376,9 +471,18 @@
         </div>
     </div>
 
+    <!-- Modal for Empty Stock -->
+    <div id="empty-stock-modal" class="modal">
+        <div class="modal-content">
+            <h3>⚠️ Stok Habis!</h3>
+            <p>Maaf, stok ayam sudah habis. Silakan tambah stok terlebih dahulu sebelum melakukan penjualan.</p>
+            <button class="modal-btn" onclick="closeModal()">Mengerti</button>
+        </div>
+    </div>
+
     <script>
-        // Data storage
-        let dataAyam = [];
+        // Get stock from server
+        let currentStock = parseInt(document.getElementById('total-ayam').textContent);
 
         // Format currency dengan titik pemisah ribuan
         function formatCurrency(amount) {
@@ -400,19 +504,76 @@
             return parseInt(rupiahString.replace(/[^\d]/g, '')) || 0;
         }
 
-        // Update stock info
-        function updateStockInfo() {
-            const totalAyam = dataAyam.reduce((sum, item) => sum + item.jumlah, 0);
-            const totalBerat = dataAyam.reduce((sum, item) => sum + item.totalBerat, 0);
-            const estimasiNilai = dataAyam.reduce((sum, item) => sum + item.totalAkhir, 0);
+        // Update stock display
+        function updateStockDisplay() {
+            const stockElement = document.getElementById('total-ayam');
+            const stockSection = document.getElementById('stock-section');
+            const formSection = document.getElementById('form-section');
+            
+            stockElement.textContent = currentStock;
+            
+            if (currentStock <= 0) {
+                stockSection.classList.add('empty');
+                formSection.classList.add('disabled');
+                showEmptyStockModal();
+            } else {
+                stockSection.classList.remove('empty');
+                formSection.classList.remove('disabled');
+            }
+        }
 
-            document.getElementById('total-ayam').textContent = totalAyam;
-            document.getElementById('total-berat').textContent = totalBerat.toLocaleString('id-ID') + ' gram';
-            document.getElementById('estimasi-nilai').textContent = formatCurrency(estimasiNilai);
+        // Show empty stock modal
+        function showEmptyStockModal() {
+            document.getElementById('empty-stock-modal').style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('empty-stock-modal').style.display = 'none';
+        }
+
+        // Validate stock
+        function validateStock() {
+            const jumlahInput = document.getElementById('jumlah_ayam');
+            const jumlah = parseInt(jumlahInput.value) || 0;
+            const stockWarning = document.getElementById('stock-warning');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            if (jumlah > currentStock) {
+                jumlahInput.classList.add('error');
+                stockWarning.style.display = 'block';
+                stockWarning.textContent = `❌ Stok tidak mencukupi! Tersedia: ${currentStock} ayam`;
+                submitBtn.disabled = true;
+                showAlert(`Jumlah ayam yang dipesan (${jumlah}) melebihi stok yang tersedia (${currentStock})!`, 'error');
+                return false;
+            } else {
+                jumlahInput.classList.remove('error');
+                stockWarning.style.display = 'none';
+                submitBtn.disabled = false;
+                
+                if (jumlah > 0 && jumlah <= currentStock) {
+                    const remaining = currentStock - jumlah;
+                    if (remaining === 0) {
+                        showAlert(`⚠️ Perhatian: Setelah transaksi ini, stok akan habis!`, 'warning');
+                    } else if (remaining <= 5) {
+                        showAlert(`⚠️ Perhatian: Setelah transaksi ini, stok tersisa ${remaining} ayam`, 'warning');
+                    }
+                }
+                return true;
+            }
         }
 
         // Calculate values
         function calculateValues() {
+            if (!validateStock()) {
+                return {
+                    beratPerAyam: 0,
+                    totalBerat: 0,
+                    nilaiDiskon: 0,
+                    totalAkhir: 0
+                };
+            }
+
             const hargaInput = document.getElementById('harga_total').value;
             const harga = parseRupiah(hargaInput);
             const jumlah = parseInt(document.getElementById('jumlah_ayam').value) || 0;
@@ -420,7 +581,7 @@
 
             // Berat per ayam = harga / 75 (dalam gram)
             const beratPerAyam = harga > 0 ? harga / 75 : 0;
-            const totalBerat = beratPerAyam ;
+            const totalBerat = beratPerAyam;
 
             // Hitung diskon
             const nilaiDiskon = diskon === '1' ? harga * 0.05 : 0;
@@ -447,7 +608,7 @@
             alertSection.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
             setTimeout(() => {
                 alertSection.innerHTML = '';
-            }, 3000);
+            }, 5000);
         }
 
         // Event listeners
@@ -456,42 +617,48 @@
             calculateValues();
         });
 
-        document.getElementById('jumlah_ayam').addEventListener('input', calculateValues);
+        document.getElementById('jumlah_ayam').addEventListener('input', function() {
+            validateStock();
+            calculateValues();
+        });
 
         document.querySelectorAll('input[name="diskon"]').forEach(radio => {
             radio.addEventListener('change', calculateValues);
         });
 
-        // Form submission - Updated to work with both Laravel submission and local storage
+        // Form submission - Keep original Laravel submission intact
         document.getElementById('form-penjualan').addEventListener('submit', function (e) {
-            // Allow Laravel form submission to proceed, but also update local calculations
+            if (!validateStock()) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Keep original Laravel form submission logic
             const calculations = calculateValues();
             const harga = parseRupiah(document.getElementById('harga_total').value);
 
-            // Store data locally for stock display (this won't interfere with Laravel submission)
-            const data = {
-                id: Date.now(),
-                tanggal: document.getElementById('tanggal').value,
-                pembeli: document.getElementById('nama_pembeli').value,
-                jumlah: parseInt(document.getElementById('jumlah_ayam').value),
-                harga: harga,
-                diskon: document.querySelector('input[name="diskon"]:checked').value,
-                beratPerAyam: calculations.beratPerAyam,
-                totalBerat: calculations.totalBerat,
-                nilaiDiskon: calculations.nilaiDiskon,
-                totalAkhir: calculations.totalAkhir
-            };
-
+            // Update hidden fields for Laravel (keep original logic)
             document.getElementById('berat_total').value = calculations.totalBerat;
             document.getElementById('harga_asli').value = harga;
             document.getElementById('harga_total_final').value = calculations.totalAkhir;
+
+            // Don't modify stock here - let Laravel handle it
+            // showAlert added for user feedback only
         });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('empty-stock-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
 
         // Set default date to today
         document.getElementById('tanggal').valueAsDate = new Date();
 
         // Initialize
-        // updateStockInfo();
+        updateStockDisplay();
     </script>
 </body>
 
