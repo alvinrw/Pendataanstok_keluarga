@@ -430,7 +430,7 @@
 
             <div class="stat-card available-stock">
                 <span class="stat-icon">🐔</span>
-                <div class="stat-value" id="availableStock">{{ $stokAyam}}</div>
+                <div class="stat-value" id="availableStock">10</div>
                 <div class="stat-label">Stok Tersedia (Ekor)</div>
                 <button class="update-stock-btn" onclick="openStockModal()">Update Stok</button>
             </div>
@@ -453,7 +453,7 @@
             <div class="modal-body">
                 <div class="current-stock">
                     <div class="current-stock-label">Stok Saat Ini</div>
-                    <div class="current-stock-value" id="currentStockDisplay">{{ $stokAyam}}7</div>
+                    <div class="current-stock-value" id="currentStockDisplay">7</div>
                 </div>
                 <div class="form-group">
                     <label for="newStockInput">Jumlah Stok Baru</label>

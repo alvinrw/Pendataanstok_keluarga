@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PenjualanAyamController;
 use App\Http\Controllers\RekapanAyam;
 use App\Http\Controllers\SummaryAyam;
-use App\Http\Controllers\SummaryAyamController;
+use App\Http\Controllers\SummaryController;
 
 
 
@@ -34,3 +34,6 @@ Route::delete('/penjualan/{id}', [DataPenjualanController::class, 'destroy'])->n
 Route::get('/penjualan/create', [DataPenjualanController::class, 'create'])->name('penjualan.create');
 Route::post('/penjualan', [DataPenjualanController::class, 'store'])->name('penjualan.store');
 Route::get('/',[indexController::class,'index'])->name('index.index');
+
+//summaries
+Route::get('/SummaryAyam', [SummaryController::class, 'index']);

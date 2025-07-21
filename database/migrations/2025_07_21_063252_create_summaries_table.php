@@ -9,13 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('summaries', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+public function up(): void
+{
+    Schema::create('summaries', function (Blueprint $table) {
+        $table->id();
+        $table->integer('stok_ayam'); // tambahkan ini
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

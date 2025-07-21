@@ -8,6 +8,6 @@ class Summary extends Model
 {
     protected $fillable = [
         'stok_ayam',
-        'sisa_stok',
+        
     ];
 }
