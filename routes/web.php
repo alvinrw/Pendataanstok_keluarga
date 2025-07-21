@@ -15,6 +15,7 @@ use App\Http\Controllers\indexController;
 
 
 
+
 Route::get('/penjualan', [DataPenjualanController::class, 'index'])->name('penjualan.index');
 
 
@@ -37,3 +38,5 @@ Route::get('/',[indexController::class,'index'])->name('index.index');
 
 //summaries
 Route::get('/SummaryAyam', [SummaryController::class, 'index']);
+Route::get('/summary', [SummaryController::class, 'index'])->name('summary.index');
+Route::post('/update-stok', [SummaryController::class, 'updateStok'])->name('stok.update');

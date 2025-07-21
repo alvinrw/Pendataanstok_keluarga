@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Summary extends Model
 {
-    protected $fillable = [
-        'stok_ayam',
-        
-    ];
+    protected $table = 'summaries';
+
+    protected $fillable = ['stok_ayam'];
 }

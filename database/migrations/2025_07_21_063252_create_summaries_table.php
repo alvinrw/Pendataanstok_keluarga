@@ -13,7 +13,7 @@ public function up(): void
 {
     Schema::create('summaries', function (Blueprint $table) {
         $table->id();
-        $table->integer('stok_ayam'); // tambahkan ini
+            $table->integer('stok_ayam')->default(0);
         $table->timestamps();
     });
 }

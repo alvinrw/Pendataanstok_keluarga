@@ -325,7 +325,7 @@
 
             <div class="stat-card available-stock">
                 <span class="stat-icon">🐔</span>
-                <div class="stat-value" id="availableStock">87</div>
+                <div class="stat-value" id="availableStock">{{ $stokAyam }}</div>
                 <div class="stat-label">Stok Tersedia (Ekor)</div>
                 <button class="update-stock-btn" onclick="openStockModal()">Update Stok</button>
             </div>
@@ -354,7 +354,7 @@
             <div class="modal-body">
                 <div class="current-stock">
                     <div class="current-stock-label">Stok Saat Ini</div>
-                    <div class="current-stock-value" id="currentStockDisplay">87</div>
+                    <div class="current-stock-value" id="currentStockDisplay">{{ $stokAyam }}</div>
                 </div>
                 <div class="form-group">
                     <label for="newStockInput">Jumlah Stok Baru</label>
@@ -425,30 +425,6 @@
             }).format(amount);
         }
 
-        // Fungsi untuk menghitung total statistik
-        function calculateStats() {
-            const totalSales = salesData.reduce((sum, item) => sum + item.sold, 0);
-            const totalStock = salesData.reduce((sum, item) => sum + item.stock, 0);
-            
-            // Hitung total berat terjual
-            const totalWeight = salesData.reduce((sum, item) => {
-                return sum + (item.sold * item.weight);
-            }, 0);
-            
-            // Hitung total pendapatan
-            const totalRevenue = salesData.reduce((sum, item) => {
-                const itemRevenue = item.sold * item.weight * item.pricePerKg;
-                return sum + itemRevenue;
-            }, 0);
-
-            // Update tampilan
-            document.getElementById('totalSales').textContent = totalSales;
-            document.getElementById('availableStock').textContent = totalStock;
-            document.getElementById('totalWeight').textContent = totalWeight.toFixed(1);
-            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
-            document.getElementById('currentStockDisplay').textContent = totalStock;
-        }
-
         // Fungsi untuk membuka modal
         function openStockModal() {
             const modal = document.getElementById('stockModal');
@@ -474,40 +450,29 @@
         // Fungsi untuk memperbarui stok
         function updateStock() {
             const newStock = parseInt(document.getElementById('newStockInput').value);
-            
+
             if (isNaN(newStock) || newStock < 0) {
-                alert('Masukkan jumlah stok yang valid (minimal 0).');
+                alert('Masukkan jumlah stok yang valid');
                 return;
             }
 
-            // Update total stok (distribusi proporsional ke semua kategori)
-            const currentTotal = salesData.reduce((sum, item) => sum + item.stock, 0);
-            const difference = newStock - currentTotal;
-            
-            if (currentTotal > 0) {
-                salesData.forEach(item => {
-                    const proportion = item.stock / currentTotal;
-                    const additionalStock = Math.round(difference * proportion);
-                    item.stock = Math.max(0, item.stock + additionalStock);
-                });
-            } else if (difference > 0) {
-                // Jika stok sebelumnya 0, distribusi merata
-                const stockPerCategory = Math.floor(newStock / salesData.length);
-                const remainder = newStock % salesData.length;
-                
-                salesData.forEach((item, index) => {
-                    item.stock = stockPerCategory + (index < remainder ? 1 : 0);
-                });
-            }
-
-            // Update tampilan
-            calculateStats();
-            
-            // Tutup modal
-            closeStockModal();
-            
-            // Tampilkan notifikasi
-            showNotification(`Stok berhasil diupdate menjadi ${newStock} ekor!`);
+            fetch('/update-stok', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ stok_ayam: newStock })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('availableStock').textContent = data.stok_ayam;
+                    document.getElementById('currentStockDisplay').textContent = data.stok_ayam;
+                    closeStockModal();
+                    showNotification(`Stok berhasil diupdate menjadi ${data.stok_ayam} ekor!`);
+                }
+            });
         }
 
         // Fungsi untuk menampilkan notifikasi
@@ -563,7 +528,7 @@
         });
 
         // Render statistik saat halaman dimuat
-        calculateStats();
+        // calculateStats();
     </script>
 </body>
 </html>
