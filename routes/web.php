@@ -14,9 +14,16 @@ use App\Http\Controllers\DataPenjualanController;
 use App\Http\Controllers\indexController;
 
 
+use App\Http\Controllers\PenjualanTokoController;
+
+Route::get('/PenjualanToko/input', [PenjualanTokoController::class, 'create'])->name('penjualanToko.form');
+Route::post('/PenjualanToko/store', [PenjualanTokoController::class, 'store'])->name('penjualanToko.store');
 
 
 Route::get('/penjualan', [DataPenjualanController::class, 'index'])->name('penjualan.index');
+
+
+Route::get('/RekapanPenjualanToko', [PenjualanTokoController::class, 'rekapan'])->name('penjualanToko.rekapan');
 
 
 // Buat route baru untuk form input

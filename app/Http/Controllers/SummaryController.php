@@ -19,11 +19,22 @@ class SummaryController extends Controller
 public function index()
 {
     $summaries = Summary::all();
-    $summary = Summary::latest()->first(); // Tambahkan ini
-    $stokAyam = $summary ? $summary->stok_ayam : 0;
+    $summary = Summary::latest()->first(); // Ambil data summary terbaru
 
-    return view('SummaryAyam', compact('summaries', 'stokAyam'));   
+    $stokAyam = $summary ? $summary->stok_ayam : 0;
+    $totalAyamTerjual = $summary ? $summary->total_ayam_terjual : 0;
+    $totalBeratTertimbang = $summary ? $summary->total_berat_tertimbang : 0;
+    $totalPemasukan = $summary ? $summary->total_pemasukan : 0;
+
+    return view('SummaryAyam', compact(
+        'summaries',
+        'stokAyam',
+        'totalAyamTerjual',
+        'totalBeratTertimbang',
+        'totalPemasukan'
+    ));
 }
+
 
 
     public function updateStok(Request $request)

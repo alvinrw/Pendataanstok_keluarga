@@ -319,7 +319,7 @@
         <div class="stats-grid">
             <div class="stat-card total-sales">
                 <span class="stat-icon">📊</span>
-                <div class="stat-value" id="totalSales">125</div>
+                <div class="stat-value" id="totalSales">{{ $totalAyamTerjual }}</div>
                 <div class="stat-label">Total Stok Terjual (Ekor)</div>
             </div>
 
@@ -332,13 +332,13 @@
 
             <div class="stat-card total-weight">
                 <span class="stat-icon">⚖️</span>
-                <div class="stat-value" id="totalWeight">104.5</div>
+                <div class="stat-value" id="totalWeight">{{ number_format($totalBeratTertimbang / 1000, 2) }}</div>
                 <div class="stat-label">Total Berat Terjual (Kg)</div>
             </div>
 
             <div class="stat-card total-revenue">
                 <span class="stat-icon">💰</span>
-                <div class="stat-value" id="totalRevenue">Rp 3.675.000</div>
+                <div class="stat-value" id="totalRevenue">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</div>
                 <div class="stat-label">Total Uang Terkumpul</div>
             </div>
         </div>

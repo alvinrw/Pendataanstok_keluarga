@@ -140,7 +140,8 @@
 
         <div id="tokoOptions" class="options">
             <h2>Data Penjualan Toko</h2>
-            <button class="nav-btn" onclick="goToPage('input-toko')">📊 Input Data Penjualan Toko</button>
+        <a href="{{ route('penjualanToko.form') }}" class="nav-btn">📊 Input Data Penjualan Toko</a>
+
             <button class="nav-btn" onclick="goToPage('rekap-toko')">📈 Rekapan Penjualan Toko</button>
             <button class="nav-btn" onclick="showSummary('toko')">📊 Summary Penjualan Toko</button>
             <div id="tokoSummary" style="display:none; margin-top: 20px;">
