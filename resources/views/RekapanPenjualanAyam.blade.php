@@ -459,19 +459,19 @@
                     <div class="stock-card total-ayam">
                         <div class="icon">🐔</div>
                         <h4>Total Ayam</h4>
-                        <p id="total-ayam">0</p>
+                        <p id="total-ayam">{{ $summary->total_ayam_terjual ?? 0 }}</p>
                         <div class="subtitle">Ekor ayam tersedia</div>
                     </div>
                     <div class="stock-card total-berat">
                         <div class="icon">⚖️</div>
                         <h4>Total Berat</h4>
-                        <p id="total-berat">0 gram</p>
+                        <p id="total-berat">{{ number_format($summary->total_berat_tertimbang ?? 0) }} gram</p>
                         <div class="subtitle">Gram total berat</div>
                     </div>
                     <div class="stock-card estimasi-nilai">
                         <div class="icon">💰</div>
                         <h4>Estimasi Nilai</h4>
-                        <p id="estimasi-nilai">Rp 0</p>
+                        <p id="estimasi-nilai">Rp {{ number_format($summary->total_pemasukan ?? 0, 0, ',', '.') }}</p>
                         <div class="subtitle">Nilai estimasi stok</div>
                     </div>
                 </div>
