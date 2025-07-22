@@ -73,4 +73,11 @@ public function rekapan()
     return view('RekapanToko', compact('dataToko'));
 }
 
+public function index()
+{
+    $dataToko = PenjualanToko::all(); // Ganti dengan model yang kamu pakai
+    return view('RekapanToko', compact('dataToko')); // Ganti nama view jika perlu
+}
+
+
 }

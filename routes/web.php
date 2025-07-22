@@ -21,6 +21,7 @@ Route::post('/PenjualanToko/store', [PenjualanTokoController::class, 'store'])->
 Route::get('/penjualan/{id}/edit', [PenjualanTokoController::class, 'edit'])->name('penjualanToko.edit');
 Route::put('/penjualan-toko/{id}', [PenjualanTokoController::class, 'update'])->name('penjualanToko.update');
 Route::delete('/penjualan-toko/{id}', [PenjualanTokoController::class, 'destroy'])->name('penjualanToko.destroy');
+Route::get('/penjualan-toko', [PenjualanTokoController::class, 'index'])->name('penjualanToko.index');
 
 
 Route::get('/penjualan', [DataPenjualanController::class, 'index'])->name('penjualan.index');
