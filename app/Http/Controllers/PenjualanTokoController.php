@@ -7,32 +7,53 @@ use App\Models\PenjualanToko;
 
 class PenjualanTokoController extends Controller
 {
-       public function create()
+    // ... (metode create dan store Anda sudah cukup baik)
+    public function store(Request $request)
     {
-        return view('InputDataToko');
+        $validated = $request->validate([
+            'tanggal' => 'required|date',
+            'total_harga' => 'required|numeric', // Cukup numeric karena JS sudah mengirim angka
+            'catatan' => 'nullable|string'
+        ]);
+
+        $created = PenjualanToko::create($validated);
+
+        // Selalu kembalikan JSON untuk AJAX
+        return response()->json([
+            'message' => 'Data berhasil disimpan',
+            'data' => $created
+        ]);
+    }
+    
+    // ... (metode edit tidak perlu diubah, sudah benar)
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'tanggal' => 'required|date',
+            'total_harga' => 'required|numeric',
+            'catatan' => 'nullable|string',
+        ]);
+
+        $data = PenjualanToko::findOrFail($id);
+        $data->update($validated);
+
+        // GANTI redirect() DENGAN response()->json()
+        return response()->json(['message' => 'Data berhasil diupdate.']);
     }
 
-    public function store(Request $request)
-{
-    $validated = $request->validate([
-        'tanggal' => 'required|date',
-        'total_harga' => 'required|string',
-        'catatan' => 'nullable|string'
-    ]);
+    public function destroy($id)
+    {
+        $data = PenjualanToko::findOrFail($id);
+        $data->delete();
 
-    // parsing "Rp ..." ke int
-    $validated['total_harga'] = (int) preg_replace('/[^\d]/', '', $validated['total_harga']);
+        // GANTI redirect() DENGAN response()->json()
+        return response()->json(['message' => 'Data berhasil dihapus.']);
+    }
 
-    PenjualanToko::create($validated);
-
-    return redirect()->back()->with('success', 'Data berhasil disimpan.');
-}
-
-public function rekapan()
-{
-    $dataToko = PenjualanToko::orderBy('tanggal', 'desc')->get();
-
-    return view('rekapan_penjualan_toko', compact('dataToko'));
-}
-
+    public function rekapan()
+    {
+        $dataToko = PenjualanToko::orderBy('tanggal', 'desc')->get();
+        return view('RekapanToko', compact('dataToko'));
+    }
 }

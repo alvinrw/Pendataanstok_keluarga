@@ -278,21 +278,23 @@
                 <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
             
-            <form id="saleForm">
+           <form id="saleForm" method="POST" action="{{ route('penjualanToko.store') }}">
+    @csrf
+
                 <input type="hidden" id="sale-id">
                 <div class="form-group">
                     <label for="modal-tanggal">Tanggal:</label>
-                    <input type="date" id="modal-tanggal" required>
+                    <input type="date" id="modal-tanggal" name="tanggal" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="modal-total">Total Harga (Rp):</label>
-                    <input type="number" id="modal-total" placeholder="Contoh: 50000" min="0" required>
+                  <input type="number" id="modal-total" name="total_harga" placeholder="Contoh: 50000" min="0" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="modal-catatan">Catatan:</label>
-                    <textarea id="modal-catatan" placeholder="Contoh: Pembelian 2 buku dan 1 pensil"></textarea>
+                   <textarea id="modal-catatan" name="catatan" placeholder="Contoh: Pembelian 2 buku dan 1 pensil"></textarea>
                 </div>
                 
                 <div class="modal-buttons">
@@ -304,104 +306,129 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSalesData();
-            populateTable();
-        });
-
-        let salesData = [];
         const modal = document.getElementById('saleModal');
         const saleForm = document.getElementById('saleForm');
 
+        // KESALAHAN 2: Memperbaiki inisialisasi data.
+        // Data diambil dari variabel PHP/Laravel dan langsung dijadikan sebagai sumber data utama.
+        // Pastikan file ini adalah .blade.php dan variabel $dataToko sudah dikirim dari Controller.
+        let salesData = @json($dataToko ?? []);
+
+        // Menjalankan fungsi populateTable() saat halaman selesai dimuat.
+        document.addEventListener('DOMContentLoaded', populateTable);
+
         // --- Fungsi Modal ---
-        function openAddModal() {
-            saleForm.reset();
-            document.getElementById('modal-title').textContent = 'Tambah Transaksi Baru';
-            document.getElementById('sale-id').value = '';
-            document.getElementById('modal-tanggal').valueAsDate = new Date();
-            modal.style.display = 'block';
-        }
+function openAddModal() {
+    saleForm.reset();
+    document.getElementById('modal-title').textContent = 'Tambah Transaksi Baru';
+    document.getElementById('sale-id').value = '';
+    document.getElementById('modal-tanggal').valueAsDate = new Date();
+
+    saleForm.action = `{{ route('penjualanToko.store') }}`; // atau "/penjualan-toko"
+    
+    // Hapus _method lama kalau ada
+    const existingMethod = document.getElementById('method-field');
+    if (existingMethod) existingMethod.remove();
+
+    modal.style.display = 'block';
+}
+
 
         function closeModal() {
             modal.style.display = 'none';
         }
         
-        function editItem(id) {
-            const itemToEdit = salesData.find(item => item.id === id);
-            if (!itemToEdit) return;
-
-            document.getElementById('modal-title').textContent = 'Edit Transaksi';
-            document.getElementById('sale-id').value = itemToEdit.id;
-            document.getElementById('modal-tanggal').value = itemToEdit.tanggal;
-            document.getElementById('modal-total').value = itemToEdit.total;
-            document.getElementById('modal-catatan').value = itemToEdit.catatan;
-
-            modal.style.display = 'block';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-
-        // --- Fungsi Data (CRUD & Local Storage) ---
-        function loadSalesData() {
-            const data = localStorage.getItem('salesData');
-            salesData = data ? JSON.parse(data) : [];
-        }
-
-        function saveSalesData() {
-            localStorage.setItem('salesData', JSON.stringify(salesData));
-        }
         
-        saleForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const saleId = document.getElementById('sale-id').value;
 
-            const sale = {
-                id: saleId ? parseInt(saleId) : Date.now(), // Gunakan ID lama atau buat ID baru
-                tanggal: document.getElementById('modal-tanggal').value,
-                total: parseInt(document.getElementById('modal-total').value),
-                catatan: document.getElementById('modal-catatan').value.trim()
-            };
+function editItem(id) {
+    const itemToEdit = salesData.find(item => item.id == id);
+    if (!itemToEdit) return;
 
-            const existingIndex = salesData.findIndex(item => item.id == sale.id);
+    document.getElementById('modal-title').textContent = 'Edit Transaksi';
+    document.getElementById('sale-id').value = itemToEdit.id;
+    document.getElementById('modal-tanggal').value = itemToEdit.tanggal;
+    document.getElementById('modal-total').value = itemToEdit.total_harga;
+    document.getElementById('modal-catatan').value = itemToEdit.catatan;
 
-            if (existingIndex > -1) {
-                // Update data yang ada
-                salesData[existingIndex] = sale;
-            } else {
-                // Tambah data baru
-                salesData.push(sale);
-            }
-            
-            // Urutkan data berdasarkan tanggal terbaru
-            salesData.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    // PERBAIKI PATH URL di sini
+    saleForm.action = `/penjualan-toko/${itemToEdit.id}`; 
 
-            saveSalesData();
-            populateTable();
-            closeModal();
+    // ... sisa kodenya sudah benar ...
+    let methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'PUT';
+    methodInput.id = 'method-field';
+    
+    const existingMethod = document.getElementById('method-field');
+    if (existingMethod) existingMethod.remove();
+    
+    saleForm.appendChild(methodInput);
+    modal.style.display = 'block';
+}
+
+        // --- Fungsi Logika Data (Hubungkan ke Backend Anda) ---
+saleForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(saleForm);
+    const action = saleForm.action;
+    const method = formData.get('_method') || 'POST';
+
+    try {
+        const response = await fetch(action, {
+            method: method,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: formData
         });
 
-        function deleteItem(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                salesData = salesData.filter(item => item.id !== id);
-                saveSalesData();
-                populateTable();
+        if (!response.ok) throw new Error('Gagal menyimpan data.');
+
+        const data = await response.json();
+        alert('✅ Data berhasil disimpan');
+        window.location.reload(); // reload biar data sinkron
+    } catch (error) {
+        console.error(error);
+        alert('❌ Terjadi kesalahan saat menyimpan data.');
+    }
+});
+
+
+
+async function deleteItem(id) {
+    if (!confirm('Yakin ingin menghapus data ini?')) return;
+
+    try {
+        // PERBAIKI PATH URL di sini
+        const response = await fetch(`/penjualan-toko/${id}`, { 
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
             }
-        }
+        });
+
+        if (!response.ok) throw new Error('Gagal menghapus data');
+
+        alert('✅ Data berhasil dihapus');
+        window.location.reload();
+    } catch (error) {
+        console.error(error);
+        alert('❌ Terjadi kesalahan saat menghapus data.');
+    }
+}
+
 
         // --- Fungsi Tampilan ---
         function populateTable() {
             const tableBody = document.getElementById('table-body');
             tableBody.innerHTML = '';
 
-            if (salesData.length === 0) {
+            if (!salesData || salesData.length === 0) {
                 tableBody.innerHTML = `
                     <tr class="no-data-row">
-                        <td colspan="5">Belum ada data penjualan. Silakan tambah transaksi baru.</td>
+                        <td colspan="5">Belum ada data penjualan.</td>
                     </tr>
                 `;
                 return;
@@ -412,7 +439,7 @@
                     <tr>
                         <td>${index + 1}</td>
                         <td>${formatDate(item.tanggal)}</td>
-                        <td>${formatCurrency(item.total)}</td>
+                        <td>${formatCurrency(item.total_harga)}</td>
                         <td>${item.catatan || '-'}</td>
                         <td>
                             <button class="btn action-btn btn-edit" onclick="editItem(${item.id})">✏️ Edit</button>
@@ -426,10 +453,13 @@
 
         // --- Fungsi Utilitas ---
         function formatCurrency(amount) {
-            return 'Rp ' + amount.toLocaleString('id-ID');
+            // Tambahkan pengecekan jika amount bukan angka
+            if (isNaN(amount)) return 'Rp 0';
+            return 'Rp ' + Number(amount).toLocaleString('id-ID');
         }
         
         function formatDate(dateString) {
+            if (!dateString) return '-';
             const date = new Date(dateString);
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
             return date.toLocaleDateString('id-ID', options);
