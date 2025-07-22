@@ -39,6 +39,7 @@ Route::post('/penjualan/store', [DataPenjualanController::class, 'store'])->name
 
 
 Route::get('/RekapanPenjualanAyam', [DataPenjualanController::class, 'rekapan'])->name('penjualan.rekapan');
+Route::delete('/RekapanPenjualanAyam/{id}', [DataPenjualanController::class, 'destroy'])->name('penjualan.destroy');
 
 
 

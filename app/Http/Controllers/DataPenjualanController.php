@@ -19,12 +19,6 @@ class DataPenjualanController extends Controller
 
     }
 
- 
-
-
-// 
-
-
 public function updateSummary()
 {
     $totalAyam = DataPenjualan::sum('jumlah_ayam_dibeli');
@@ -90,20 +84,43 @@ public function store(Request $request)
     return redirect()->route('penjualan.index')->with('success', 'Data penjualan berhasil disimpan dan summary diperbarui!');
 }
 
-    public function destroy($id)
+public function destroy($id)
 {
     $data = DataPenjualan::findOrFail($id);
+
+    // Ambil data jumlah ayam yang akan dihapus
+    $jumlahAyam = $data->jumlah_ayam_dibeli;
+
+    // Tambahkan kembali stok ayam
+    $latestSummary = Summary::latest()->first();
+    if ($latestSummary) {
+        $latestSummary->stok_ayam += $jumlahAyam;
+        $latestSummary->save();
+    }
+
+    // Hapus data penjualan
     $data->delete();
 
-    return redirect()->route('penjualan.index')->with('success', 'Data berhasil dihapus.');
+    // Update summary
+    $this->updateSummary();
+
+    return redirect()->route('penjualan.rekapan')->with('success', 'Data berhasil dihapus dari rekapan.');
 }
 
 
 
-    public function rekapan()
+public function rekapan()
 {
     $data = DataPenjualan::all(); // Ambil semua data penjualan
-    return view('RekapanPenjualanAyam', compact('data'));
+
+    // Hitung summary dan kirim ke view
+    $summary = (object) [
+        'total_ayam_terjual' => $data->sum('jumlah_ayam_dibeli'),
+        'total_berat_tertimbang' => $data->sum('berat_total'),
+        'total_pemasukan' => $data->sum('harga_total'),
+    ];
+
+    return view('RekapanPenjualanAyam', compact('data', 'summary'));
 }
 
 }

@@ -537,13 +537,19 @@
     <td>{{ $item->diskon ? 'Ya' : 'Tidak' }}</td>
     <td>Rp {{ number_format($item->harga_total, 0, ',', '.') }}</td>
     <td>
-        <form method="POST" action="#" onsubmit="return confirmDelete(this)">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn-delete">🗑️ Hapus</button>
-        </form>
+        @if (!empty($item->id))
+            <form action="{{ route('penjualan.destroy', $item->id) }}" method="POST" style="display: inline;">
+                @csrf
+                @method('DELETE')
+<button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(this.form)">Hapus</button>
+
+            </form>
+        @else
+            <span class="text-danger">ID Data Hilang</span>
+        @endif
     </td>
 </tr>
+
 @endforeach
 
 
