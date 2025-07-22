@@ -144,7 +144,7 @@
 
 <a href="{{ route('penjualanToko.rekapan') }}" class="nav-btn">📈 Rekapan Penjualan Toko</a>
 
-            <button class="nav-btn" onclick="showSummary('toko')">📊 Summary Penjualan Toko</button>
+     
             <div id="tokoSummary" style="display:none; margin-top: 20px;">
                 <p>Summary Penjualan Toko: [Summary Data]</p>
             </div>

@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -68,8 +68,8 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        .btn-add {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        .btn-back {
+            background: linear-gradient(135deg, #6c5ce7 0%, #5a4fcf 100%);
             margin-bottom: 25px;
         }
         
@@ -93,6 +93,88 @@
         
         .btn-cancel {
             background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .filter-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            padding: 10px 20px;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            padding: 10px 20px;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .summary-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .summary-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .summary-info {
+            margin-top: 10px;
+            opacity: 0.9;
+            font-size: 0.9rem;
         }
 
         .table-section {
@@ -238,18 +320,54 @@
             justify-content: flex-end;
             margin-top: 30px;
         }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="header">
-            <h1>🏪 Laporan Penjualan Sederhana</h1>
-            <p>Catat setiap transaksi dengan mudah</p>
+            <h1>📊 Laporan Penjualan Toko</h1>
+            <p>Analisis data penjualan dengan filter tanggal</p>
         </div>
 
         <div class="content">
-            <button class="btn btn-add" onclick="openAddModal()">➕ Tambah Transaksi</button>
+            <a href="/" class="btn btn-back">🏠 Kembali ke Halaman Utama</a>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="start-date">Tanggal Mulai:</label>
+                        <input type="date" id="start-date">
+                    </div>
+                    <div class="filter-group">
+                        <label for="end-date">Tanggal Akhir:</label>
+                        <input type="date" id="end-date">
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="btn btn-filter" onclick="applyFilter()">🔍 Filter</button>
+                        <button class="btn btn-reset" onclick="resetFilter()">🔄 Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary-section" id="summary-section">
+                <h3>💰 Total Akumulasi</h3>
+                <div class="summary-amount" id="total-amount">Rp 0</div>
+                <div class="summary-info" id="summary-info">Dari seluruh data</div>
+            </div>
             
             <div class="table-section">
                 <div class="table-container">
@@ -264,7 +382,7 @@
                             </tr>
                         </thead>
                         <tbody id="table-body">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -274,11 +392,11 @@
     <div id="saleModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modal-title">Tambah Transaksi Baru</h2>
+                <h2 id="modal-title">Edit Transaksi</h2>
                 <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
             
-           <form id="saleForm" method="POST" action="{{ route('penjualanToko.store') }}">
+           <form id="saleForm" method="POST">
     @csrf
 
                 <input type="hidden" id="sale-id">
@@ -309,113 +427,149 @@
         const modal = document.getElementById('saleModal');
         const saleForm = document.getElementById('saleForm');
 
-        // KESALAHAN 2: Memperbaiki inisialisasi data.
-        // Data diambil dari variabel PHP/Laravel dan langsung dijadikan sebagai sumber data utama.
-        // Pastikan file ini adalah .blade.php dan variabel $dataToko sudah dikirim dari Controller.
+        // Data dari backend Laravel
         let salesData = @json($dataToko ?? []);
+        let filteredData = [...salesData]; // Copy untuk data yang difilter
 
-        // Menjalankan fungsi populateTable() saat halaman selesai dimuat.
-        document.addEventListener('DOMContentLoaded', populateTable);
+        // Menjalankan fungsi saat halaman selesai dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            populateTable();
+            updateSummary();
+        });
+
+        // --- Fungsi Filter ---
+        function applyFilter() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (!startDate && !endDate) {
+                alert('Pilih minimal satu tanggal untuk filter');
+                return;
+            }
+
+            filteredData = salesData.filter(item => {
+                const itemDate = new Date(item.tanggal);
+                const start = startDate ? new Date(startDate) : new Date('1900-01-01');
+                const end = endDate ? new Date(endDate) : new Date('2100-12-31');
+                
+                return itemDate >= start && itemDate <= end;
+            });
+
+            populateTable();
+            updateSummary();
+        }
+
+        function resetFilter() {
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+            filteredData = [...salesData];
+            populateTable();
+            updateSummary();
+        }
+
+        // --- Fungsi Summary ---
+        function updateSummary() {
+            const total = filteredData.reduce((sum, item) => sum + parseFloat(item.total_harga || 0), 0);
+            const count = filteredData.length;
+            
+            document.getElementById('total-amount').textContent = formatCurrency(total);
+            
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            let info = '';
+            if (startDate || endDate) {
+                if (startDate && endDate) {
+                    info = `Dari ${formatDateShort(startDate)} s/d ${formatDateShort(endDate)} (${count} transaksi)`;
+                } else if (startDate) {
+                    info = `Dari ${formatDateShort(startDate)} ke atas (${count} transaksi)`;
+                } else {
+                    info = `Sampai ${formatDateShort(endDate)} (${count} transaksi)`;
+                }
+            } else {
+                info = `Dari seluruh data (${count} transaksi)`;
+            }
+            
+            document.getElementById('summary-info').textContent = info;
+        }
 
         // --- Fungsi Modal ---
-function openAddModal() {
-    saleForm.reset();
-    document.getElementById('modal-title').textContent = 'Tambah Transaksi Baru';
-    document.getElementById('sale-id').value = '';
-    document.getElementById('modal-tanggal').valueAsDate = new Date();
-
-    saleForm.action = `{{ route('penjualanToko.store') }}`; // atau "/penjualan-toko"
-    
-    // Hapus _method lama kalau ada
-    const existingMethod = document.getElementById('method-field');
-    if (existingMethod) existingMethod.remove();
-
-    modal.style.display = 'block';
-}
-
-
         function closeModal() {
             modal.style.display = 'none';
         }
-        
-        
 
-function editItem(id) {
-    const itemToEdit = salesData.find(item => item.id == id);
-    if (!itemToEdit) return;
+        function editItem(id) {
+            const itemToEdit = salesData.find(item => item.id == id);
+            if (!itemToEdit) return;
 
-    document.getElementById('modal-title').textContent = 'Edit Transaksi';
-    document.getElementById('sale-id').value = itemToEdit.id;
-    document.getElementById('modal-tanggal').value = itemToEdit.tanggal;
-    document.getElementById('modal-total').value = itemToEdit.total_harga;
-    document.getElementById('modal-catatan').value = itemToEdit.catatan;
+            document.getElementById('modal-title').textContent = 'Edit Transaksi';
+            document.getElementById('sale-id').value = itemToEdit.id;
+            document.getElementById('modal-tanggal').value = itemToEdit.tanggal;
+            document.getElementById('modal-total').value = itemToEdit.total_harga;
+            document.getElementById('modal-catatan').value = itemToEdit.catatan;
 
-    // Ganti method form jadi PUT (spoofing Laravel)
-   saleForm.action = `/penjualan-toko/${itemToEdit.id}`; // ✅ sudah sesuai
+            // Set form action untuk edit
+           saleForm.action = `/penjualan-toko/${itemToEdit.id}`;
+            
+            let methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'PUT';
+            methodInput.id = 'method-field';
+            
+            // Hapus _method lama kalau ada
+            const existingMethod = document.getElementById('method-field');
+            if (existingMethod) existingMethod.remove();
+            
+            saleForm.appendChild(methodInput);
 
-    
-    let methodInput = document.createElement('input');
-    methodInput.type = 'hidden';
-    methodInput.name = '_method';
-    methodInput.value = 'PUT';
-    methodInput.id = 'method-field';
-    
-    // Hapus _method lama kalau ada
-    const existingMethod = document.getElementById('method-field');
-    if (existingMethod) existingMethod.remove();
-    
-    saleForm.appendChild(methodInput);
-
-    modal.style.display = 'block';
-}
-
-
-
-
-function deleteItem(id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
-
-    fetch(`/penjualan-toko/${id}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ _method: 'DELETE' })
-    })
-    .then(response => {
-        if (response.ok) {
-            // Hapus item dari array salesData
-            salesData = salesData.filter(item => item.id !== id);
-            // Refresh tabel
-            populateTable();
-        } else {
-            alert('Gagal menghapus data.');
+            modal.style.display = 'block';
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan saat menghapus.');
-    });
-}
 
+        function deleteItem(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
 
+            fetch(`/penjualan-toko/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ _method: 'DELETE' })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Hapus item dari array salesData
+                    salesData = salesData.filter(item => item.id !== id);
+                    filteredData = filteredData.filter(item => item.id !== id);
+                    // Refresh tabel dan summary
+                    populateTable();
+                    updateSummary();
+                } else {
+                    alert('Gagal menghapus data.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menghapus.');
+            });
+        }
 
         // --- Fungsi Tampilan ---
         function populateTable() {
             const tableBody = document.getElementById('table-body');
             tableBody.innerHTML = '';
 
-            if (!salesData || salesData.length === 0) {
+            if (!filteredData || filteredData.length === 0) {
                 tableBody.innerHTML = `
                     <tr class="no-data-row">
-                        <td colspan="5">Belum ada data penjualan.</td>
+                        <td colspan="5">Tidak ada data yang sesuai dengan filter.</td>
                     </tr>
                 `;
                 return;
             }
 
-            salesData.forEach((item, index) => {
+            filteredData.forEach((item, index) => {
                 const row = `
                     <tr>
                         <td>${index + 1}</td>
@@ -434,7 +588,6 @@ function deleteItem(id) {
 
         // --- Fungsi Utilitas ---
         function formatCurrency(amount) {
-            // Tambahkan pengecekan jika amount bukan angka
             if (isNaN(amount)) return 'Rp 0';
             return 'Rp ' + Number(amount).toLocaleString('id-ID');
         }
@@ -443,6 +596,13 @@ function deleteItem(id) {
             if (!dateString) return '-';
             const date = new Date(dateString);
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            return date.toLocaleDateString('id-ID', options);
+        }
+
+        function formatDateShort(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
             return date.toLocaleDateString('id-ID', options);
         }
     </script>
