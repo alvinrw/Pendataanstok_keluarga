@@ -16,12 +16,12 @@ use App\Http\Controllers\indexController;
 
 use App\Http\Controllers\PenjualanTokoController;
 
-// Route BARU & BENAR untuk PenjualanTokoController
-Route::get('/penjualan-toko', [PenjualanTokoController::class, 'rekapan'])->name('penjualanToko.rekapan');
-Route::post('/penjualan-toko', [PenjualanTokoController::class, 'store'])->name('penjualanToko.store');
+Route::get('/PenjualanToko/input', [PenjualanTokoController::class, 'create'])->name('penjualanToko.form');
+Route::post('/PenjualanToko/store', [PenjualanTokoController::class, 'store'])->name('penjualanToko.store');
+Route::get('/penjualan/{id}/edit', [PenjualanTokoController::class, 'edit'])->name('penjualanToko.edit');
 Route::put('/penjualan-toko/{id}', [PenjualanTokoController::class, 'update'])->name('penjualanToko.update');
 Route::delete('/penjualan-toko/{id}', [PenjualanTokoController::class, 'destroy'])->name('penjualanToko.destroy');
-// Route lainnya biarkan saja
+
 
 Route::get('/penjualan', [DataPenjualanController::class, 'index'])->name('penjualan.index');
 
@@ -39,7 +39,6 @@ Route::post('/penjualan/store', [DataPenjualanController::class, 'store'])->name
 
 Route::get('/RekapanPenjualanAyam', [DataPenjualanController::class, 'rekapan'])->name('penjualan.rekapan');
 
-Route::delete('/penjualan/{id}', [DataPenjualanController::class, 'destroy'])->name('penjualan.destroy');
 
 
 Route::get('/penjualan/create', [DataPenjualanController::class, 'create'])->name('penjualan.create');

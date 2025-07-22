@@ -350,74 +350,55 @@ function editItem(id) {
     document.getElementById('modal-total').value = itemToEdit.total_harga;
     document.getElementById('modal-catatan').value = itemToEdit.catatan;
 
-    // PERBAIKI PATH URL di sini
-    saleForm.action = `/penjualan-toko/${itemToEdit.id}`; 
+    // Ganti method form jadi PUT (spoofing Laravel)
+   saleForm.action = `/penjualan-toko/${itemToEdit.id}`; // ✅ sudah sesuai
 
-    // ... sisa kodenya sudah benar ...
+    
     let methodInput = document.createElement('input');
     methodInput.type = 'hidden';
     methodInput.name = '_method';
     methodInput.value = 'PUT';
     methodInput.id = 'method-field';
     
+    // Hapus _method lama kalau ada
     const existingMethod = document.getElementById('method-field');
     if (existingMethod) existingMethod.remove();
     
     saleForm.appendChild(methodInput);
+
     modal.style.display = 'block';
 }
 
-        // --- Fungsi Logika Data (Hubungkan ke Backend Anda) ---
-saleForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(saleForm);
-    const action = saleForm.action;
-    const method = formData.get('_method') || 'POST';
-
-    try {
-        const response = await fetch(action, {
-            method: method,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: formData
-        });
-
-        if (!response.ok) throw new Error('Gagal menyimpan data.');
-
-        const data = await response.json();
-        alert('✅ Data berhasil disimpan');
-        window.location.reload(); // reload biar data sinkron
-    } catch (error) {
-        console.error(error);
-        alert('❌ Terjadi kesalahan saat menyimpan data.');
-    }
-});
 
 
 
-async function deleteItem(id) {
-    if (!confirm('Yakin ingin menghapus data ini?')) return;
+function deleteItem(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
 
-    try {
-        // PERBAIKI PATH URL di sini
-        const response = await fetch(`/penjualan-toko/${id}`, { 
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        });
-
-        if (!response.ok) throw new Error('Gagal menghapus data');
-
-        alert('✅ Data berhasil dihapus');
-        window.location.reload();
-    } catch (error) {
-        console.error(error);
-        alert('❌ Terjadi kesalahan saat menghapus data.');
-    }
+    fetch(`/penjualan-toko/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ _method: 'DELETE' })
+    })
+    .then(response => {
+        if (response.ok) {
+            // Hapus item dari array salesData
+            salesData = salesData.filter(item => item.id !== id);
+            // Refresh tabel
+            populateTable();
+        } else {
+            alert('Gagal menghapus data.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menghapus.');
+    });
 }
+
 
 
         // --- Fungsi Tampilan ---

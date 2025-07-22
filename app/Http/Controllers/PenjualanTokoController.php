@@ -7,53 +7,70 @@ use App\Models\PenjualanToko;
 
 class PenjualanTokoController extends Controller
 {
-    // ... (metode create dan store Anda sudah cukup baik)
-    public function store(Request $request)
+       public function create()
     {
-        $validated = $request->validate([
-            'tanggal' => 'required|date',
-            'total_harga' => 'required|numeric', // Cukup numeric karena JS sudah mengirim angka
-            'catatan' => 'nullable|string'
-        ]);
+        return view('InputDataToko');
+    }
 
-        $created = PenjualanToko::create($validated);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'tanggal' => 'required|date',
+        'total_harga' => 'required|string',
+        'catatan' => 'nullable|string'
+    ]);
 
-        // Selalu kembalikan JSON untuk AJAX
+    // parsing "Rp ..." ke int
+    $validated['total_harga'] = (int) preg_replace('/[^\d]/', '', $validated['total_harga']);
+
+    $created = PenjualanToko::create($validated);
+
+    if ($request->ajax()) {
         return response()->json([
             'message' => 'Data berhasil disimpan',
             'data' => $created
         ]);
     }
-    
-    // ... (metode edit tidak perlu diubah, sudah benar)
 
-    public function update(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'tanggal' => 'required|date',
-            'total_harga' => 'required|numeric',
-            'catatan' => 'nullable|string',
-        ]);
+    return redirect()->back()->with('success', 'Data berhasil disimpan.');
+}
 
-        $data = PenjualanToko::findOrFail($id);
-        $data->update($validated);
 
-        // GANTI redirect() DENGAN response()->json()
-        return response()->json(['message' => 'Data berhasil diupdate.']);
-    }
+public function edit($id)
+{
+    $data = PenjualanToko::findOrFail($id);
+    return response()->json($data); // agar bisa dikirim ke JS
+}
 
-    public function destroy($id)
-    {
-        $data = PenjualanToko::findOrFail($id);
-        $data->delete();
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'tanggal' => 'required|date',
+        'total_harga' => 'required|numeric',
+        'catatan' => 'nullable|string',
+    ]);
 
-        // GANTI redirect() DENGAN response()->json()
-        return response()->json(['message' => 'Data berhasil dihapus.']);
-    }
+    $data = PenjualanToko::findOrFail($id);
+    $data->update($request->all());
 
-    public function rekapan()
-    {
-        $dataToko = PenjualanToko::orderBy('tanggal', 'desc')->get();
-        return view('RekapanToko', compact('dataToko'));
-    }
+    return redirect()->route('penjualanToko.index')->with('success', 'Data berhasil diupdate.');
+}
+
+public function destroy($id)
+{
+    $data = PenjualanToko::findOrFail($id);
+    $data->delete();
+
+    return response()->json(['message' => 'Data berhasil dihapus.'], 200);
+}
+
+
+
+public function rekapan()
+{
+    $dataToko = PenjualanToko::orderBy('tanggal', 'desc')->get();
+
+    return view('RekapanToko', compact('dataToko'));
+}
+
 }
