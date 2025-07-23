@@ -652,8 +652,8 @@
                 if (cells.length >= 7) {
                     // Extract data from table cells
                     const jumlahAyam = parseInt(cells[3].textContent) || 0;
-                    const beratText = cells[4].textContent.replace(' gram', '');
-                    const berat = parseInt(beratText) || 0;
+                    const beratText = cells[4].textContent; // Ambil teks lengkap, misal "1.200 gram"
+                    const berat = parseInt(beratText.replace(/[^0-9]/g, '')) || 0; // Hapus semua yg bukan angka
                     const hargaText = cells[6].textContent.replace('Rp ', '').replace(/\./g, '');
                     const harga = parseInt(hargaText) || 0;
 
@@ -678,7 +678,7 @@
 
             visibleRows.forEach(row => {
                 totalAyam += parseInt(row.cells[3].textContent) || 0;
-                totalBerat += parseInt(row.cells[4].textContent.replace(/\./g, '')) || 0;
+                totalBerat += parseInt(row.cells[4].textContent.replace(/[^0-9]/g, '')) || 0;
                 totalUang += parseInt(row.cells[6].textContent.replace('Rp ', '').replace(/\./g, '')) || 0;
             });
 
