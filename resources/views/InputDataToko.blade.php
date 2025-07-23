@@ -391,8 +391,7 @@
         </div>
 
         <div class="content">
-            <a href="/" class="back-btn">← Kembali ke Menu Utama</a>
-
+            <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
             <!-- Alert Section -->
             <div id="alert-section"></div>
 

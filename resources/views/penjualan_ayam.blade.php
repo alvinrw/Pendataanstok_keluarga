@@ -374,8 +374,7 @@
         </div>
 
         <div class="content">
-            <a href="/" class="back-btn">← Kembali ke Menu Utama</a>
-
+            <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
             <!-- Stock Section -->
             <div class="stock-section" id="stock-section">
                 <h3>📊 Stok Ayam Saat Ini</h3>

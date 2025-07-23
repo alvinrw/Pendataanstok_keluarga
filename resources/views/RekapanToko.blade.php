@@ -342,7 +342,8 @@
         </div>
 
         <div class="content">
-            <a href="/" class="btn btn-back">🏠 Kembali ke Halaman Utama</a>
+           <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
+
             
             <!-- Filter Section -->
             <div class="filter-section">

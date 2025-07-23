@@ -164,7 +164,7 @@
         .password-toggle {
             position: absolute;
             right: 15px;
-            top: 50%;
+            top: 70%;
             transform: translateY(-50%);
             cursor: pointer;
             color: #666;
@@ -381,72 +381,24 @@
         </div>
 
         <div class="error-message" id="errorMessage">
-            Email atau password salah. Silakan coba lagi.
+            Username atau password salah. Silakan coba lagi.
         </div>
 
-        <form id="loginForm">
+        <form action="/login-admin" method="POST">
+            @csrf
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="nama@email.com" required>
+                <input type="text" name="username" placeholder="Username" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Masukkan password Anda" required>
-                <span class="password-toggle" onclick="togglePassword()">👁️</span>
+                <input type="password" name="password" placeholder="Password" required>
             </div>
 
-
-
-            <button type="submit" class="login-btn">Masuk</button>
+            <button type="submit" class="login-btn">Login</button>
         </form>
-
-
-
-
     </div>
 
     <script>
-        // Toggle password visibility
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.querySelector('.password-toggle');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.textContent = '🙈';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.textContent = '👁️';
-            }
-        }
-
-        // Handle form submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Simulate login process
-            if (email && password) {
-                // Hide error message
-                document.getElementById('errorMessage').style.display = 'none';
-                
-                // Show success message
-                document.getElementById('successMessage').style.display = 'block';
-                
-                // Simulate redirect after 2 seconds
-                setTimeout(() => {
-                    alert('Login berhasil! Anda akan diarahkan ke dashboard.');
-                }, 2000);
-            } else {
-                // Show error message
-                document.getElementById('successMessage').style.display = 'none';
-                document.getElementById('errorMessage').style.display = 'block';
-            }
-        });
-
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
             // Add focus effects to form inputs

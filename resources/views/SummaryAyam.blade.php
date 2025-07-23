@@ -310,7 +310,7 @@
 </head>
 <body>
     <div class="container">
-        <button class="back-button" onclick="window.location.href='/'">← Kembali ke Menu Utama</button>
+        <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
         <div class="header">
             <h1>🐔 Dashboard Penjualan Ayam</h1>
             <p>Rekapan penjualan dan stok ayam harian</p>

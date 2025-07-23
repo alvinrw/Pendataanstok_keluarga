@@ -451,7 +451,7 @@
         </script>
 
         <div class="content">
-            <a href="/" class="back-btn">← Kembali ke Menu Utama</a>
+            <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
             <!-- Improved Stock Section -->
             <div class="stock-section">
                 <h3>📦 Stok Ayam terjual Saat Ini</h3>
