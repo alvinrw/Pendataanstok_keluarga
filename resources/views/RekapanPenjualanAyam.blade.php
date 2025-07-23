@@ -400,6 +400,24 @@
             .stock-card p {
                 font-size: 1.5rem;
             }
+
+.reset-btn {
+    background: linear-gradient(135deg, #adb5bd 0%, #909da7 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(144, 157, 167, 0.3);
+}
+
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -501,9 +519,10 @@
                             <option value="tidak">Tanpa Diskon</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <button class="filter-btn" onclick="applyFilter()">Terapkan Filter</button>
-                    </div>
+                <div class="filter-group">
+                    <button class="filter-btn" onclick="applyFilter()">Terapkan Filter</button>
+                    <button class="filter-btn" onclick="resetFilter()" style="margin-top: 10px;">Reset Filter</button>
+                </div>
                 </div>
             </div>
 
@@ -528,12 +547,15 @@
                         </thead>
                         <tbody id="table-body">
 @foreach ($data as $index => $item)
-<tr>
+<tr 
+    data-tanggal="{{ $item->tanggal }}" 
+    data-pembeli="{{ strtolower($item->nama_pembeli) }}" 
+    data-diskon="{{ $item->diskon ? 'ya' : 'tidak' }}">
     <td>{{ $index + 1 }}</td>
-    <td>{{ $item->tanggal }}</td>
+    <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d F Y') }}</td>
     <td>{{ $item->nama_pembeli }}</td>
     <td>{{ $item->jumlah_ayam_dibeli }}</td>
-    <td>{{ $item->berat_total }} gram</td>
+    <td>{{ number_format($item->berat_total) }} gram</td>
     <td>{{ $item->diskon ? 'Ya' : 'Tidak' }}</td>
     <td>Rp {{ number_format($item->harga_total, 0, ',', '.') }}</td>
     <td>
@@ -541,15 +563,13 @@
             <form action="{{ route('penjualan.destroy', $item->id) }}" method="POST" style="display: inline;">
                 @csrf
                 @method('DELETE')
-<button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(this.form)">Hapus</button>
-
+                <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(this.form)">Hapus</button>
             </form>
         @else
             <span class="text-danger">ID Data Hilang</span>
         @endif
     </td>
 </tr>
-
 @endforeach
 
 
@@ -579,6 +599,8 @@
         let dataAyam = [];
         let filteredData = [];
 
+        
+
         // Format currency
         function formatCurrency(amount) {
             return 'Rp ' + amount.toLocaleString('id-ID');
@@ -597,6 +619,25 @@
         // Format number with thousand separator
         function formatNumber(number) {
             return number.toLocaleString('id-ID');
+        }
+
+        // Fungsi untuk mereset semua filter
+        function resetFilter() {
+            // 1. Hapus nilai dari semua input filter
+            document.getElementById('filter-tanggal-dari').value = '';
+            document.getElementById('filter-tanggal-sampai').value = '';
+            document.getElementById('filter-pembeli').value = '';
+            document.getElementById('filter-diskon').value = '';
+
+            // 2. Tampilkan kembali semua baris di tabel
+            const tableBody = document.getElementById('table-body');
+            const allRows = tableBody.querySelectorAll('tr');
+            allRows.forEach(row => {
+                row.style.display = ''; // Menghapus style 'display: none'
+            });
+
+            // 3. Sembunyikan kembali kotak ringkasan filter
+            document.getElementById('filter-summary').style.display = 'none';
         }
 
         // Function to calculate and update stock display
@@ -629,42 +670,83 @@
         }
 
         // Populate table (tidak digunakan untuk Laravel data, hanya untuk filter)
-        function populateTable() {
-            // Function ini tidak dipanggil karena kita menggunakan data dari Laravel
-            // Hanya untuk kompatibilitas dengan kode yang sudah ada
-        }
+  // Fungsi untuk mengupdate ringkasan hasil filter
+        function updateFilterSummary(visibleRows) {
+            let totalAyam = 0;
+            let totalBerat = 0;
+            let totalUang = 0;
 
-        // Update filter summary
-        function updateFilterSummary() {
-            const totalAyam = filteredData.reduce((sum, item) => sum + item.jumlah, 0);
-            const totalBerat = filteredData.reduce((sum, item) => sum + item.totalBerat, 0);
-            const totalUang = filteredData.reduce((sum, item) => sum + item.totalAkhir, 0);
+            visibleRows.forEach(row => {
+                totalAyam += parseInt(row.cells[3].textContent) || 0;
+                totalBerat += parseInt(row.cells[4].textContent.replace(/\./g, '')) || 0;
+                totalUang += parseInt(row.cells[6].textContent.replace('Rp ', '').replace(/\./g, '')) || 0;
+            });
 
             document.getElementById('filter-total-ayam').textContent = formatNumber(totalAyam);
-            document.getElementById('filter-total-berat').textContent = formatNumber(totalBerat);
+            document.getElementById('filter-total-berat').textContent = formatNumber(totalBerat) + ' gram';
             document.getElementById('filter-total-uang').textContent = formatCurrency(totalUang);
+
+            // Tampilkan atau sembunyikan kotak ringkasan
+            const summaryBox = document.getElementById('filter-summary');
+            const filterApplied = document.getElementById('filter-tanggal-dari').value || 
+                                  document.getElementById('filter-tanggal-sampai').value ||
+                                  document.getElementById('filter-pembeli').value ||
+                                  document.getElementById('filter-diskon').value;
+
+            if (filterApplied) {
+                summaryBox.style.display = 'block';
+            } else {
+                summaryBox.style.display = 'none';
+            }
         }
 
-        // Apply filter
+        // Apply filter (versi yang sudah berfungsi)
         function applyFilter() {
             const tanggalDari = document.getElementById('filter-tanggal-dari').value;
             const tanggalSampai = document.getElementById('filter-tanggal-sampai').value;
             const pembeli = document.getElementById('filter-pembeli').value.toLowerCase();
             const diskon = document.getElementById('filter-diskon').value;
 
-            filteredData = dataAyam.filter(item => {
-                let valid = true;
+            const tableBody = document.getElementById('table-body');
+            const allRows = tableBody.querySelectorAll('tr');
+            const visibleRows = [];
 
-                if (tanggalDari && item.tanggal < tanggalDari) valid = false;
-                if (tanggalSampai && item.tanggal > tanggalSampai) valid = false;
-                if (pembeli && !item.pembeli.toLowerCase().includes(pembeli)) valid = false;
-                if (diskon && item.diskon !== diskon) valid = false;
+            allRows.forEach(row => {
+                const rowTanggal = row.dataset.tanggal;
+                const rowPembeli = row.dataset.pembeli;
+                const rowDiskon = row.dataset.diskon;
+                let showRow = true;
 
-                return valid;
+                if (tanggalDari && rowTanggal < tanggalDari) {
+                    showRow = false;
+                }
+                if (tanggalSampai && rowTanggal > tanggalSampai) {
+                    showRow = false;
+                }
+                if (pembeli && !rowPembeli.includes(pembeli)) {
+                    showRow = false;
+                }
+                if (diskon && rowDiskon !== diskon) {
+                    showRow = false;
+                }
+
+                if (showRow) {
+                    row.style.display = ''; // Tampilkan baris
+                    visibleRows.push(row);
+                } else {
+                    row.style.display = 'none'; // Sembunyikan baris
+                }
             });
 
-            populateTable();
+            // Panggil fungsi untuk update ringkasan dengan data yang terlihat
+            updateFilterSummary(visibleRows);
         }
+
+        // Fungsi ini tidak lagi diperlukan karena kita hanya menyembunyikan/menampilkan baris
+        function populateTable() {
+            // Kosongkan saja
+        }
+
 
         // Export data to Excel
         function exportData() {
