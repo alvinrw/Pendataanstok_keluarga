@@ -43,6 +43,25 @@ Route::get('/dashboard-admin', function () {
 
 
 
+//alvin
+use App\Http\Controllers\JadwalController;
+
+Route::get('/input-jadwal', [JadwalController::class, 'create'])->name('jadwal.input');
+Route::post('/input-jadwal', [JadwalController::class, 'store'])->name('jadwal.store');
+
+
+//rekapan jadwal
+Route::get('/rekapan-jadwal', [JadwalController::class, 'rekapan'])->name('jadwal.rekapan');
+
+// Route untuk delete jadwal (DELETE)
+Route::delete('/jadwal/{id}', [JadwalController::class, 'destroy'])->name('jadwal.destroy');
+
+// Route untuk update status jadwal (PUT)
+Route::put('/jadwal/{id}/status', [JadwalController::class, 'updateStatus']);
+
+// Route untuk edit jadwal (GET & PUT)
+Route::get('/jadwal/{id}/edit', [JadwalController::class, 'edit']);
+Route::put('/jadwal/{id}', [JadwalController::class, 'update']);
 
 // =============================
 // Penjualan Toko Ayam

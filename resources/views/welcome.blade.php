@@ -85,6 +85,7 @@
             padding: 60px 40px;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             position: relative;
+            flex-wrap: wrap;
         }
 
         .nav-buttons::before {
@@ -121,6 +122,16 @@
             overflow: hidden;
             min-width: 180px;
             z-index: 1;
+        }
+
+        .nav-btn.jadwal {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        .nav-btn.jadwal:hover {
+            background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+            box-shadow: 0 20px 40px rgba(40, 167, 69, 0.6);
         }
 
         .nav-btn::before {
@@ -186,6 +197,10 @@
             border-radius: 2px;
         }
 
+        .jadwal-options h2::after {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
         .option-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -209,6 +224,7 @@
             gap: 15px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .option-btn::before {
@@ -224,11 +240,20 @@
             z-index: -1;
         }
 
+        .jadwal-options .option-btn::before {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
         .option-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
             border-color: #667eea;
             color: white;
+        }
+
+        .jadwal-options .option-btn:hover {
+            border-color: #28a745;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
         }
 
         .option-btn:hover::before {
@@ -254,6 +279,11 @@
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
             display: none;
             animation: slideDown 0.5s ease-in-out;
+        }
+
+        .jadwal-summary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
         }
 
         @keyframes slideDown {
@@ -334,7 +364,7 @@
     <div class="container">
         <div class="header">
             <h1>🏪 Sistem Manajemen Penjualan</h1>
-            <p>Kelola data penjualan toko dan ayam dengan mudah dan efisien</p>
+            <p>Kelola data penjualan toko, ayam, dan jadwal kerja dengan mudah dan efisien</p>
         </div>
 
         <div class="nav-buttons">
@@ -343,6 +373,9 @@
             </button>
             <button class="nav-btn" onclick="showOptions('toko')">
                 🏪 Toko
+            </button>
+            <button class="nav-btn jadwal" onclick="showOptions('jadwal')">
+                📅 Jadwal Alvin
             </button>
         </div>
 
@@ -388,6 +421,32 @@
                 <p>📈 Summary Penjualan Toko: [Summary Data akan ditampilkan di sini]</p>
             </div>
         </div>
+
+<div id="jadwalOptions" class="options jadwal-options">
+    <h2>📅 Jadwal Kerja Alvin</h2>
+    <div class="option-buttons">
+        
+        <a href="{{ route('jadwal.input') }}" class="option-btn">
+            <span class="icon">➕</span>
+            <span>Input Jadwal Baru</span>
+        </a>
+
+        <a href="{{ route('jadwal.rekapan') }}" class="option-btn">
+            <span class="icon">📋</span>
+            <span>Rekapan Jadwal Alvin</span>
+        </a>
+
+
+    </div>
+
+    <div id="jadwalSummary" class="summary-box jadwal-summary">
+        <p>📈 Summary Jadwal: [Summary Data akan ditampilkan di sini]</p>
+    </div>
+</div>
+
+
+</form>
+-->
     </div>
 
     <script>
@@ -395,8 +454,10 @@
             // Hide all options
             document.getElementById('ayamOptions').classList.remove('active');
             document.getElementById('tokoOptions').classList.remove('active');
+            document.getElementById('jadwalOptions').classList.remove('active');
             document.getElementById('ayamSummary').style.display = 'none';
             document.getElementById('tokoSummary').style.display = 'none';
+            document.getElementById('jadwalSummary').style.display = 'none';
 
             // Show selected option with animation
             if (type === 'ayam') {
@@ -406,6 +467,11 @@
             } else if (type === 'toko') {
                 setTimeout(() => {
                     document.getElementById('tokoOptions').classList.add('active');
+                }, 100);
+            } else if (type === 'jadwal') {
+                setTimeout(() => {
+                    document.getElementById('jadwalOptions').classList.add('active');
+                    document.getElementById('jadwalSummary').style.display = 'block';
                 }, 100);
             }
         }
@@ -426,12 +492,6 @@
                     summaryDiv.style.display = 'none';
                 }
             }
-        }
-
-        function goToPage(page) {
-            // Logika navigasi dapat ditambahkan di sini
-            alert(`Navigasi ke halaman: ${page}`);
-            // window.location.href = page + '.html'; // Uncomment untuk navigasi aktual
         }
 
         // Add smooth scroll behavior
