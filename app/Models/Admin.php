@@ -11,7 +11,7 @@ class Admin extends Model
 {
     protected $table = 'admins'; // 👈 Tambahkan baris ini
 
-    protected $fillable = ['username', 'password'];
+   protected $fillable = ['username', 'password', 'role'];
 
     public $timestamps = true;
 }

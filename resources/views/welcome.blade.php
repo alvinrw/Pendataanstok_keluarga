@@ -436,6 +436,20 @@
             <span>Rekapan Jadwal Alvin</span>
         </a>
 
+        <a href="{{ route('transaksi.input') }}" class="option-btn">
+            <span class="icon">➕</span>
+            <span>Input Pengeluaran Baru</span>
+        </a>
+
+        <a href="{{ route('rekapan') }}" class="option-btn">
+            <span class="icon">📋</span>
+            <span>Rekapan Pengeluaran Alvin</span>
+        </a>
+           <a href="{{ route('akun.index') }}" class="option-btn">
+            <span class="icon">(📋)</span>
+            <span>kelola akun</span>
+        </a>
+
 
     </div>
 

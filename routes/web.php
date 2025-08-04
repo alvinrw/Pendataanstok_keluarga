@@ -63,6 +63,31 @@ Route::put('/jadwal/{id}/status', [JadwalController::class, 'updateStatus']);
 Route::get('/jadwal/{id}/edit', [JadwalController::class, 'edit']);
 Route::put('/jadwal/{id}', [JadwalController::class, 'update']);
 
+
+//pengeluaran
+use App\Http\Controllers\TransaksiController;
+
+Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
+Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
+Route::get('/rekapan', [TransaksiController::class, 'rekapan'])->name('rekapan');
+Route::get('/transaksi/input', function () {
+    return view('InputTransaksi'); // ganti dengan nama file view kamu (misalnya InputTransaksi.blade.php)
+})->name('transaksi.input');
+
+// Tampilkan form edit
+Route::get('/transaksi/{id}/edit', [TransaksiController::class, 'edit'])->name('transaksi.edit');
+
+// Proses update setelah form disubmit
+Route::put('/transaksi/{id}', [TransaksiController::class, 'update']);
+
+Route::delete('/transaksi/{id}', [TransaksiController::class, 'destroy']);
+
+use App\Http\Controllers\AdminController;
+Route::get('/akun', [AdminController::class, 'index'])->name('akun.index');
+Route::get('/kelola-akun', [AdminController::class, 'index'])->name('admin.index');
+
+
+
 // =============================
 // Penjualan Toko Ayam
 // =============================
