@@ -13,17 +13,32 @@ class AdminAuthController extends Controller
         return view('admin_login');
     }
 
-    public function login(Request $request)
-    {
-        $admin = Admin::where('username', $request->username)->first();
 
-        if ($admin && Hash::check($request->password, $admin->password)) {
-            // Simpan ke session manual (karena kita nggak pakai guard admin)
-            session(['admin_logged_in' => true]);
-            return redirect('/welcome');
-        }
+public function login(Request $request)
+{
+    // 1. Validasi input dari form
+    $credentials = $request->validate([
+        'username' => ['required', 'string'],
+        'password' => ['required', 'string'],
+    ]);
 
-        return back()->withErrors(['username' => 'Username atau password salah.']);
+    // 2. Coba login dengan sistem Auth Laravel
+    // Fungsi ini otomatis mencari user & mengecek password yang sudah di-bcrypt
+    if (Auth::attempt($credentials)) {
+        // Jika berhasil...
+        $request->session()->regenerate(); // Regenerasi session untuk keamanan
+
+        // Langsung arahkan ke halaman welcome
+        return redirect()->intended('welcome'); 
     }
+
+    // 3. Jika login gagal...
+    return back()->withErrors([
+        'username' => 'Username atau password yang diberikan salah.',
+    ])->onlyInput('username');
+}
+
+
+    
 }
 

@@ -43,6 +43,67 @@ Route::get('/dashboard-admin', function () {
 
 
 
+//alvin
+use App\Http\Controllers\JadwalController;
+
+Route::get('/input-jadwal', [JadwalController::class, 'create'])->name('jadwal.input');
+Route::post('/input-jadwal', [JadwalController::class, 'store'])->name('jadwal.store');
+
+
+//rekapan jadwal
+Route::get('/rekapan-jadwal', [JadwalController::class, 'rekapan'])->name('jadwal.rekapan');
+
+// Route untuk delete jadwal (DELETE)
+Route::delete('/jadwal/{id}', [JadwalController::class, 'destroy'])->name('jadwal.destroy');
+
+// Route untuk update status jadwal (PUT)
+Route::put('/jadwal/{id}/status', [JadwalController::class, 'updateStatus']);
+
+// Route untuk edit jadwal (GET & PUT)
+Route::get('/jadwal/{id}/edit', [JadwalController::class, 'edit']);
+Route::put('/jadwal/{id}', [JadwalController::class, 'update']);
+
+
+//pengeluaran
+use App\Http\Controllers\TransaksiController;
+
+Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
+Route::post('/transaksi', [TransaksiController::class, 'store'])->name('transaksi.store');
+Route::get('/rekapan', [TransaksiController::class, 'rekapan'])->name('rekapan');
+Route::get('/transaksi/input', function () {
+    return view('InputTransaksi'); // ganti dengan nama file view kamu (misalnya InputTransaksi.blade.php)
+})->name('transaksi.input');
+
+// Tampilkan form edit
+Route::get('/transaksi/{id}/edit', [TransaksiController::class, 'edit'])->name('transaksi.edit');
+
+// Proses update setelah form disubmit
+Route::put('/transaksi/{id}', [TransaksiController::class, 'update']);
+
+Route::delete('/transaksi/{id}', [TransaksiController::class, 'destroy']);
+
+use App\Http\Controllers\AdminController;
+Route::get('/akun', [AdminController::class, 'index'])->name('akun.index');
+Route::get('/kelola-akun', [AdminController::class, 'index'])->name('admin.index');
+Route::put('/users/{id}', [AdminController::class, 'update'])->name('users.update');
+Route::post('/users', [AdminController::class, 'store'])->name('users.store');
+Route::delete('/users/{id}', [AdminController::class, 'destroy'])->name('users.destroy');
+
+
+//logout
+
+use Illuminate\Support\Facades\Auth;
+
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/'); // Atau redirect ke halaman login
+})->name('logout');
+
+
+
+
 
 // =============================
 // Penjualan Toko Ayam

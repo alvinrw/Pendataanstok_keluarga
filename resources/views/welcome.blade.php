@@ -78,6 +78,59 @@
             z-index: 1;
         }
 
+        /* Logout Button Styles */
+        .logout-container {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            z-index: 10;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .logout-btn:hover::before {
+            left: 100%;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(220, 53, 69, 0.6);
+            background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+        }
+
+        .logout-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
         .nav-buttons {
             display: flex;
             justify-content: center;
@@ -85,6 +138,7 @@
             padding: 60px 40px;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             position: relative;
+            flex-wrap: wrap;
         }
 
         .nav-buttons::before {
@@ -121,6 +175,16 @@
             overflow: hidden;
             min-width: 180px;
             z-index: 1;
+        }
+
+        .nav-btn.jadwal {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        .nav-btn.jadwal:hover {
+            background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+            box-shadow: 0 20px 40px rgba(40, 167, 69, 0.6);
         }
 
         .nav-btn::before {
@@ -186,6 +250,10 @@
             border-radius: 2px;
         }
 
+        .jadwal-options h2::after {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
         .option-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -209,6 +277,7 @@
             gap: 15px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .option-btn::before {
@@ -224,11 +293,20 @@
             z-index: -1;
         }
 
+        .jadwal-options .option-btn::before {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
         .option-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
             border-color: #667eea;
             color: white;
+        }
+
+        .jadwal-options .option-btn:hover {
+            border-color: #28a745;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
         }
 
         .option-btn:hover::before {
@@ -256,6 +334,11 @@
             animation: slideDown 0.5s ease-in-out;
         }
 
+        .jadwal-summary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -266,6 +349,85 @@
             font-weight: 500;
         }
 
+        /* Logout Confirmation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .modal p {
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(108, 117, 125, 0.4);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header h1 {
@@ -274,6 +436,12 @@
             
             .header p {
                 font-size: 1.1rem;
+            }
+
+            .logout-container {
+                position: static;
+                text-align: center;
+                margin-top: 20px;
             }
             
             .nav-buttons {
@@ -297,6 +465,15 @@
             .option-buttons {
                 grid-template-columns: 1fr;
                 gap: 15px;
+            }
+
+            .modal-content {
+                margin: 30% auto;
+                width: 95%;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
             }
         }
 
@@ -327,14 +504,25 @@
                 padding: 15px 20px;
                 font-size: 1rem;
             }
+
+            .logout-btn {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+   <div class="container">
         <div class="header">
+            <div class="logout-container">
+                <button class="logout-btn" onclick="showLogoutModal()">
+                    <span>🚪</span>
+                    <span>Logout</span>
+                </button>
+            </div>
             <h1>🏪 Sistem Manajemen Penjualan</h1>
-            <p>Kelola data penjualan toko dan ayam dengan mudah dan efisien</p>
+            <p>Kelola data penjualan toko, ayam, dan jadwal kerja dengan mudah dan efisien</p>
         </div>
 
         <div class="nav-buttons">
@@ -344,8 +532,13 @@
             <button class="nav-btn" onclick="showOptions('toko')">
                 🏪 Toko
             </button>
+           @if(Auth::check() && trim(strtolower(Auth::user()->role)) == 'admin')
+            <button class="nav-btn jadwal" onclick="showOptions('jadwal')">
+                📅 Jadwal Alvin
+            </button>
+            @endif
+          
         </div>
-
         <div id="ayamOptions" class="options">
             <h2>📊 Data Penjualan Ayam</h2>
             <div class="option-buttons">
@@ -353,18 +546,15 @@
                     <span class="icon">🐔</span>
                     <span>Input Data Penjualan Ayam</span>
                 </a>
-
                 <a href="{{ url('/RekapanPenjualanAyam') }}" class="option-btn">
                     <span class="icon">📋</span>
                     <span>Rekapan Penjualan Ayam</span>
                 </a>
-
                 <a href="{{ url('/SummaryAyam') }}" class="option-btn">
                     <span class="icon">📊</span>
                     <span>Summary Penjualan Ayam</span>
                 </a>
             </div>
-            
             <div id="ayamSummary" class="summary-box">
                 <p>📈 Summary Penjualan Ayam: [Summary Data akan ditampilkan di sini]</p>
             </div>
@@ -377,36 +567,76 @@
                     <span class="icon">📊</span>
                     <span>Input Data Penjualan Toko</span>
                 </a>
-
                 <a href="{{ route('penjualanToko.rekapan') }}" class="option-btn">
                     <span class="icon">📈</span>
                     <span>Rekapan Penjualan Toko</span>
                 </a>
             </div>
-
             <div id="tokoSummary" class="summary-box">
                 <p>📈 Summary Penjualan Toko: [Summary Data akan ditampilkan di sini]</p>
+            </div>
+        </div>
+
+       @if(Auth::check() && trim(strtolower(Auth::user()->role)) == 'admin') 
+       <div id="jadwalOptions" class="options jadwal-options">
+            <h2>📅 Jadwal Kerja Alvin</h2>
+            <div class="option-buttons">
+                <a href="{{ route('jadwal.input') }}" class="option-btn">
+                    <span class="icon">➕</span>
+                    <span>Input Jadwal Baru</span>
+                </a>
+                <a href="{{ route('jadwal.rekapan') }}" class="option-btn">
+                    <span class="icon">📋</span>
+                    <span>Rekapan Jadwal Alvin</span>
+                </a>
+                <a href="{{ route('transaksi.input') }}" class="option-btn">
+                    <span class="icon">➕</span>
+                    <span>Input Pengeluaran Baru</span>
+                </a>
+                <a href="{{ route('rekapan') }}" class="option-btn">
+                    <span class="icon">📋</span>
+                    <span>Rekapan Pengeluaran Alvin</span>
+                </a>
+                <a href="{{ route('akun.index') }}" class="option-btn">
+                    <span class="icon">📋</span>
+                    <span>Kelola Akun</span>
+                </a>
+            </div>
+            <div id="jadwalSummary" class="summary-box jadwal-summary">
+                <p>📈 Summary Jadwal: [Summary Data akan ditampilkan di sini]</p>
+            </div>
+        </div>
+        @endif
+        </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h3>🚪 Konfirmasi Logout</h3>
+            <p>Apakah Anda yakin ingin keluar dari sistem?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" onclick="confirmLogout()">Ya, Logout</button>
+                <button class="modal-btn cancel-btn" onclick="closeLogoutModal()">Batal</button>
             </div>
         </div>
     </div>
 
     <script>
-        function showOptions(type) {
-            // Hide all options
-            document.getElementById('ayamOptions').classList.remove('active');
-            document.getElementById('tokoOptions').classList.remove('active');
-            document.getElementById('ayamSummary').style.display = 'none';
-            document.getElementById('tokoSummary').style.display = 'none';
 
-            // Show selected option with animation
-            if (type === 'ayam') {
-                setTimeout(() => {
-                    document.getElementById('ayamOptions').classList.add('active');
-                }, 100);
-            } else if (type === 'toko') {
-                setTimeout(() => {
-                    document.getElementById('tokoOptions').classList.add('active');
-                }, 100);
+        function showOptions(type) {
+            const ayamOptions = document.getElementById('ayamOptions');
+            const tokoOptions = document.getElementById('tokoOptions');
+            const jadwalOptions = document.getElementById('jadwalOptions');
+
+            if (ayamOptions) ayamOptions.classList.remove('active');
+            if (tokoOptions) tokoOptions.classList.remove('active');
+            if (jadwalOptions) jadwalOptions.classList.remove('active');
+            
+            if (type === 'ayam' && ayamOptions) {
+                setTimeout(() => { ayamOptions.classList.add('active'); }, 100);
+            } else if (type === 'toko' && tokoOptions) {
+                setTimeout(() => { tokoOptions.classList.add('active'); }, 100);
+            } else if (type === 'jadwal' && jadwalOptions) {
+                setTimeout(() => { jadwalOptions.classList.add('active'); }, 100);
             }
         }
 
@@ -428,10 +658,25 @@
             }
         }
 
-        function goToPage(page) {
-            // Logika navigasi dapat ditambahkan di sini
-            alert(`Navigasi ke halaman: ${page}`);
-            // window.location.href = page + '.html'; // Uncomment untuk navigasi aktual
+        // Logout functionality
+        function showLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'block';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+        function confirmLogout() {
+            document.getElementById('logout-form').submit();
+        }
+
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('logoutModal');
+            if (event.target === modal) {
+                closeLogoutModal();
+            }
         }
 
         // Add smooth scroll behavior
@@ -449,5 +694,10 @@
             }, 100);
         });
     </script>
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+
 </body>
 </html>
