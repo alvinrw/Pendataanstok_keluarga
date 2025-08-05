@@ -85,6 +85,23 @@ Route::delete('/transaksi/{id}', [TransaksiController::class, 'destroy']);
 use App\Http\Controllers\AdminController;
 Route::get('/akun', [AdminController::class, 'index'])->name('akun.index');
 Route::get('/kelola-akun', [AdminController::class, 'index'])->name('admin.index');
+Route::put('/users/{id}', [AdminController::class, 'update'])->name('users.update');
+Route::post('/users', [AdminController::class, 'store'])->name('users.store');
+Route::delete('/users/{id}', [AdminController::class, 'destroy'])->name('users.destroy');
+
+
+//logout
+
+use Illuminate\Support\Facades\Auth;
+
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/'); // Atau redirect ke halaman login
+})->name('logout');
+
+
 
 
 
