@@ -586,13 +586,35 @@
 
 
                     
-                    <div class="footer">
-                        <strong>Terima kasih atas pembelian Anda!</strong><br>
-                        Ini adalah invoice yang dibuat secara otomatis dan sah tanpa tanda tangan.
+<div class="footer">
+                        <p>Ayam kampung asli. Enak dan sehat.<br>Terima kasih atas pembelian Anda!</p>
                     </div>
                 </div>
             </body>
-            </html>`;
+            </html>
+        `;
+
+        // Membuat iframe tersembunyi untuk mencetak HTML
+        const printFrame = document.createElement('iframe');
+        printFrame.style.display = 'none';
+        printFrame.style.position = 'absolute';
+        printFrame.style.left = '-9999px';
+        document.body.appendChild(printFrame);
+
+        const frameDoc = printFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(receiptHtmlForPrint);
+        frameDoc.close();
+
+        // Tunggu hingga frame selesai render, lalu cetak
+        printFrame.onload = function () {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+            setTimeout(() => {
+                document.body.removeChild(printFrame);
+            }, 1000);
+        };
+    }
         
         // Menampilkan popup dan opsi download
         Swal.fire({
