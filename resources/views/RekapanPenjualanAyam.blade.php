@@ -201,6 +201,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -343,314 +344,436 @@
         </div>
     </div>
 
-    <script>
-        // Notifikasi dan konfirmasi hapus (tidak diubah)
-        document.addEventListener("DOMContentLoaded", function() {
-            @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: '{{ session('success') }}',
-                    confirmButtonColor: '#27ae60'
-                });
-            @endif
+<script>
+    // Notifikasi dan konfirmasi hapus
+    document.addEventListener("DOMContentLoaded", function() {
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#27ae60'
+            });
+        @endif
+    });
+
+    function confirmDelete(form) {
+        event.preventDefault(); 
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: "Data akan hilang secara permanen.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e74c3c',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        return false;
+    }
+
+    // Fungsi untuk mengunduh PDF
+    function downloadPdf(htmlContent, fileName) {
+        const options = {
+            margin: [10, 10, 10, 10],
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                letterRendering: true
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait'
+            }
+        };
+
+        Swal.fire({
+            title: 'Membuat PDF...',
+            text: 'Mohon tunggu sebentar...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
         });
 
-        function confirmDelete(form) {
-            event.preventDefault(); // Mencegah form submit langsung
-            Swal.fire({
-                title: 'Yakin ingin menghapus?',
-                text: "Data akan hilang secara permanen.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-            return false;
+        html2pdf().from(htmlContent).set(options).save().then(function () {
+            Swal.close();
+        }).catch(function(error) {
+            console.error('Error generating PDF:', error);
+            Swal.fire('Gagal!', 'Terjadi kesalahan saat membuat PDF.', 'error');
+        });
+    }
+
+    // Fungsi untuk membuat struk
+    function generateStruk(buttonEl) {
+        const row = buttonEl.closest('tr');
+        const data = row.dataset;
+
+        // Helper & Kalkulasi
+        const parseNumber = (str) => Number(String(str).replace(/[^0-9]/g, ''));
+        const formatCurrency = (num) => 'Rp ' + Number(num).toLocaleString('id-ID');
+        const formatNumber = (num) => Number(num).toLocaleString('id-ID');
+        
+        const hargaTotalFinal = parseNumber(data.hargaTotal);
+        const beratTotal = parseNumber(data.beratTotal);
+        
+        let subtotal, diskonAmount;
+        if (data.diskon === 'ya') {
+            subtotal = Math.round(hargaTotalFinal / 0.95);
+            diskonAmount = subtotal - hargaTotalFinal;
+        } else {
+            subtotal = hargaTotalFinal;
+            diskonAmount = 0;
         }
 
-        // --- FUNGSI BARU UNTUK STRUK ---
-function printReceipt(htmlContent, pembeli, tanggal) {
-    // 1. Membuat nama file dinamis (tidak ada perubahan)
-    const namaPembeliFormatted = pembeli.charAt(0).toUpperCase() + pembeli.slice(1);
-    const namaFile = `Struk pembelian ${namaPembeliFormatted} ${tanggal}`;
+        const hargaPerGram = beratTotal > 0 ? (subtotal / beratTotal) : 0;
+        const formatHargaSatuan = (num) => 'Rp ' + num.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // 2. Membuka jendela baru yang kosong
-    const printWindow = window.open('', '_blank', 'height=700,width=850');
+        // Template untuk popup preview
+        const receiptHtmlForDisplay = `
+            <style>
+                .ss-receipt-box{font-family:'Courier New',monospace;width:100%;max-width:350px;margin:0 auto;padding:10px;font-size:15px;line-height:1.6;color:#333;}.ss-receipt-box .header{text-align:center;margin-bottom:10px;}.ss-receipt-box .header h3{margin:0;font-weight:bold;}.ss-receipt-box hr{border:none;border-top:1px dashed #555;margin:10px 0;}.ss-receipt-box .item-row{display:flex;justify-content:space-between;}.ss-receipt-box .footer{text-align:center;margin-top:15px;font-size:13px;}
+            </style>
+            <div class="ss-receipt-box">
+                <div class="header"><h3>Nota Pembelian</h3></div><hr>
+                <div class="item-row"><span>Tanggal:</span> <span>${data.tanggalFormatted}</span></div>
+                <div class="item-row"><span>Pembeli:</span> <span>${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}</span></div><hr>
+                <div><strong>Ayam Kampung</strong></div>
+                <div class="item-row"><span>- Qty</span> <span>${data.jumlahAyam} ekor</span></div>
+                <div class="item-row"><span>- Berat</span> <span>${data.beratTotal} gr</span></div>
+                <div class="item-row"><span>- Subtotal</span> <span>${formatCurrency(subtotal)}</span></div>
+                ${diskonAmount > 0 ? `<div class="item-row"><span>- Diskon</span> <span>- ${formatCurrency(diskonAmount)}</span></div>` : ''}<hr>
+                <div class="item-row" style="font-size:1.1em"><strong><span>TOTAL</span></strong> <strong><span>${formatCurrency(hargaTotalFinal)}</span></strong></div><hr>
+                <div class="footer"><p>Ayam kampung asli. Enak dan sehat.<br>Terimakasih telah beli ayam kampung kami.</p></div>
+            </div>`;
 
-    // 3. Jika jendela berhasil dibuka (tidak diblokir pop-up blocker)
-    if (printWindow) {
-        // 4. Menulis seluruh konten HTML ke jendela baru tersebut
-        printWindow.document.write(`
+        // Template untuk PDF - diperbaiki dengan CSS yang lebih sederhana
+        const receiptHtmlForPrint = `
+            <!DOCTYPE html>
             <html>
-                <head>
-                    <title>${namaFile}</title>
-                </head>
-                <body>
-                    ${htmlContent}
-                </body>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    
+                    body {
+                        font-family: Arial, sans-serif;
+                        font-size: 12px;
+                        line-height: 1.4;
+                        color: #333;
+                        padding: 20px;
+                        background: #fff;
+                    }
+                    
+                    .invoice {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background: #fff;
+                    }
+                    
+                    .header {
+                        text-align: center;
+                        padding-bottom: 20px;
+                        border-bottom: 2px solid #333;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .header h1 {
+                        font-size: 22px;
+                        margin-bottom: 5px;
+                        color: #333;
+                    }
+                    
+                    .header .subtitle {
+                        font-size: 11px;
+                        margin-bottom: 10px;
+                    }
+                    
+                    .invoice-title {
+                        font-size: 16px;
+                        margin-top: 10px;
+                        color: #ffff;
+                    }
+
+                    
+                    .info-section {
+                        margin-bottom: 25px;
+                    }
+                    
+                    .info-row {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 3px;
+                    }
+                    
+                    .info-left {
+                        width: 48%;
+                    }
+                    
+                    .info-right {
+                        width: 48%;
+                        text-align: right;
+                    }
+                    
+                    .info-label {
+                        font-weight: bold;
+                        display: inline-block;
+                        width: 70px;
+                    }
+                    
+                    .items-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                    }
+                    
+                    .items-table th {
+                        background: #f5f5f5;
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: left;
+                        font-weight: bold;
+                        font-size: 11px;
+                    }
+                    
+                    .items-table td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        font-size: 11px;
+                    }
+                    
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                    
+                    .summary-table {
+                        width: 250px;
+                        margin: 20px 0 0 auto;
+                        border-collapse: collapse;
+                    }
+                    
+                    .summary-table td {
+                        padding: 5px 8px;
+                        border-bottom: 1px solid #eee;
+                    }
+                    
+                    .summary-table .total-row td {
+                        border-top: 2px solid #333;
+                        border-bottom: 2px solid #333;
+                        font-weight: bold;
+                        font-size: 13px;
+                        padding: 8px;
+                    }
+                    
+                    .footer {
+                        margin-top: 30px;
+                        text-align: center;
+                        border-top: 1px solid #ddd;
+                        padding-top: 15px;
+                    }
+                    
+                    .thank-you {
+                        background: #f9f9f9;
+                        padding: 12px;
+                        margin-bottom: 10px;
+                        border-radius: 3px;
+                        font-size: 11px;
+                    }
+                    
+                    .contact-info {
+                        font-size: 10px;
+                        color: #666;
+                        margin-top: 10px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="invoice">
+                    <div class="header">
+                        <div class="invoice-title"><h1>  </h1> </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-row">
+                            <div class="info-left">
+                                <strong><h1>Keterangan</h1></strong><br>
+                                <span class="info-label">Pembeli:</span> ${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}<br>
+                                <span class="info-label">Produk:</span> Ayam Kampung<br>
+                                <span class="info-label">Penjual:</span>Eko Wahyudi<br>
+                                <span class="info-label">Tanggal:</span> ${data.tanggalFormatted}<br>
+                            </div>
+                            <div class="info-right">
+                             
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th class="text-center">Jumlah</th>
+                                <th class="text-center">Berat</th>
+                                <th class="text-right">Harga/gram</th>
+                                <th class="text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Ayam Kampung Segar</td>
+                                <td class="text-center">${data.jumlahAyam} ekor</td>
+                                <td class="text-center">${formatNumber(beratTotal)} gr</td>
+                                <td class="text-right">Rp.75 </td>
+                                <td class="text-right">${formatCurrency(subtotal)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="summary-table">
+                        <tr>
+                            <td>Subtotal:</td>
+                            <td class="text-right">${formatCurrency(subtotal)}</td>
+                        </tr>
+                        ${diskonAmount > 0 ? `
+                        <tr>
+                            <td style="color: #d63384;">Diskon (5%):</td>
+                            <td class="text-right" style="color: #d63384;">- ${formatCurrency(diskonAmount)}</td>
+                        </tr>
+                        ` : ''}
+                        <tr class="total-row">
+                            <td>TOTAL BAYAR:</td>
+                            <td class="text-right">${formatCurrency(hargaTotalFinal)}</td>
+                        </tr>
+                    </table>
+
+                    <div class="footer">
+                        <div class="thank-you">
+                            <strong>Terima kasih atas pembelian Anda!</strong><br>
+                            Ayam kampung asli, sehat dan bergizi tinggi
+                        </div>
+                        
+                        <div class="contact-info">
+                            <strong>Kontak:</strong> +62 812-3456-7890 | 
+                            <strong>Alamat:</strong> Desa Sejahtera, Kab. Berkah<br>
+                            <br>
+                            Struk ini adalah bukti pembelian yang sah. Simpan dengan baik.
+                        </div>
+                    </div>
+                </div>
+            </body>
             </html>
-        `);
-
-        // 5. Menutup stream dokumen agar halaman selesai dimuat
-        printWindow.document.close();
-
-        // 6. Memberi jeda sesaat agar jendela sempat me-render konten
-        setTimeout(function () {
-            printWindow.focus();  // Fokus ke jendela baru
-            printWindow.print();  // Memanggil dialog cetak
-            printWindow.close();  // Menutup jendela setelah dialog cetak ditutup
-        }, 250); // Jeda 250 milidetik
-
-    } else {
-        // Peringatan jika pop-up diblokir
-        Swal.fire(
-            'Gagal Membuka Jendela Cetak',
-            'Browser Anda mungkin memblokir pop-up. Mohon izinkan pop-up untuk situs ini pada address bar.',
-            'warning'
-        );
-    }
-}
-
-
-function generateStruk(buttonEl) {
-    const row = buttonEl.closest('tr');
-    const data = row.dataset;
-
-    // Helper (tidak ada perubahan)
-    const parseCurrency = (str) => Number(str.replace(/[^0-9]/g, ''));
-    const formatCurrency = (num) => 'Rp ' + num.toLocaleString('id-ID');
-
-    // Kalkulasi Biaya (tidak ada perubahan)
-    const hargaTotalFinal = parseCurrency(data.hargaTotal);
-    const beratTotal = parseCurrency(data.beratTotal);
-    let subtotal, diskonAmount;
-
-    if (data.diskon === 'ya') {
-        subtotal = Math.round(hargaTotalFinal / 0.95);
-        diskonAmount = subtotal - hargaTotalFinal;
-    } else {
-        subtotal = hargaTotalFinal;
-        diskonAmount = 0;
-    }
-    const hargaPerGram = beratTotal > 0 ? (subtotal / beratTotal) : 0;
-
-    // =======================================================================
-    // --- TEMPLATE #1: UNTUK TAMPILAN POPUP (RAMAH SCREENSHOT HP) ---
-    // =======================================================================
-    const receiptHtmlForDisplay = `
-        <style>
-            .ss-receipt-box {
-                font-family: 'Courier New', monospace;
-                width: 100%;
-                max-width: 350px;
-                margin: 0 auto;
-                padding: 10px;
-                font-size: 15px;
-                line-height: 1.6;
-                color: #333;
+        `;
+       
+        // Proses menampilkan popup dan mengunduh PDF
+        Swal.fire({
+            title: 'Rincian Struk',
+            html: receiptHtmlForDisplay,
+            width: 'auto',
+            maxWidth: '400px',
+            showCancelButton: true,
+            confirmButtonText: '🖨️ Download PDF',
+            cancelButtonText: 'Tutup',
+            confirmButtonColor: '#27ae60',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const namaPembeliFormatted = data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1);
+                const namaFile = `Invoice-${namaPembeliFormatted}-${data.tanggal}.pdf`;
+                
+                downloadPdf(receiptHtmlForPrint, namaFile);
             }
-            .ss-receipt-box .header { text-align: center; margin-bottom: 10px; }
-            .ss-receipt-box .header h3 { margin: 0; font-weight: bold; }
-            .ss-receipt-box hr { border: none; border-top: 1px dashed #555; margin: 10px 0; }
-            .ss-receipt-box .item-row { display: flex; justify-content: space-between; }
-            .ss-receipt-box .footer { text-align: center; margin-top: 15px; font-size: 13px; }
-        </style>
-        <div class="ss-receipt-box">
-            <div class="header">
-                <h3>Struk Pembelian</h3>
-            </div>
-            <hr>
-            <div class="item-row"><span>Tanggal:</span> <span>${data.tanggalFormatted}</span></div>
-            <div class="item-row"><span>Pembeli:</span> <span>${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}</span></div>
-            <hr>
-            <div><strong>Ayam Kampung</strong></div>
-            <div class="item-row"><span>- Qty</span> <span>${data.jumlahAyam} ekor</span></div>
-            <div class="item-row"><span>- Berat</span> <span>${data.beratTotal} gr</span></div>
-            <div class="item-row"><span>- Subtotal</span> <span>${formatCurrency(subtotal)}</span></div>
-            ${diskonAmount > 0 ? `
-            <div class="item-row"><span>- Diskon</span> <span>- ${formatCurrency(diskonAmount)}</span></div>` : ''}
-            <hr>
-            <div class="item-row" style="font-size: 1.1em;">
-                <strong><span>TOTAL</span></strong> 
-                <strong><span>${formatCurrency(hargaTotalFinal)}</span></strong>
-            </div>
-            <hr>
-            <div class="footer">
-                <p>Ayam kampung asli. Enak dan sehat.<br>Terimakasih telah beli ayam kampung di kami.</p>
-            </div>
-        </div>
-    `;
+        });
+    }
 
-    // ===============================================================
-    // --- TEMPLATE #2: UNTUK DICETAK/PDF (DESAIN FORMAL) ---
-    // ===============================================================
-    const receiptHtmlForPrint = `
-        <style>
-            @page { size: auto; margin: 0mm; }
-            body { margin: 0; }
-            .invoice-box { max-width: 800px; margin: auto; padding: 30px; font-size: 14px; line-height: 20px; font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif; color: #555; }
-            .invoice-box .header { text-align: center; margin-bottom: 20px; }
-            .invoice-box .header h1 { margin: 0; color: #000; font-size: 28px; font-weight: bold; }
-            .invoice-box .info-section { display: flex; justify-content: space-between; margin-bottom: 30px; }
-            .invoice-box .info-block { font-size: 12px; }
-            .invoice-box .info-block strong { display: block; margin-bottom: 5px; color: #000; }
-            .invoice-box table.details { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; }
-            .invoice-box table.details thead th { background: #eee; border-bottom: 2px solid #ddd; font-weight: bold; color: #333; padding: 8px; }
-            .invoice-box table.details tbody td { padding: 10px 8px; border-bottom: 1px solid #eee; }
-            .invoice-box table.details tbody tr:last-child td { border-bottom: none; }
-            .invoice-box .text-right { text-align: right; }
-            .invoice-box .summary { display: flex; justify-content: flex-end; margin-top: 20px; }
-            .invoice-box .summary table { width: 40%; }
-            .invoice-box .summary td { padding: 5px 8px; }
-            .invoice-box .summary tr.total td { border-top: 2px solid #aaa; font-size: 16px; font-weight: bold; color: #000; }
-            .invoice-box .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #777; }
-        </style>
-        <div class="invoice-box">
-            <div class="header">
-                <h1>Struk Pembelian</h1>
-            </div>
-            <div class="info-section">
-                <div class="info-block">
-                    <strong>Pembeli:</strong>
-                    ${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}<br>
-                </div>
-                <div class="info-block text-right">
-                    <strong>Pihak Toko:</strong>
-                    Eko Wahyudi<br>
-                </div>
-            </div>
-            <div class="info-section" style="margin-bottom: 20px;">
-                <div class="info-block">
-                    <strong>Tanggal Pembelian:</strong>
-                    ${data.tanggalFormatted}
-                </div>
-                <div class="info-block text-right">
-                    <strong>Jenis Pembelian:</strong>
-                    Ayam Kampung
-                </div>
-            </div>
-            <table class="details">
-                <thead>
-                    <tr>
-                        <th>Deskripsi</th><th>Qty</th><th>Berat Ayam</th><th>Harga Satuan (per gr)</th><th class="text-right">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Ayam Kampung</td><td>${data.jumlahAyam} ekor</td><td>${data.beratTotal} gr</td><td>Rp. 75 </td><td class="text-right">${formatCurrency(subtotal)}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="summary" style="margin-top: 200px;">
-                <table>
-                    <tr><td>Subtotal</td><td class="text-right">${formatCurrency(subtotal)}</td></tr>
-                    <tr><td>Diskon</td><td class="text-right">${formatCurrency(diskonAmount)}</td></tr>
-                    <tr class="total"><td>TOTAL</td><td class="text-right">${formatCurrency(hargaTotalFinal)}</td></tr>
-                </table>
-            </div>
-            <div class="footer">
-                Ayam kampung asli. Enak dan sehat<br>
-                Terimakasih telah beli ayam kampung di kami
-            </div>
-        </div>
-    `;
+    // Fungsi filter dan lainnya
+    const formatCurrency = (amount) => 'Rp ' + Number(amount).toLocaleString('id-ID');
+    const formatNumber = (number) => Number(number).toLocaleString('id-ID');
 
-    // Menampilkan popup SweetAlert dengan desain yang ramah di HP
-    Swal.fire({
-        title: 'Rincian Struk',
-        html: receiptHtmlForDisplay, // <- Menggunakan template untuk display
-        width: 'auto',
-        maxWidth: '400px', // <- Lebar popup dibuat kecil
-        showCancelButton: true,
-        confirmButtonText: '🖨️ Cetak PDF', // <- Tombol untuk mencetak
-        cancelButtonText: 'Tutup',
-        confirmButtonColor: '#3498db',
-    }).then((result) => {
-        // Jika tombol "Cetak PDF" diklik
-        if (result.isConfirmed) {
-            // Maka kita panggil fungsi print dengan template untuk PDF
-            printReceipt(receiptHtmlForPrint, data.pembeli, data.tanggal);
+    function updateFilterSummary(visibleRows) {
+        let totalAyam = 0;
+        let totalBerat = 0;
+        let totalUang = 0;
+
+        visibleRows.forEach(row => {
+            totalAyam += parseInt(row.dataset.jumlahAyam.replace(/[^0-9]/g, '')) || 0;
+            totalBerat += parseInt(row.dataset.beratTotal.replace(/[^0-9]/g, '')) || 0;
+            totalUang += parseInt(row.dataset.hargaTotal.replace(/[^0-9]/g, '')) || 0;
+        });
+
+        document.getElementById('filter-total-ayam').textContent = formatNumber(totalAyam);
+        document.getElementById('filter-total-berat').textContent = formatNumber(totalBerat) + ' gram';
+        document.getElementById('filter-total-uang').textContent = formatCurrency(totalUang);
+        
+        const summaryBox = document.getElementById('filter-summary');
+        const filters = [
+            document.getElementById('filter-tanggal-dari').value,
+            document.getElementById('filter-tanggal-sampai').value,
+            document.getElementById('filter-pembeli').value,
+            document.getElementById('filter-diskon').value
+        ];
+        
+        summaryBox.style.display = filters.some(f => f) ? 'block' : 'none';
+    }
+
+    function applyFilter() {
+        const tglDari = document.getElementById('filter-tanggal-dari').value;
+        const tglSampai = document.getElementById('filter-tanggal-sampai').value;
+        const pembeli = document.getElementById('filter-pembeli').value.toLowerCase();
+        const diskon = document.getElementById('filter-diskon').value;
+
+        const allRows = document.querySelectorAll('#table-body tr');
+        const visibleRows = [];
+        let dataFound = false;
+
+        allRows.forEach(row => {
+            if (!row.dataset.id) return; // Skip no-data row
+            const rowData = row.dataset;
+            
+            const isVisible = 
+                (!tglDari || rowData.tanggal >= tglDari) &&
+                (!tglSampai || rowData.tanggal <= tglSampai) &&
+                (!pembeli || rowData.pembeli.includes(pembeli)) &&
+                (!diskon || rowData.diskon === diskon);
+            
+            row.style.display = isVisible ? '' : 'none';
+            if (isVisible) {
+                visibleRows.push(row);
+                dataFound = true;
+            }
+        });
+        
+        // Menampilkan atau menyembunyikan baris "tidak ada data"
+        const noDataRow = document.querySelector('#table-body .no-data');
+        if (noDataRow) {
+            noDataRow.closest('tr').style.display = dataFound ? 'none' : '';
         }
+
+        updateFilterSummary(visibleRows);
+    }
+
+    function resetFilter() {
+        document.getElementById('filter-tanggal-dari').value = '';
+        document.getElementById('filter-tanggal-sampai').value = '';
+        document.getElementById('filter-pembeli').value = '';
+        document.getElementById('filter-diskon').value = '';
+        applyFilter();
+    }
+
+    function exportData() {
+        Swal.fire('Info', 'Fungsi export belum diimplementasikan sepenuhnya.', 'info');
+    }
+
+    // Panggil applyFilter saat halaman dimuat
+    document.addEventListener("DOMContentLoaded", function() {
+        applyFilter();
     });
-}
-
-
-        // --- FUNGSI FILTER DAN LAINNYA (Telah dioptimalkan) ---
-        const formatCurrency = (amount) => 'Rp ' + amount.toLocaleString('id-ID');
-        const formatNumber = (number) => number.toLocaleString('id-ID');
-
-        function updateFilterSummary(visibleRows) {
-            let totalAyam = 0;
-            let totalBerat = 0;
-            let totalUang = 0;
-
-            visibleRows.forEach(row => {
-                totalAyam += parseInt(row.dataset.jumlahAyam) || 0;
-                totalBerat += parseInt(row.dataset.beratTotal.replace(/[^0-9]/g, '')) || 0;
-                totalUang += parseInt(row.dataset.hargaTotal.replace(/[^0-9]/g, '')) || 0;
-            });
-
-            document.getElementById('filter-total-ayam').textContent = formatNumber(totalAyam);
-            document.getElementById('filter-total-berat').textContent = formatNumber(totalBerat) + ' gram';
-            document.getElementById('filter-total-uang').textContent = formatCurrency(totalUang);
-            
-            const summaryBox = document.getElementById('filter-summary');
-            const filters = [
-                document.getElementById('filter-tanggal-dari').value,
-                document.getElementById('filter-tanggal-sampai').value,
-                document.getElementById('filter-pembeli').value,
-                document.getElementById('filter-diskon').value
-            ];
-            
-            summaryBox.style.display = filters.some(f => f) ? 'block' : 'none';
-        }
-
-        function applyFilter() {
-            const tglDari = document.getElementById('filter-tanggal-dari').value;
-            const tglSampai = document.getElementById('filter-tanggal-sampai').value;
-            const pembeli = document.getElementById('filter-pembeli').value.toLowerCase();
-            const diskon = document.getElementById('filter-diskon').value;
-
-            const allRows = document.querySelectorAll('#table-body tr');
-            const visibleRows = [];
-
-            allRows.forEach(row => {
-                if (!row.dataset.id) return; // Skip no-data row
-                const rowData = row.dataset;
-                
-                const isVisible = 
-                    (!tglDari || rowData.tanggal >= tglDari) &&
-                    (!tglSampai || rowData.tanggal <= tglSampai) &&
-                    (!pembeli || rowData.pembeli.includes(pembeli)) &&
-                    (!diskon || rowData.diskon === diskon);
-                
-                row.style.display = isVisible ? '' : 'none';
-                if (isVisible) visibleRows.push(row);
-            });
-
-            updateFilterSummary(visibleRows);
-        }
-
-        function resetFilter() {
-            document.getElementById('filter-tanggal-dari').value = '';
-            document.getElementById('filter-tanggal-sampai').value = '';
-            document.getElementById('filter-pembeli').value = '';
-            document.getElementById('filter-diskon').value = '';
-            applyFilter();
-        }
-
-        function exportData() {
-            // Logika export Anda bisa diletakkan di sini
-            Swal.fire('Info', 'Fungsi export belum diimplementasikan sepenuhnya.', 'info');
-        }
-
-    </script>
+</script>
 </body>
 </html>
