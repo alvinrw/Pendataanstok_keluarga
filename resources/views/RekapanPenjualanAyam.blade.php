@@ -513,7 +513,17 @@ function generateStruk(buttonEl) {
         <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice - ${data.pembeli}</title>
         <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.5; color: #333; background: #fff; }
-            .invoice-box { width: 100%; box-sizing: border-box; padding: 20px; }
+.invoice-box {
+    width: 190mm; /* dikurangi sedikit dari A4 agar aman */
+    min-height: 270mm; /* jangan gunakan height tetap, tapi pakai min-height */
+    box-sizing: border-box;
+    padding: 15mm;
+    margin: auto;
+    background: white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+
             .header { text-align: center; margin-bottom: 2px; page-break-inside: avoid; }
             .info-table { width: 100%; margin-bottom: 30px; border-collapse: collapse; page-break-inside: avoid; }
             .info-table td { padding: 5px 0; vertical-align: top; }
@@ -525,7 +535,7 @@ function generateStruk(buttonEl) {
             /* --- PERUBAHAN UTAMA ADA DI SINI --- */
             /* 1. Membuat wrapper baru untuk menyatukan summary dan footer */
             .summary-footer-wrapper {
-                margin-top: 20px;
+            
                 page-break-inside: avoid; /* Aturan Kunci: Jangan potong blok ini */
             }
             .summary-container { display: flex; justify-content: flex-end; }
@@ -571,7 +581,7 @@ function generateStruk(buttonEl) {
         width: 400,
         showCancelButton: true,
         showDenyButton: true,
-        confirmButtonText: '📥 Unduh PDF',
+       confirmButtonText: '📥 Unduh PDF',
         denyButtonText: '🖨️ Cetak Struk',
         cancelButtonText: 'Tutup',
         confirmButtonColor: '#3498db',
