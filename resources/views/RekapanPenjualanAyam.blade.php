@@ -617,23 +617,21 @@
     }
         
         // Menampilkan popup dan opsi download
-        Swal.fire({
-            title: 'Rincian Struk',
-            html: receiptHtmlForDisplay,
-            width: 'auto',
-            maxWidth: '400px',
-            showCancelButton: true,
-            confirmButtonText: '🖨️ Download PDF',
-            cancelButtonText: 'Tutup',
-            confirmButtonColor: '#27ae60',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const namaPembeliFormatted = data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1);
-                const namaFile = `Invoice-${namaPembeliFormatted}-${data.tanggal}.pdf`;
-                downloadPdf(receiptHtmlForPrint, namaFile);
-            }
-        });
+Swal.fire({
+    title: 'Rincian Struk',
+    html: receiptHtmlForDisplay,
+    width: 400,
+    showCancelButton: true,
+    confirmButtonText: 'Unduh PDF',
+    cancelButtonText: 'Tutup',
+    confirmButtonColor: '#3498db'
+}).then((result) => {
+    if (result.isConfirmed) {
+        downloadPdf(receiptHtmlForDisplay, `Struk_${data.pembeli}_${data.id}.pdf`);
     }
+});
+
+    
 
     // Fungsi filter dan lainnya (Tidak diubah)
     const formatCurrency = (amount) => 'Rp ' + Number(amount).toLocaleString('id-ID');
