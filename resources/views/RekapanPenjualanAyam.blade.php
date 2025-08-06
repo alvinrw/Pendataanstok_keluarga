@@ -419,44 +419,82 @@ function printReceipt(htmlContent, pembeli, tanggal) {
 }
 
 
- function generateStruk(buttonEl) {
+function generateStruk(buttonEl) {
     const row = buttonEl.closest('tr');
     const data = row.dataset;
 
-    // Helper untuk mengubah format mata uang dan angka menjadi nilai numerik
+    // Helper (tidak ada perubahan)
     const parseCurrency = (str) => Number(str.replace(/[^0-9]/g, ''));
     const formatCurrency = (num) => 'Rp ' + num.toLocaleString('id-ID');
 
-    // --- Kalkulasi Rincian Biaya ---
+    // Kalkulasi Biaya (tidak ada perubahan)
     const hargaTotalFinal = parseCurrency(data.hargaTotal);
     const beratTotal = parseCurrency(data.beratTotal);
     let subtotal, diskonAmount;
 
     if (data.diskon === 'ya') {
-        // Asumsi diskon 5%, kita hitung balik harga subtotal sebelum diskon
         subtotal = Math.round(hargaTotalFinal / 0.95);
         diskonAmount = subtotal - hargaTotalFinal;
     } else {
         subtotal = hargaTotalFinal;
         diskonAmount = 0;
     }
-    // Harga per gram dihitung dari subtotal untuk akurasi
     const hargaPerGram = beratTotal > 0 ? (subtotal / beratTotal) : 0;
 
-
-    // --- Template HTML Baru untuk Invoice ---
-    const receiptHtml = `
+    // =======================================================================
+    // --- TEMPLATE #1: UNTUK TAMPILAN POPUP (RAMAH SCREENSHOT HP) ---
+    // =======================================================================
+    const receiptHtmlForDisplay = `
         <style>
-            /* === KODE BARU UNTUK MENGHILANGKAN HEADER/FOOTER PRINT === */
-            @page {
-                size: auto; /* Biarkan browser menentukan ukuran kertas */
-                margin: 0mm; /* Atur margin cetak menjadi nol */
+            .ss-receipt-box {
+                font-family: 'Courier New', monospace;
+                width: 100%;
+                max-width: 350px;
+                margin: 0 auto;
+                padding: 10px;
+                font-size: 15px;
+                line-height: 1.6;
+                color: #333;
             }
-            body {
-                margin: 0; /* Pastikan body tidak punya margin */
-            }
-            /* ========================================================= */
+            .ss-receipt-box .header { text-align: center; margin-bottom: 10px; }
+            .ss-receipt-box .header h3 { margin: 0; font-weight: bold; }
+            .ss-receipt-box hr { border: none; border-top: 1px dashed #555; margin: 10px 0; }
+            .ss-receipt-box .item-row { display: flex; justify-content: space-between; }
+            .ss-receipt-box .footer { text-align: center; margin-top: 15px; font-size: 13px; }
+        </style>
+        <div class="ss-receipt-box">
+            <div class="header">
+                <h3>Struk Pembelian</h3>
+            </div>
+            <hr>
+            <div class="item-row"><span>Tanggal:</span> <span>${data.tanggalFormatted}</span></div>
+            <div class="item-row"><span>Pembeli:</span> <span>${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}</span></div>
+            <hr>
+            <div><strong>Ayam Kampung</strong></div>
+            <div class="item-row"><span>- Qty</span> <span>${data.jumlahAyam} ekor</span></div>
+            <div class="item-row"><span>- Berat</span> <span>${data.beratTotal} gr</span></div>
+            <div class="item-row"><span>- Subtotal</span> <span>${formatCurrency(subtotal)}</span></div>
+            ${diskonAmount > 0 ? `
+            <div class="item-row"><span>- Diskon</span> <span>- ${formatCurrency(diskonAmount)}</span></div>` : ''}
+            <hr>
+            <div class="item-row" style="font-size: 1.1em;">
+                <strong><span>TOTAL</span></strong> 
+                <strong><span>${formatCurrency(hargaTotalFinal)}</span></strong>
+            </div>
+            <hr>
+            <div class="footer">
+                <p>Ayam kampung asli. Enak dan sehat.<br>Terimakasih telah beli ayam kampung di kami.</p>
+            </div>
+        </div>
+    `;
 
+    // ===============================================================
+    // --- TEMPLATE #2: UNTUK DICETAK/PDF (DESAIN FORMAL) ---
+    // ===============================================================
+    const receiptHtmlForPrint = `
+        <style>
+            @page { size: auto; margin: 0mm; }
+            body { margin: 0; }
             .invoice-box { max-width: 800px; margin: auto; padding: 30px; font-size: 14px; line-height: 20px; font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif; color: #555; }
             .invoice-box .header { text-align: center; margin-bottom: 20px; }
             .invoice-box .header h1 { margin: 0; color: #000; font-size: 28px; font-weight: bold; }
@@ -498,46 +536,25 @@ function printReceipt(htmlContent, pembeli, tanggal) {
                     Ayam Kampung
                 </div>
             </div>
-
             <table class="details">
                 <thead>
                     <tr>
-                        <th>Deskripsi</th>
-                        <th>Qty</th>
-                        <th>Berat Ayam</th>
-                        <th>Harga Satuan (per gr)</th>
-                        <th class="text-right">Subtotal</th>
+                        <th>Deskripsi</th><th>Qty</th><th>Berat Ayam</th><th>Harga Satuan (per gr)</th><th class="text-right">Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Ayam Kampung</td>
-                        <td>${data.jumlahAyam} ekor</td>
-                        <td>${data.beratTotal} gr</td>
-                        <td>Rp. 75 </td>
-                        <td class="text-right">${formatCurrency(subtotal)}</td>
+                        <td>Ayam Kampung</td><td>${data.jumlahAyam} ekor</td><td>${data.beratTotal} gr</td><td>Rp. 75 </td><td class="text-right">${formatCurrency(subtotal)}</td>
                     </tr>
                 </tbody>
             </table>
-
             <div class="summary" style="margin-top: 200px;">
                 <table>
-                    <tr>
-                        <td>Subtotal</td>
-                        <td class="text-right">${formatCurrency(subtotal)}</td>
-                    </tr>
-                    <tr>
-                        <td>Diskon</td>
-                        <td class="text-right">${formatCurrency(diskonAmount)}</td>
-                    </tr>
-                    <tr class="total">
-                        <td>TOTAL</td>
-                        <td class="text-right">${formatCurrency(hargaTotalFinal)}</td>
-                    </tr>
+                    <tr><td>Subtotal</td><td class="text-right">${formatCurrency(subtotal)}</td></tr>
+                    <tr><td>Diskon</td><td class="text-right">${formatCurrency(diskonAmount)}</td></tr>
+                    <tr class="total"><td>TOTAL</td><td class="text-right">${formatCurrency(hargaTotalFinal)}</td></tr>
                 </table>
             </div>
-
-
             <div class="footer">
                 Ayam kampung asli. Enak dan sehat<br>
                 Terimakasih telah beli ayam kampung di kami
@@ -545,23 +562,25 @@ function printReceipt(htmlContent, pembeli, tanggal) {
         </div>
     `;
 
+    // Menampilkan popup SweetAlert dengan desain yang ramah di HP
     Swal.fire({
-        title: 'Rincian Struk', // Judul diubah agar lebih sesuai
-        html: receiptHtml,
-        width: '850px',
+        title: 'Rincian Struk',
+        html: receiptHtmlForDisplay, // <- Menggunakan template untuk display
+        width: 'auto',
+        maxWidth: '400px', // <- Lebar popup dibuat kecil
         showCancelButton: true,
-        confirmButtonText: '🖨️ Cetak',
+        confirmButtonText: '🖨️ Cetak PDF', // <- Tombol untuk mencetak
         cancelButtonText: 'Tutup',
         confirmButtonColor: '#3498db',
-        customClass: {
-            htmlContainer: ''
-        }
     }).then((result) => {
+        // Jika tombol "Cetak PDF" diklik
         if (result.isConfirmed) {
-            printReceipt(receiptHtml, data.pembeli, data.tanggal);
+            // Maka kita panggil fungsi print dengan template untuk PDF
+            printReceipt(receiptHtmlForPrint, data.pembeli, data.tanggal);
         }
     });
 }
+
 
         // --- FUNGSI FILTER DAN LAINNYA (Telah dioptimalkan) ---
         const formatCurrency = (amount) => 'Rp ' + amount.toLocaleString('id-ID');
