@@ -345,7 +345,7 @@
     </div>
 
 <script>
-    // Notifikasi dan konfirmasi hapus
+    // Notifikasi dan konfirmasi hapus (Tidak diubah)
     document.addEventListener("DOMContentLoaded", function() {
         @if(session('success'))
             Swal.fire({
@@ -376,10 +376,10 @@
         return false;
     }
 
-    // Fungsi untuk mengunduh PDF
+    // Fungsi untuk mengunduh PDF (Tidak diubah)
     function downloadPdf(htmlContent, fileName) {
         const options = {
-            margin: [10, 10, 10, 10],
+            margin: 5,
             filename: fileName,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
@@ -409,7 +409,6 @@
         });
     }
 
-    // Fungsi untuk membuat struk
     function generateStruk(buttonEl) {
         const row = buttonEl.closest('tr');
         const data = row.dataset;
@@ -419,22 +418,13 @@
         const formatCurrency = (num) => 'Rp ' + Number(num).toLocaleString('id-ID');
         const formatNumber = (num) => Number(num).toLocaleString('id-ID');
         
-        const hargaTotalFinal = parseNumber(data.hargaTotal);
+        const HARGA_PER_GRAM = 75;
         const beratTotal = parseNumber(data.beratTotal);
+        const hargaTotalFinal = parseNumber(data.hargaTotal);
+        const subtotal = beratTotal * HARGA_PER_GRAM;
+        const diskonAmount = subtotal - hargaTotalFinal;
         
-        let subtotal, diskonAmount;
-        if (data.diskon === 'ya') {
-            subtotal = Math.round(hargaTotalFinal / 0.95);
-            diskonAmount = subtotal - hargaTotalFinal;
-        } else {
-            subtotal = hargaTotalFinal;
-            diskonAmount = 0;
-        }
-
-        const hargaPerGram = beratTotal > 0 ? (subtotal / beratTotal) : 0;
-        const formatHargaSatuan = (num) => 'Rp ' + num.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-        // Template untuk popup preview
+        // Template untuk popup preview (tampilan struk kasir, tidak diubah)
         const receiptHtmlForDisplay = `
             <style>
                 .ss-receipt-box{font-family:'Courier New',monospace;width:100%;max-width:350px;margin:0 auto;padding:10px;font-size:15px;line-height:1.6;color:#333;}.ss-receipt-box .header{text-align:center;margin-bottom:10px;}.ss-receipt-box .header h3{margin:0;font-weight:bold;}.ss-receipt-box hr{border:none;border-top:1px dashed #555;margin:10px 0;}.ss-receipt-box .item-row{display:flex;justify-content:space-between;}.ss-receipt-box .footer{text-align:center;margin-top:15px;font-size:13px;}
@@ -451,177 +441,97 @@
                 <div class="item-row" style="font-size:1.1em"><strong><span>TOTAL</span></strong> <strong><span>${formatCurrency(hargaTotalFinal)}</span></strong></div><hr>
                 <div class="footer"><p>Ayam kampung asli. Enak dan sehat.<br>Terimakasih telah beli ayam kampung kami.</p></div>
             </div>`;
-
-        // Template untuk PDF - diperbaiki dengan CSS yang lebih sederhana
+        
+        const hasDiskon = diskonAmount > 0;
+        
         const receiptHtmlForPrint = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
+                <title>Invoice - ${data.pembeli}</title>
                 <style>
-                    * {
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                    }
+                    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.5; color: #333; background: #fff; }
+                    .invoice-box { max-width: 800px; margin: auto; padding: 30px; }
+                    .header { text-align: center; margin-bottom: 25px; }
+                    .header h1 { font-size: 28px; margin: 0; color: #fff; background-color: #2c3e50; padding: 10px 20px; display: inline-block; border-radius: 5px; }
                     
-                    body {
-                        font-family: Arial, sans-serif;
-                        font-size: 12px;
-                        line-height: 1.4;
-                        color: #333;
-                        padding: 20px;
-                        background: #fff;
-                    }
+                    .info-table { width: 100%; margin-bottom: 30px; border-collapse: collapse; }
+                    .info-table td { padding: 5px 0; vertical-align: top; }
                     
-                    .invoice {
-                        max-width: 600px;
-                        margin: 0 auto;
-                        background: #fff;
-                    }
-                    
-                    .header {
-                        text-align: center;
-                        padding-bottom: 20px;
-                        border-bottom: 2px solid #333;
-                        margin-bottom: 20px;
-                    }
-                    
-                    .header h1 {
-                        font-size: 22px;
-                        margin-bottom: 5px;
-                        color: #333;
-                    }
-                    
-                    .header .subtitle {
-                        font-size: 11px;
-                        margin-bottom: 10px;
-                    }
-                    
-                    .invoice-title {
-                        font-size: 16px;
-                        margin-top: 10px;
-                        color: #ffff;
-                    }
-
-                    
-                    .info-section {
-                        margin-bottom: 25px;
-                    }
-                    
-                    .info-row {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 3px;
-                    }
-                    
-                    .info-left {
-                        width: 48%;
-                    }
-                    
-                    .info-right {
-                        width: 48%;
-                        text-align: right;
-                    }
-                    
-                    .info-label {
-                        font-weight: bold;
-                        display: inline-block;
-                        width: 70px;
-                    }
-                    
-                    .items-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 20px 0;
-                    }
-                    
-                    .items-table th {
-                        background: #f5f5f5;
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        text-align: left;
-                        font-weight: bold;
-                        font-size: 11px;
-                    }
-                    
-                    .items-table td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        font-size: 11px;
-                    }
+                    .items-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    .items-table th, .items-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                    .items-table th { background-color: #f2f2f2; font-weight: bold; }
                     
                     .text-center { text-align: center; }
                     .text-right { text-align: right; }
-                    
-                    .summary-table {
-                        width: 250px;
-                        margin: 20px 0 0 auto;
-                        border-collapse: collapse;
+
+                    /* Bagian summary yang menggunakan Flexbox */
+                    .summary-container {
+                        display: flex;
+                        justify-content: flex-end;
+                        margin-top: 20px;
+                        /* PERBAIKAN FINAL: Menambahkan margin bawah untuk mendorong footer */
+                        margin-bottom: 40px; 
                     }
-                    
-                    .summary-table td {
-                        padding: 5px 8px;
+                    .summary-box {
+                        width: 45%;
+                        max-width: 300px;
+                    }
+                    .summary-line {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 8px 0;
                         border-bottom: 1px solid #eee;
                     }
-                    
-                    .summary-table .total-row td {
+                    .summary-line.total-row {
                         border-top: 2px solid #333;
-                        border-bottom: 2px solid #333;
                         font-weight: bold;
-                        font-size: 13px;
-                        padding: 8px;
+                        font-size: 14px;
                     }
                     
                     .footer {
-                        margin-top: 30px;
+                        /* PERBAIKAN FINAL: Menghapus margin-top yang bermasalah */
                         text-align: center;
                         border-top: 1px solid #ddd;
                         padding-top: 15px;
-                    }
-                    
-                    .thank-you {
-                        background: #f9f9f9;
-                        padding: 12px;
-                        margin-bottom: 10px;
-                        border-radius: 3px;
-                        font-size: 11px;
-                    }
-                    
-                    .contact-info {
                         font-size: 10px;
                         color: #666;
-                        margin-top: 10px;
                     }
                 </style>
             </head>
             <body>
-                <div class="invoice">
-                    <div class="header">
-                        <div class="invoice-title"><h1>  </h1> </div>
-                    </div>
-
-                    <div class="info-section">
-                        <div class="info-row">
-                            <div class="info-left">
-                                <strong><h1>Keterangan</h1></strong><br>
-                                <span class="info-label">Pembeli:</span> ${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}<br>
-                                <span class="info-label">Produk:</span> Ayam Kampung<br>
-                                <span class="info-label">Penjual:</span>Eko Wahyudi<br>
-                                <span class="info-label">Tanggal:</span> ${data.tanggalFormatted}<br>
-                            </div>
-                            <div class="info-right">
-                             
-                            </div>
-                        </div>
-                    </div>
+                <div class="invoice-box">
+                    <div class="header"><h1>Nota Pembelian</h1></div>
+                    
+                    <table class="info-table">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Pembeli:</strong><br>
+                                    ${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}
+                                </td>
+                                <td class="text-right">
+                                    <strong>Invoice #:</strong> INV-${data.id}<br>
+                                    <strong>Tanggal:</strong> ${data.tanggalFormatted}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Penjual:</strong><br>
+                                    Eko Wahyudi
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
                     <table class="items-table">
                         <thead>
                             <tr>
                                 <th>Produk</th>
                                 <th class="text-center">Jumlah</th>
-                                <th class="text-center">Berat</th>
+                                <th class="text-center">Berat Total</th>
                                 <th class="text-right">Harga/gram</th>
                                 <th class="text-right">Subtotal</th>
                             </tr>
@@ -631,48 +541,60 @@
                                 <td>Ayam Kampung Segar</td>
                                 <td class="text-center">${data.jumlahAyam} ekor</td>
                                 <td class="text-center">${formatNumber(beratTotal)} gr</td>
-                                <td class="text-right">Rp.75 </td>
+                                <td class="text-right">${formatCurrency(HARGA_PER_GRAM)}</td>
                                 <td class="text-right">${formatCurrency(subtotal)}</td>
                             </tr>
                         </tbody>
                     </table>
+                    
+                    <div class="summary-container">
+                        <div class="summary-box">
+                            <div class="summary-line">
+                                <span>Subtotal</span>
+                                <span>${formatCurrency(subtotal)}</span>
+                            </div>
+                            ${hasDiskon ? `
+                            <div class="summary-line">
+                                <span style="color: #e74c3c;">Diskon</span>
+                                <span style="color: #e74c3c;">- ${formatCurrency(diskonAmount)}</span>
+                            </div>
+                            ` : ''}
+                            <div class="summary-line total-row">
+                                <span>TOTAL</span>
+                                <span>${formatCurrency(hargaTotalFinal)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-container">
+                        <div class="summary-box">
+                            <div class="summary-line">
+                                <span></span>
+                                <span></span>
+                            </div>
+                            ${hasDiskon ? `
+                            
+                                <span style="color: #e74c3c;"></span>
+                                <span style="color: #e74c3c;">- </span>
+                            </div>
+                            ` : ''}
+                           
+                                <span>L</span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <table class="summary-table">
-                        <tr>
-                            <td>Subtotal:</td>
-                            <td class="text-right">${formatCurrency(subtotal)}</td>
-                        </tr>
-                        ${diskonAmount > 0 ? `
-                        <tr>
-                            <td style="color: #d63384;">Diskon (5%):</td>
-                            <td class="text-right" style="color: #d63384;">- ${formatCurrency(diskonAmount)}</td>
-                        </tr>
-                        ` : ''}
-                        <tr class="total-row">
-                            <td>TOTAL BAYAR:</td>
-                            <td class="text-right">${formatCurrency(hargaTotalFinal)}</td>
-                        </tr>
-                    </table>
 
+                    
                     <div class="footer">
-                        <div class="thank-you">
-                            <strong>Terima kasih atas pembelian Anda!</strong><br>
-                            Ayam kampung asli, sehat dan bergizi tinggi
-                        </div>
-                        
-                        <div class="contact-info">
-                            <strong>Kontak:</strong> +62 812-3456-7890 | 
-                            <strong>Alamat:</strong> Desa Sejahtera, Kab. Berkah<br>
-                            <br>
-                            Struk ini adalah bukti pembelian yang sah. Simpan dengan baik.
-                        </div>
+                        <strong>Terima kasih atas pembelian Anda!</strong><br>
+                        Ini adalah invoice yang dibuat secara otomatis dan sah tanpa tanda tangan.
                     </div>
                 </div>
             </body>
-            </html>
-        `;
-       
-        // Proses menampilkan popup dan mengunduh PDF
+            </html>`;
+        
+        // Menampilkan popup dan opsi download
         Swal.fire({
             title: 'Rincian Struk',
             html: receiptHtmlForDisplay,
@@ -686,13 +608,12 @@
             if (result.isConfirmed) {
                 const namaPembeliFormatted = data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1);
                 const namaFile = `Invoice-${namaPembeliFormatted}-${data.tanggal}.pdf`;
-                
                 downloadPdf(receiptHtmlForPrint, namaFile);
             }
         });
     }
 
-    // Fungsi filter dan lainnya
+    // Fungsi filter dan lainnya (Tidak diubah)
     const formatCurrency = (amount) => 'Rp ' + Number(amount).toLocaleString('id-ID');
     const formatNumber = (number) => Number(number).toLocaleString('id-ID');
 
@@ -749,7 +670,6 @@
             }
         });
         
-        // Menampilkan atau menyembunyikan baris "tidak ada data"
         const noDataRow = document.querySelector('#table-body .no-data');
         if (noDataRow) {
             noDataRow.closest('tr').style.display = dataFound ? 'none' : '';
@@ -770,7 +690,6 @@
         Swal.fire('Info', 'Fungsi export belum diimplementasikan sepenuhnya.', 'info');
     }
 
-    // Panggil applyFilter saat halaman dimuat
     document.addEventListener("DOMContentLoaded", function() {
         applyFilter();
     });
