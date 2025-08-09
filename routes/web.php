@@ -101,9 +101,9 @@ Route::delete('/RekapanPenjualanAyam/{id}', [DataPenjualanController::class, 'de
 // =============================
 // Summary Ayam
 // =============================
-Route::get('/SummaryAyam', [SummaryController::class, 'index']); // tanpa nama
-
-
+Route::get('/SummaryAyam', function () {
+    return view('SummaryAyam');
+});
 
 use App\Http\Controllers\KloterController;
 
@@ -113,3 +113,8 @@ Route::post('/kloters', [KloterController::class, 'store']);
 Route::put('/kloters/{kloter}/update-stock', [KloterController::class, 'updateStock']);
 Route::get('/summaries', [KloterController::class, 'summary']);
 Route::delete('/kloters/{kloter}', [KloterController::class, 'destroy']);
+// Menyediakan data semua kloter
+Route::get('/kloters', [KloterController::class, 'index']);
+
+// Menyediakan data ringkasan
+Route::get('/summaries', [SummaryController::class, 'index']); // <-- Ini akan memanggil controller yang baru kita perbaiki
