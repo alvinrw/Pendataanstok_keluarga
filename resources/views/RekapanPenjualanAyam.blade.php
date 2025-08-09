@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Penjualan Ayam</title>
     <style>
-        /* [ SEMUA CSS ANDA YANG SUDAH ADA, TIDAK ADA PERUBAHAN DI SINI ] */
+     
         * {
             margin: 0;
             padding: 0;
@@ -361,7 +361,7 @@
             confirmButtonColor: '#27ae60'
         });
         @endif
-        // Jalankan filter saat halaman dimuat untuk memastikan ringkasan filter tersembunyi
+      
         applyFilter();
     });
 
@@ -389,7 +389,7 @@
     }
 
    function downloadPdf(htmlContent, fileName) {
-    // Buat elemen sementara di luar layar untuk rendering yang akurat
+
     const tempWrapper = document.createElement('div');
     tempWrapper.style.position = 'fixed';
     tempWrapper.style.left = '-9999px';
@@ -409,7 +409,7 @@
     }
     
     // --- PERUBAHAN UTAMA & TERAKHIR ---
-    // 1. Secara manual kita ukur tinggi total dari elemen yang sudah dirender browser.
+
     const contentHeight = elementToRender.scrollHeight;
 
     const options = {
@@ -418,12 +418,10 @@
         image: { type: 'jpeg', quality: 0.98 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'], avoid: '.summary-footer-wrapper' },
-        // 2. Kita masukkan hasil pengukuran tinggi ke dalam opsi html2canvas
         html2canvas: {
             scale: 2,
             useCORS: true,
             letterRendering: true,
-            // Perintah ini memaksa canvas untuk memiliki tinggi yang sama dengan konten
             windowHeight: contentHeight 
         }
     };
@@ -444,6 +442,8 @@
         document.body.removeChild(tempWrapper);
     });
 }
+   
+   
     function printContent(htmlContent) {
         const printFrame = document.createElement('iframe');
         printFrame.style.display = 'none';
@@ -473,7 +473,7 @@ function generateStruk(buttonEl) {
     const row = buttonEl.closest('tr');
     const data = row.dataset;
 
-    // Kalkulasi (Tidak ada perubahan)
+
     const parseNumber = (str) => Number(String(str).replace(/[^0-9]/g, ''));
     const HARGA_PER_GRAM = 75;
     const beratTotal = Number(data.beratTotal);
@@ -482,7 +482,7 @@ function generateStruk(buttonEl) {
     const diskonAmount = subtotal - hargaTotalFinal;
     const hasDiskon = diskonAmount > 0;
     
-    // Format tanggal ke Bahasa Indonesia (Tidak ada perubahan)
+
     const tanggalObj = new Date(data.tanggal);
     const tanggalIndonesia = new Intl.DateTimeFormat('id-ID', {
         day: '2-digit',
@@ -574,7 +574,6 @@ function generateStruk(buttonEl) {
 
         </div></body></html>`;
 
-    // Menampilkan Popup SweetAlert (Tidak ada perubahan)
     Swal.fire({
         title: 'Rincian Struk',
         html: receiptHtmlForDisplay,
@@ -635,7 +634,7 @@ function generateStruk(buttonEl) {
         let dataFound = false;
 
         allRows.forEach(row => {
-            if (!row.dataset.id) return; // Skip baris 'no-data'
+            if (!row.dataset.id) return; 
             
             const rowData = row.dataset;
             const isVisible = 
@@ -685,7 +684,7 @@ function generateStruk(buttonEl) {
             const rowData = [
                 index + 1,
                 cells[1].innerText,
-                `"${cells[2].innerText}"`, // Bungkus nama dengan kutip untuk handle koma
+                `"${cells[2].innerText}"`, 
                 parseInt(cells[3].innerText),
                 parseInt(cells[4].innerText.replace(/[^0-9]/g, '')),
                 cells[5].innerText,

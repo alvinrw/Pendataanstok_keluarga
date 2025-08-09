@@ -1,350 +1,115 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Penjualan Ayam</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 1.1em;
-        }
-
-        .back-button {
-            margin-bottom: 20px;
-            background: #2196F3;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s ease;
-        }
-
-        .back-button:hover {
-            background: #1976D2;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-card.total-sales {
-            border-color: #4CAF50;
-        }
-
-        .stat-card.available-stock {
-            border-color: #2196F3;
-        }
-
-        .stat-card.total-revenue {
-            border-color: #FF9800;
-        }
-
-        .stat-card.total-weight {
-            border-color: #9C27B0;
-        }
-
-        .stat-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .total-sales .stat-icon {
-            color: #4CAF50;
-        }
-
-        .available-stock .stat-icon {
-            color: #2196F3;
-        }
-
-        .total-revenue .stat-icon {
-            color: #FF9800;
-        }
-
-        .total-weight .stat-icon {
-            color: #9C27B0;
-        }
-
-        .stat-value {
-            font-size: 2.2em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            font-size: 1.1em;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .update-stock-btn {
-            margin-top: 15px;
-            background: #2196F3;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .update-stock-btn:hover {
-            background: #1976D2;
-            transform: translateY(-2px);
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .modal.show .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .modal-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .modal-body {
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #2196F3;
-        }
-
-        .current-stock {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .current-stock-label {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .current-stock-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #2196F3;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .modal-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-btn-primary {
-            background: #2196F3;
-            color: white;
-        }
-
-        .modal-btn-primary:hover {
-            background: #1976D2;
-        }
-
-        .modal-btn-secondary {
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .modal-btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                margin: 10% auto;
-                width: 95%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/SummaryAyam.css') }}">
 </head>
 <body>
     <div class="container">
-        <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
+        <button class="back-button" onclick="window.history.back()">← Kembali ke Menu Utama</button>
+
         <div class="header">
             <h1>🐔 Dashboard Penjualan Ayam</h1>
-            <p>Rekapan penjualan dan stok ayam harian</p>
+            <p>Kelola penjualan dan stok ayam per kloter</p>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card total-sales">
-                <span class="stat-icon">📊</span>
-                <div class="stat-value" id="totalSales">{{ $totalAyamTerjual }}</div>
-                <div class="stat-label">Total Stok Terjual (Ekor)</div>
+        <div class="kloter-controls">
+            <div class="kloter-selector">
+                <label for="kloterSelect">Pilih Kloter:</label>
+                <select id="kloterSelect" class="kloter-dropdown" onchange="changeKloter()">
+                    <option value="">-- Pilih Kloter --</option>
+                </select>
             </div>
+            <button class="new-kloter-btn" onclick="openNewKloterModal()">+ Kloter Baru</button>
+        </div>
 
-            <div class="stat-card available-stock">
-                <span class="stat-icon">🐔</span>
-                <div class="stat-value" id="availableStock">{{ $stokAyam }}</div>
-                <div class="stat-label">Stok Tersedia (Ekor)</div>
-                <button class="update-stock-btn" onclick="openStockModal()">Update Stok</button>
+        <div id="kloterInfo" class="current-kloter-info" style="display: none;">
+            <h3 id="currentKloterName"></h3>
+            <p>Data penjualan dan stok untuk kloter ini</p>
+        </div>
+
+        <div id="statsContainer" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card total-sales">
+                    <span class="stat-icon">📊</span>
+                    <div class="stat-value" id="totalSales">0</div>
+                    <div class="stat-label">Total Ayam Terjual (Ekor)</div>
+                </div>
+
+                <div class="stat-card available-stock">
+                    <span class="stat-icon">🐔</span>
+                    <div class="stat-value" id="availableStock">0</div>
+                    <div class="stat-label">Stok Tersedia (Ekor)</div>
+                    <button class="update-stock-btn" onclick="openStockModal()">Update Stok</button>
+                </div>
+
+                <div class="stat-card total-weight">
+                    <span class="stat-icon">⚖️</span>
+                    <div class="stat-value" id="totalWeight">0</div>
+                    <div class="stat-label">Total Berat Terjual (Kg)</div>
+                </div>
+
+                <div class="stat-card total-revenue">
+                    <span class="stat-icon">💰</span>
+                    <div class="stat-value" id="totalRevenue">Rp 0</div>
+                    <div class="stat-label">Total Uang Terkumpul</div>
+                </div>
             </div>
+        </div>
 
-            <div class="stat-card total-weight">
-                <span class="stat-icon">⚖️</span>
-                <div class="stat-value" id="totalWeight">{{ number_format($totalBeratTertimbang / 1000, 2) }}</div>
-                <div class="stat-label">Total Berat Terjual (Kg)</div>
-            </div>
-
-            <div class="stat-card total-revenue">
-                <span class="stat-icon">💰</span>
-                <div class="stat-value" id="totalRevenue">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</div>
-                <div class="stat-label">Total Uang Terkumpul</div>
+        <div class="summary-section">
+            <h3>📈 Ringkasan Total Semua Kloter</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value" id="summaryTotalKloter">0</div>
+                    <div class="summary-label">Total Kloter</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="summaryTotalSales">0</div>
+                    <div class="summary-label">Total Ayam Terjual</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="summaryTotalStock">0</div>
+                    <div class="summary-label">Total Stok Tersedia</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="summaryTotalWeight">0 Kg</div>
+                    <div class="summary-label">Total Berat Terjual</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="summaryTotalRevenue">Rp 0</div>
+                    <div class="summary-label">Total Uang Terkumpul</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal untuk Update Stok -->
+    <div id="newKloterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Buat Kloter Baru</h2>
+                <span class="close" onclick="closeNewKloterModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newKloterName">Nama Kloter</label>
+                    <input type="text" id="newKloterName" placeholder="Contoh: Kloter 1, Kloter A, dll">
+                </div>
+                <div class="form-group">
+                    <label for="initialStock">Stok Awal</label>
+                    <input type="number" id="initialStock" placeholder="Jumlah ayam awal" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeNewKloterModal()">Batal</button>
+                <button class="modal-btn modal-btn-success" onclick="createNewKloter()">Buat Kloter</button>
+            </div>
+        </div>
+    </div>
+
     <div id="stockModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -354,7 +119,7 @@
             <div class="modal-body">
                 <div class="current-stock">
                     <div class="current-stock-label">Stok Saat Ini</div>
-                    <div class="current-stock-value" id="currentStockDisplay">{{ $stokAyam }}</div>
+                    <div class="current-stock-value" id="currentStockDisplay">0</div>
                 </div>
                 <div class="form-group">
                     <label for="newStockInput">Jumlah Stok Baru</label>
@@ -369,166 +134,207 @@
     </div>
 
     <script>
-        // Data penjualan dengan harga per kg
-        let salesData = [
-            {
-                id: 1,
-                weight: 0.6,
-                stock: 15,
-                sold: 12,
-                pricePerKg: 28000
-            },
-            {
-                id: 2,
-                weight: 0.7,
-                stock: 20,
-                sold: 18,
-                pricePerKg: 28500
-            },
-            {
-                id: 3,
-                weight: 0.8,
-                stock: 18,
-                sold: 25,
-                pricePerKg: 29000
-            },
-            {
-                id: 4,
-                weight: 0.9,
-                stock: 12,
-                sold: 30,
-                pricePerKg: 29500
-            },
-            {
-                id: 5,
-                weight: 1.0,
-                stock: 10,
-                sold: 35,
-                pricePerKg: 30000
-            },
-            {
-                id: 6,
-                weight: 1.2,
-                stock: 12,
-                sold: 5,
-                pricePerKg: 30500
-            }
-        ];
+        let kloterData = {};
+        let currentKloter = null;
+        let summaryData = {};
 
-        // Fungsi untuk format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(amount);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadKloterData();
+        });
+
+        function loadKloterData() {
+            fetch('/kloters')
+            .then(response => {
+                if (!response.ok) { throw new Error('Gagal memuat data kloter.'); }
+                return response.json();
+            })
+            .then(kloters => {
+                kloterData = kloters.reduce((acc, kloter) => {
+                    acc[kloter.id] = kloter;
+                    return acc;
+                }, {});
+                updateKloterDropdown(kloters);
+                loadSummaryData();
+            })
+            .catch(error => console.error('Error loading kloter data:', error));
         }
 
-        // Fungsi untuk membuka modal
+        function loadSummaryData() {
+            fetch('/summaries')
+            .then(response => {
+                if (!response.ok) { throw new Error('Gagal memuat data ringkasan.'); }
+                return response.json();
+            })
+            .then(summary => {
+                summaryData = summary;
+                updateSummaryStats();
+            })
+            .catch(error => console.error('Error loading summary data:', error));
+        }
+
+        function updateSummaryStats() {
+            if (!summaryData) return;
+            document.getElementById('summaryTotalKloter').textContent = Object.keys(kloterData).length;
+            document.getElementById('summaryTotalSales').textContent = summaryData.total_ayam_terjual || 0;
+            document.getElementById('summaryTotalStock').textContent = summaryData.stok_ayam || 0;
+            document.getElementById('summaryTotalWeight').textContent = (summaryData.total_berat_tertimbang || 0).toFixed(2) + ' Kg';
+            document.getElementById('summaryTotalRevenue').textContent = formatCurrency(summaryData.total_pemasukan || 0);
+        }
+
+        function updateKloterDropdown(kloters) {
+            const select = document.getElementById('kloterSelect');
+            select.innerHTML = '<option value="">-- Pilih Kloter --</option>';
+            kloters.forEach(kloter => {
+                const option = document.createElement('option');
+                option.value = kloter.id;
+                option.textContent = kloter.nama_kloter;
+                select.appendChild(option);
+            });
+        }
+
+        function changeKloter() {
+            const selectedKloterId = document.getElementById('kloterSelect').value;
+            if (!selectedKloterId) {
+                document.getElementById('kloterInfo').style.display = 'none';
+                document.getElementById('statsContainer').style.display = 'none';
+                currentKloter = null;
+                return;
+            }
+            currentKloter = kloterData[selectedKloterId];
+            document.getElementById('currentKloterName').textContent = currentKloter.nama_kloter;
+            document.getElementById('kloterInfo').style.display = 'block';
+            document.getElementById('statsContainer').style.display = 'block';
+            updateKloterStats(currentKloter);
+        }
+
+        function updateKloterStats(data) {
+            if (!data) return;
+            document.getElementById('totalSales').textContent = data.total_terjual || 0;
+            document.getElementById('availableStock').textContent = data.stok_tersedia || 0;
+            document.getElementById('totalWeight').textContent = (data.total_berat || 0).toFixed(2);
+            document.getElementById('totalRevenue').textContent = formatCurrency(data.total_pemasukan || 0);
+            document.getElementById('currentStockDisplay').textContent = data.stok_tersedia || 0;
+        }
+
+        function openNewKloterModal() {
+            const modal = document.getElementById('newKloterModal');
+            modal.style.display = 'block';
+            setTimeout(() => { modal.classList.add('show'); }, 10);
+            document.getElementById('newKloterName').value = '';
+            document.getElementById('initialStock').value = '';
+            document.getElementById('newKloterName').focus();
+        }
+
+        function closeNewKloterModal() {
+            const modal = document.getElementById('newKloterModal');
+            modal.classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+
+        function createNewKloter() {
+            const name = document.getElementById('newKloterName').value.trim();
+            const initialStock = parseInt(document.getElementById('initialStock').value) || 0;
+            if (!name) { alert('Masukkan nama kloter'); return; }
+            fetch('/kloters', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ nama_kloter: name, stok_awal: initialStock })
+            })
+            .then(response => {
+                if (!response.ok) { return response.json().then(err => { throw new Error(err.message || 'Gagal membuat kloter baru.'); }); }
+                return response.json();
+            })
+            .then(() => {
+                closeNewKloterModal();
+                loadKloterData();
+                showNotification(`Kloter "${name}" berhasil dibuat!`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
+            });
+        }
+
         function openStockModal() {
+            if (!currentKloter) { alert('Pilih kloter terlebih dahulu'); return; }
             const modal = document.getElementById('stockModal');
             modal.style.display = 'block';
-            setTimeout(() => {
-                modal.classList.add('show');
-            }, 10);
-            
-            // Reset input
+            setTimeout(() => { modal.classList.add('show'); }, 10);
+            document.getElementById('currentStockDisplay').textContent = currentKloter.stok_tersedia;
             document.getElementById('newStockInput').value = '';
             document.getElementById('newStockInput').focus();
         }
 
-        // Fungsi untuk menutup modal
         function closeStockModal() {
             const modal = document.getElementById('stockModal');
             modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
 
-        // Fungsi untuk memperbarui stok
         function updateStock() {
+            if (!currentKloter) return;
             const newStock = parseInt(document.getElementById('newStockInput').value);
-
-            if (isNaN(newStock) || newStock < 0) {
-                alert('Masukkan jumlah stok yang valid');
-                return;
-            }
-
-            fetch('/update-stok', {
-                method: 'POST',
+            if (isNaN(newStock) || newStock < 0) { alert('Masukkan jumlah stok yang valid'); return; }
+            fetch(`/kloters/${currentKloter.id}/update-stock`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ stok_ayam: newStock })
+                body: JSON.stringify({ new_stock: newStock })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) { return response.json().then(err => { throw new Error(err.message || 'Gagal update stok.'); }); }
+                return response.json();
+            })
             .then(data => {
-                if (data.success) {
-                    document.getElementById('availableStock').textContent = data.stok_ayam;
-                    document.getElementById('currentStockDisplay').textContent = data.stok_ayam;
-                    closeStockModal();
-                    showNotification(`Stok berhasil diupdate menjadi ${data.stok_ayam} ekor!`);
-                }
+                kloterData[data.id] = data;
+                updateKloterStats(data);
+                closeStockModal();
+                loadSummaryData();
+                showNotification(`Stok kloter "${data.nama_kloter}" berhasil diupdate menjadi ${newStock} ekor!`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);
             });
         }
 
-        // Fungsi untuk menampilkan notifikasi
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0
+            }).format(amount);
+        }
+
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #4CAF50;
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                z-index: 1001;
-                transform: translateX(300px);
-                transition: transform 0.3s ease;
-                font-weight: 500;
+                position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px 20px;
+                border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1001;
+                transform: translateX(300px); transition: transform 0.3s ease; font-weight: 500; max-width: 300px;
             `;
             notification.textContent = message;
-            
             document.body.appendChild(notification);
-            
-            // Animasi masuk
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Hapus setelah 3 detik
+            setTimeout(() => { notification.style.transform = 'translateX(0)'; }, 10);
             setTimeout(() => {
                 notification.style.transform = 'translateX(300px)';
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
+                setTimeout(() => { if (document.body.contains(notification)) { document.body.removeChild(notification); } }, 300);
             }, 3000);
         }
 
-        // Event listener untuk menutup modal ketika klik di luar
         window.onclick = function(event) {
-            const modal = document.getElementById('stockModal');
-            if (event.target === modal) {
-                closeStockModal();
-            }
+            const stockModal = document.getElementById('stockModal');
+            const newKloterModal = document.getElementById('newKloterModal');
+            if (event.target === stockModal) { closeStockModal(); }
+            if (event.target === newKloterModal) { closeNewKloterModal(); }
         }
 
-        // Event listener untuk tombol Enter di input
-        document.getElementById('newStockInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                updateStock();
-            }
-        });
-
-        // Render statistik saat halaman dimuat
-        // calculateStats();
+        document.getElementById('newStockInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') { updateStock(); } });
+        document.getElementById('newKloterName').addEventListener('keypress', function(e) { if (e.key === 'Enter') { document.getElementById('initialStock').focus(); } });
+        document.getElementById('initialStock').addEventListener('keypress', function(e) { if (e.key === 'Enter') { createNewKloter(); } });
     </script>
 </body>
 </html>

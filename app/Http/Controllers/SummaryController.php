@@ -3,59 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Summary;
+// use App\Models\Summary; // Tidak perlu model Summary di sini lagi jika hanya me-return view
 
 class SummaryController extends Controller
 {
-    // public function index()
-    // {
-    //     // Ambil semua data summary dari tabel `summaries`
-    //     $summaries = Summary::all();
-
-    //     // Kirim ke view
-      
-    // }
-
-public function index()
-{
-    $summaries = Summary::all();
-    $summary = Summary::latest()->first(); // Ambil data summary terbaru
-
-    $stokAyam = $summary ? $summary->stok_ayam : 0;
-    $totalAyamTerjual = $summary ? $summary->total_ayam_terjual : 0;
-    $totalBeratTertimbang = $summary ? $summary->total_berat_tertimbang : 0;
-    $totalPemasukan = $summary ? $summary->total_pemasukan : 0;
-
-    return view('SummaryAyam', compact(
-        'summaries',
-        'stokAyam',
-        'totalAyamTerjual',
-        'totalBeratTertimbang',
-        'totalPemasukan'
-    ));
-}
-
-
-
-    public function updateStok(Request $request)
+    public function index()
     {
-        $request->validate([
-            'stok_ayam' => 'required|integer|min:0',
-        ]);
-
-        // Ambil entri paling baru atau buat baru jika belum ada
-        $summary = Summary::latest()->first();
-        if (!$summary) {
-            $summary = new Summary();
-        }
-
-        $summary->stok_ayam = $request->stok_ayam;
-        $summary->save();
-
-        return response()->json([
-            'success' => true,
-            'stok_ayam' => $summary->stok_ayam,
-        ]);
+        // Cukup return view, data akan diisi oleh JavaScript melalui API
+        return view('SummaryAyam');
     }
-}
 
+    // Hapus fungsi updateStok() dari sini
+    // Karena update summary akan ditangani oleh KloterController
+}

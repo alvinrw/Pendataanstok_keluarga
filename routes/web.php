@@ -102,5 +102,13 @@ Route::delete('/RekapanPenjualanAyam/{id}', [DataPenjualanController::class, 'de
 // Summary Ayam
 // =============================
 Route::get('/SummaryAyam', [SummaryController::class, 'index']); // tanpa nama
-Route::get('/summary', [SummaryController::class, 'index'])->name('summary.index');
-Route::post('/update-stok', [SummaryController::class, 'updateStok'])->name('stok.update');
+
+
+
+use App\Http\Controllers\KloterController;
+
+// Rute untuk semua API dashboard kloter
+Route::get('/kloters', [KloterController::class, 'index']);
+Route::post('/kloters', [KloterController::class, 'store']);
+Route::put('/kloters/{kloter}/update-stock', [KloterController::class, 'updateStock']);
+Route::get('/summaries', [KloterController::class, 'summary']);
