@@ -15,6 +15,18 @@ class KloterController extends Controller
         return response()->json($kloters);
     }
 
+
+      public function destroy(Kloter $kloter)
+    {
+        // Hapus kloter dari database
+        $kloter->delete();
+
+        // Perbarui data ringkasan setelah menghapus
+        $this->updateSummary();
+
+        // Kirim respons sukses dalam format JSON
+        return response()->json(['message' => 'Kloter berhasil dihapus.']);
+    }
     // Menyimpan kloter baru
     public function store(Request $request)
     {

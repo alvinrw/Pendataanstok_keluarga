@@ -267,6 +267,52 @@
             font-size: 0.9em;
             color: #6c757d;
         }
+        /*tombol hapus */
+        .kloter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.delete-kloter-btn {
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+.delete-kloter-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Notifikasi */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 1001;
+    transform: translateX(300px);
+    transition: transform 0.3s ease;
+    font-weight: 500;
+    max-width: 300px;
+}
+
+.notification.error {
+    background-color: #e74c3c;
+}
+
+
 
         /* Modal Styles */
         .modal {

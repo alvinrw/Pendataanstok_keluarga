@@ -112,3 +112,4 @@ Route::get('/kloters', [KloterController::class, 'index']);
 Route::post('/kloters', [KloterController::class, 'store']);
 Route::put('/kloters/{kloter}/update-stock', [KloterController::class, 'updateStock']);
 Route::get('/summaries', [KloterController::class, 'summary']);
+Route::delete('/kloters/{kloter}', [KloterController::class, 'destroy']);
