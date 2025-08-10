@@ -2,79 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kloter;
-use App\Models\Summary;
 use Illuminate\Http\Request;
+use App\Models\Kloter;
+use App\Models\DataPenjualan;
 
 class KloterController extends Controller
 {
-    // Mengambil semua data kloter
+    /**
+     * Menyediakan data SEMUA kloter untuk dropdown.
+     */
     public function index()
     {
-        $kloters = Kloter::all();
+        // PERUBAHAN DI SINI: Kita hapus filter 'where' untuk mengambil semua kloter.
+        $kloters = Kloter::with(['pengeluarans', 'kematianAyams', 'dataPenjualans'])->get();
+
+        // Perhitungan metrik tetap berjalan untuk semua kloter
+        $kloters->each(function ($kloter) {
+            $kloter->total_terjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
+            $kloter->total_pemasukan = $kloter->dataPenjualans->sum('harga_total');
+            
+            $totalPengeluaran = $kloter->pengeluarans->sum('jumlah_pengeluaran');
+            $keuntungan = $kloter->total_pemasukan - $totalPengeluaran;
+            $kloter->keuntungan = $keuntungan;
+
+            $totalMati = $kloter->kematianAyams->sum('jumlah_mati');
+            $persentaseKematian = ($kloter->jumlah_doc > 0) ? ($totalMati / $kloter->jumlah_doc) * 100 : 0;
+            $kloter->persentase_kematian = round($persentaseKematian, 2);
+        });
+
         return response()->json($kloters);
     }
 
-
-      public function destroy(Kloter $kloter)
-    {
-        // Hapus kloter dari database
-        $kloter->delete();
-
-        // Perbarui data ringkasan setelah menghapus
-        $this->updateSummary();
-
-        // Kirim respons sukses dalam format JSON
-        return response()->json(['message' => 'Kloter berhasil dihapus.']);
-    }
-    // Menyimpan kloter baru
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama_kloter' => 'required|unique:kloters,nama_kloter',
-            'stok_awal' => 'required|integer|min:0',
-        ]);
-
-        $kloter = Kloter::create([
-            'nama_kloter' => $request->nama_kloter,
-            'stok_awal' => $request->stok_awal,
-            'stok_tersedia' => $request->stok_awal,
-        ]);
-
-        $this->updateSummary();
-
-        return response()->json($kloter, 201);
-    }
-
-    // Memperbarui stok kloter
+    /**
+     * Memperbarui stok untuk kloter yang dipilih.
+     */
     public function updateStock(Request $request, Kloter $kloter)
     {
-        $request->validate([
+        $validated = $request->validate([
             'new_stock' => 'required|integer|min:0',
         ]);
 
-        $kloter->stok_tersedia = $request->new_stock;
-        $kloter->save();
-
-        $this->updateSummary();
-
+        $kloter->update(['stok_tersedia' => $validated['new_stock']]);
+        
         return response()->json($kloter);
-    }
-
-    // Fungsi untuk memperbarui tabel ringkasan
-    private function updateSummary()
-    {
-        $total_kloters = Kloter::count();
-        $total_ayam_terjual = Kloter::sum('total_terjual');
-        $total_stok_tersedia = Kloter::sum('stok_tersedia');
-        $total_berat_tertimbang = Kloter::sum('total_berat');
-        $total_pemasukan = Kloter::sum('total_pemasukan');
-
-        $summary = Summary::firstOrNew(['id' => 1]); // Asumsi hanya ada satu baris summary
-        $summary->total_ayam_terjual = $total_ayam_terjual;
-        $summary->stok_ayam = $total_stok_tersedia;
-        $summary->total_berat_tertimbang = $total_berat_tertimbang;
-        $summary->total_pemasukan = $total_pemasukan;
-        $summary->save();
     }
 }

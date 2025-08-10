@@ -2,30 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Summary; // <-- Pastikan ini di-import
 use Illuminate\Http\Request;
+use App\Models\Summary;
+use App\Models\Kloter; // <-- Tambahkan ini
 
 class SummaryController extends Controller
 {
     /**
-     * Mengambil dan menampilkan data ringkasan total sebagai JSON.
+     * Menyediakan data ringkasan TOTAL dari SEMUA kloter yang sudah panen.
      */
     public function index()
     {
-        // Mengambil data ringkasan pertama dari tabel.
-        // Jika tabel kosong (misal saat aplikasi pertama kali jalan),
-        // buat baris baru dengan nilai default 0.
-        $summary = Summary::firstOrCreate(
-            ['id' => 1], // Kunci untuk mencari data ringkasan
-            [           // Nilai default jika tidak ditemukan
-                'total_ayam_terjual' => 0,
-                'stok_ayam' => 0,
-                'total_berat_tertimbang' => 0,
-                'total_pemasukan' => 0,
-            ]
-        );
+        // Ambil semua kloter yang statusnya 'Selesai Panen'
+        $klotersPanen = Kloter::where('status', 'Selesai Panen')->get();
 
-        // Mengembalikan data sebagai respons JSON
-        return response()->json($summary);
+        // Hitung total dari koleksi
+        $totalAyamTerjual = $klotersPanen->sum('total_terjual');
+        $totalStokTersedia = $klotersPanen->sum('stok_tersedia');
+        $totalBeratTerjual = $klotersPanen->sum('total_berat');
+        $totalPemasukan = $klotersPanen->sum('total_pemasukan');
+
+        $summaryData = [
+            'total_kloter' => $klotersPanen->count(),
+            'total_ayam_terjual' => $totalAyamTerjual,
+            'stok_ayam' => $totalStokTersedia,
+            'total_berat_tertimbang' => $totalBeratTerjual,
+            'total_pemasukan' => $totalPemasukan,
+        ];
+
+        return response()->json($summaryData);
     }
 }

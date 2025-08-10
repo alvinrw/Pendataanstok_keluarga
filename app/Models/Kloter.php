@@ -31,6 +31,15 @@ class Kloter extends Model
         return $this->hasMany(Pengeluaran::class);
     }
 
+
+    // Di dalam file app/Models/Kloter.php
+
+public function dataPenjualans()
+{
+    return $this->hasMany(DataPenjualan::class);
+}
+
+
     /**
      * Relasi: Satu Kloter memiliki banyak data Kematian Ayam.
      */

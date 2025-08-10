@@ -9,7 +9,7 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; }
         .container { max-width: 1100px; margin: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;}
         h1 { color: #333; }
         .btn { padding: 10px 20px; text-decoration: none; color: white; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; border: none; cursor: pointer; }
         .btn-green { background-color: #28a745; }
@@ -24,8 +24,6 @@
         .status-aktif { color: #ffc107; font-weight: bold; }
         .status-selesai { color: #28a745; font-weight: bold; }
         .actions { display: flex; gap: 10px; align-items: center;}
-        
-        /* Gaya untuk Modal */
         .swal2-popup { width: 80% !important; max-width: 950px !important; }
         .modal-content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; text-align: left; }
         .modal-card { padding: 15px; border: 1px solid #eee; border-radius: 8px; }
@@ -35,13 +33,16 @@
         .modal-rekapan-table tr:last-child td { border-bottom: none; }
         .modal-summary-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; }
         .summary-item { display: flex; justify-content: space-between; font-size: 1.1em; margin-bottom: 10px; }
+        .editable-item { display: flex; justify-content: space-between; align-items: center; gap: 10px;}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Manajemen Kloter</h1>
-            <a href="{{ route('manajemen.kloter.create') }}" class="btn btn-green">Tambah Kloter Baru</a>
+            <!-- PERUBAHAN 1: Tombol diubah menjadi button dengan onclick -->
+             <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
+            <button type="button" class="btn btn-green" onclick="openCreateKloterModal()">Tambah Kloter Baru</button>
         </div>
 
         @if(session('success'))
@@ -61,7 +62,7 @@
                         <th>Nama Kloter</th>
                         <th>Status</th>
                         <th>Tanggal Mulai</th>
-                        <th>Jumlah DOC Awal</th>
+                        <th>DOC Awal</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -81,11 +82,8 @@
                             <td>
                                 <div class="actions">
                                     <button class="btn btn-blue" onclick="openDetailModal({{ $kloter->id }})">Detail</button>
-                                    
-                                    <!-- PERUBAHAN 1: Tombol diubah menjadi button biasa dengan onclick -->
                                     <button type="button" class="btn btn-orange" onclick="openUpdateStatusModal({{ $kloter->id }}, '{{ $kloter->status }}', '{{ $kloter->nama_kloter }}')">Ubah Status</button>
-
-                                    <form action="{{ route('manajemen.kloter.destroy', $kloter->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus kloter ini?');">
+                                    <form action="{{ route('manajemen.kloter.destroy', $kloter->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus kloter ini? Semua data terkait akan hilang.');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-red">Hapus</button>
@@ -94,7 +92,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" style="text-align: center; padding: 40px;">Belum ada data kloter.</td></tr>
+                        <tr><td colspan="5" style="text-align: center; padding: 40px;">Belum ada data kloter. Silakan buat yang baru.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -102,62 +100,66 @@
     </div>
 
 <script>
-    // PERUBAHAN 2: Fungsi ubah status diubah menjadi pop-up dengan pilihan
+    // PERUBAHAN 2: Fungsi baru untuk membuka modal tambah kloter
+    function openCreateKloterModal() {
+        Swal.fire({
+            title: 'Tambah Kloter Baru',
+            html: `
+                <form id="form-create-kloter" action="{{ route('manajemen.kloter.store') }}" method="POST" style="text-align: left;">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    
+                    <label for="swal-nama_kloter" style="display: block; margin-bottom: 5px;">Nama Kloter</label>
+                    <input id="swal-nama_kloter" type="text" name="nama_kloter" class="swal2-input" placeholder="Contoh: Kloter Agustus 2025" required>
+                    
+                    <label for="swal-tanggal_mulai" style="display: block; margin-bottom: 5px; margin-top: 10px;">Tanggal Ayam Masuk</label>
+                    <input id="swal-tanggal_mulai" type="date" name="tanggal_mulai" class="swal2-input" value="{{ date('Y-m-d') }}" required>
+
+                    <label for="swal-jumlah_doc" style="display: block; margin-bottom: 5px; margin-top: 10px;">DOC Awal (Jumlah Ayam)</label>
+                    <input id="swal-jumlah_doc" type="number" name="jumlah_doc" class="swal2-input" placeholder="Contoh: 100" required min="1">
+
+                    <label for="swal-harga_beli_doc" style="display: block; margin-bottom: 5px; margin-top: 10px;">Harga Beli DOC (Wajib)</label>
+                    <input id="swal-harga_beli_doc" type="number" name="harga_beli_doc" class="swal2-input" placeholder="Contoh: 800000" min="0">
+                </form>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan Kloter',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#28a745',
+            preConfirm: () => {
+                // Saat tombol simpan diklik, submit form di dalam modal
+                document.getElementById('form-create-kloter').submit();
+            }
+        });
+    }
     function openUpdateStatusModal(kloterId, currentStatus, kloterName) {
         Swal.fire({
             title: `Ubah Status Kloter "${kloterName}"`,
             input: 'select',
-            inputOptions: {
-                'Aktif': 'Belum Siap Panen',
-                'Selesai Panen': 'Sudah Panen'
-            },
-            inputValue: currentStatus, // Menandai status saat ini
+            inputOptions: { 'Aktif': 'Belum Siap Panen', 'Selesai Panen': 'Sudah Panen' },
+            inputValue: currentStatus,
             showCancelButton: true,
             confirmButtonText: 'Simpan Perubahan',
             cancelButtonText: 'Batal',
             confirmButtonColor: '#fd7e14',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'Anda harus memilih status!'
-                }
-            }
+            inputValidator: (value) => !value && 'Anda harus memilih status!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Jika dikonfirmasi, buat form dinamis dan kirim
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/manajemen-kloter/${kloterId}/update-status`;
-
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                
-                const hiddenMethod = document.createElement('input');
-                hiddenMethod.type = 'hidden';
-                hiddenMethod.name = '_method';
-                hiddenMethod.value = 'PUT';
-
-                const hiddenToken = document.createElement('input');
-                hiddenToken.type = 'hidden';
-                hiddenToken.name = '_token';
-                hiddenToken.value = csrfToken;
-
-                const hiddenStatus = document.createElement('input');
-                hiddenStatus.type = 'hidden';
-                hiddenStatus.name = 'status';
-                hiddenStatus.value = result.value; // Mengirim status yang dipilih
-
-                form.appendChild(hiddenMethod);
-                form.appendChild(hiddenToken);
-                form.appendChild(hiddenStatus);
-
+                form.innerHTML = `
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="status" value="${result.value}">
+                `;
                 document.body.appendChild(form);
                 form.submit();
             }
         });
     }
 
-    // ... (sisa kode JavaScript lainnya tetap sama) ...
     async function openDetailModal(kloterId) {
-        Swal.fire({ title: 'Memuat data kloter...', didOpen: () => { Swal.showLoading() }, allowOutsideClick: false });
+        Swal.fire({ title: 'Memuat data kloter...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
             const response = await fetch(`/manajemen-kloter/${kloterId}/detail-json`);
@@ -180,7 +182,7 @@
                     </td>
                 </tr>`;
             });
-            if (kloter.kematian_ayams.length === 0) kematianHtml = '<tr><td colspan="3">Belum ada data.</td></tr>';
+            if (kloter.kematian_ayams.length === 0) kematianHtml = '<tr><td colspan="3" style="text-align:center;">Belum ada data.</td></tr>';
 
             let pengeluaranHtml = '';
             kloter.pengeluarans.forEach(item => {
@@ -196,13 +198,14 @@
                     </td>
                 </tr>`;
             });
-            if (kloter.pengeluarans.length === 0) pengeluaranHtml = '<tr><td colspan="3">Belum ada data.</td></tr>';
+            if (kloter.pengeluarans.length === 0) pengeluaranHtml = '<tr><td colspan="3" style="text-align:center;">Belum ada data.</td></tr>';
 
             const modalHtml = `
                 <div class="modal-content-grid">
                     <div class="modal-card">
                         <h3>📝 Input & Edit Data</h3>
-                        <p><strong>DOC Awal:</strong> ${kloter.jumlah_doc} ekor <button class="btn btn-orange btn-sm" onclick="openEditDocModal(${kloter.id}, ${kloter.jumlah_doc})">Edit</button></p>
+                        <div class="editable-item"><p><strong>DOC Awal:</strong> ${kloter.jumlah_doc} ekor</p> <button class="btn btn-orange btn-sm" onclick="openEditDocModal(${kloter.id}, ${kloter.jumlah_doc})">Edit</button></div>
+                        <div class="editable-item"><p><strong>Tanggal Mulai:</strong> ${new Date(kloter.tanggal_mulai).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'})}</p> <button class="btn btn-orange btn-sm" onclick="openEditTanggalModal(${kloter.id}, '${kloter.tanggal_mulai}')">Edit</button></div>
                         <hr>
                         <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openKematianModal(${kloter.id})">Input Jumlah Kematian</button>
                         <button class="btn btn-blue" style="width:100%;" onclick="openPengeluaranModal(${kloter.id})">Input Data Keperluan</button>
@@ -231,6 +234,22 @@
         }
     }
 
+    function openEditTanggalModal(kloterId, currentTanggal) {
+        Swal.fire({
+            title: 'Edit Tanggal Mulai',
+            html: `
+                <form id="form-edit-tanggal" action="/manajemen-kloter/${kloterId}/update-tanggal" method="POST">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="date" name="tanggal_mulai" class="swal2-input" value="${currentTanggal}" required>
+                </form>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan Perubahan',
+            preConfirm: () => document.getElementById('form-edit-tanggal').submit()
+        });
+    }
+
     function openEditDocModal(kloterId, currentDoc) {
         Swal.fire({
             title: 'Edit Jumlah DOC Awal',
@@ -243,7 +262,7 @@
             `,
             showCancelButton: true,
             confirmButtonText: 'Simpan Perubahan',
-            preConfirm: () => { document.getElementById('form-edit-doc').submit(); }
+            preConfirm: () => document.getElementById('form-edit-doc').submit()
         });
     }
 
@@ -260,7 +279,7 @@
             `,
             showCancelButton: true,
             confirmButtonText: 'Simpan',
-            preConfirm: () => { document.getElementById('form-kematian').submit(); }
+            preConfirm: () => document.getElementById('form-kematian').submit()
         });
     }
 
@@ -277,7 +296,7 @@
             `,
             showCancelButton: true,
             confirmButtonText: 'Simpan',
-            preConfirm: () => { document.getElementById('form-pengeluaran').submit(); }
+            preConfirm: () => document.getElementById('form-pengeluaran').submit()
         });
     }
 </script>
