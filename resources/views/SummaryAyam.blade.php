@@ -18,12 +18,11 @@
 
         <div class="kloter-controls">
             <div class="kloter-selector">
-                <label for="kloterSelect">Pilih Kloter Siap Jual:</label>
+                <label for="kloterSelect">Pilih Kloter:</label>
                 <select id="kloterSelect" class="kloter-dropdown" onchange="changeKloter()">
                     <option value="">-- Pilih Kloter --</option>
                 </select>
             </div>
-            <!-- Tombol Tambah Kloter Baru sudah dihapus -->
         </div>
 
         <div id="kloterInfo" class="current-kloter-info" style="display: none;">
@@ -31,7 +30,7 @@
             <p>Data penjualan dan performa untuk kloter ini</p>
         </div>
 
- <div id="statsContainer" style="display: none;">
+        <div id="statsContainer" style="display: none;">
             <div class="stats-grid">
                 <div class="stat-card available-stock">
                     <span class="stat-icon">🐔</span>
@@ -44,31 +43,36 @@
                     <div class="stat-value" id="totalSales">0</div>
                     <div class="stat-label">Total Ayam Terjual (Ekor)</div>
                 </div>
-                 <div class="stat-card total-revenue">
+                <div class="stat-card total-revenue">
                     <span class="stat-icon">💰</span>
                     <div class="stat-value" id="totalRevenue">Rp 0</div>
                     <div class="stat-label">Total Pemasukan Kloter Ini</div>
                 </div>
                 <div class="stat-card total-weight">
                     <span class="stat-icon">⚖️</span>
-                    <div class="stat-value" id="totalWeight">0</div>
+                    <div class="stat-value" id="totalWeight">0 Kg</div>
                     <div class="stat-label">Total Berat Terjual (Kg)</div>
                 </div>
-                <div class="stat-card profit">
-                    <span class="stat-icon">📈</span>
-                    <div class="stat-value" id="keuntungan">Rp 0</div>
-                    <div class="stat-label">Keuntungan Kloter Ini</div>
+                <div class="stat-card expense">
+                    <span class="stat-icon">💸</span>
+                    <div class="stat-value" id="totalPengeluaran">Rp 0</div>
+                    <div class="stat-label">Total Pengeluaran</div>
                 </div>
                 <div class="stat-card mortality">
                     <span class="stat-icon">💀</span>
                     <div class="stat-value" id="persenMati">0%</div>
                     <div class="stat-label">Persentase Kematian</div>
                 </div>
+                <div class="stat-card profit">
+                    <span class="stat-icon">📈</span>
+                    <div class="stat-value" id="keuntungan">Rp 0</div>
+                    <div class="stat-label">Keuntungan Kloter Ini</div>
+                </div>
             </div>
         </div>
 
         <div class="summary-section">
-            <h3>📈 Ringkasan Total (Semua Kloter Panen)</h3>
+            <h3>📈 Ringkasan Total (Hanya Kloter Panen)</h3>
             <div class="summary-grid">
                 <div class="summary-item">
                     <div class="summary-value" id="summaryTotalKloter">0</div>
@@ -94,26 +98,38 @@
         </div>
     </div>
 
-    <!-- Modal Update Stok (tidak berubah) -->
     <div id="stockModal" class="modal">
-        <!-- ... (Isi modal ini sama seperti sebelumnya) ... -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Update Stok Ayam</h2>
+                <span class="close" onclick="closeStockModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="current-stock">
+                    <div class="current-stock-label">Stok Saat Ini</div>
+                    <div class="current-stock-value" id="currentStockDisplay">0</div>
+                </div>
+                <div class="form-group">
+                    <label for="newStockInput">Jumlah Stok Baru</label>
+                    <input type="number" id="newStockInput" placeholder="Masukkan jumlah stok baru" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeStockModal()">Batal</button>
+                <button class="modal-btn modal-btn-primary" onclick="updateStock()">Update Stok</button>
+            </div>
+        </div>
     </div>
 
 <script>
     let kloterData = {};
     let currentKloter = null;
 
-    // PERBAIKAN DI SINI:
-    // Menggunakan 'pageshow' agar data selalu di-refresh saat halaman ditampilkan,
-    // termasuk saat pengguna menekan tombol "kembali" di browser.
     window.addEventListener('pageshow', function(event) {
-        // Selalu panggil loadKloterData saat halaman ditampilkan
-        // untuk memastikan data selalu yang terbaru.
         loadKloterData();
     });
 
     function loadKloterData() {
-        // Reset tampilan sebelum memuat data baru
         document.getElementById('kloterInfo').style.display = 'none';
         document.getElementById('statsContainer').style.display = 'none';
 
@@ -140,10 +156,10 @@
     }
 
     function formatCurrency(amount) {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount || 0);
     }
 
- function updateKloterDropdown(kloters) {
+    function updateKloterDropdown(kloters) {
         const select = document.getElementById('kloterSelect');
         select.innerHTML = '<option value="">-- Pilih Kloter --</option>';
         
@@ -151,12 +167,10 @@
             const option = document.createElement('option');
             option.value = kloter.id;
             
-            // Memberi penanda status pada setiap pilihan
             if (kloter.status === 'Aktif') {
                 option.textContent = `${kloter.nama_kloter} (Belum Panen)`;
-                // Kloter yang belum panen tidak bisa dipilih untuk dijual
                 option.disabled = true; 
-            } else { // Status 'Selesai Panen'
+            } else {
                 option.textContent = `${kloter.nama_kloter} (Siap Jual - Sisa: ${kloter.stok_tersedia} ekor)`;
                 option.disabled = false;
             }
@@ -184,19 +198,22 @@
         updateKloterStats(currentKloter);
     }
 
+    /**
+     * PERUBAHAN JAVASCRIPT ADA DI SINI
+     */
     function updateKloterStats(data) {
         if (!data) return;
-        // Update kartu lama
         document.getElementById('availableStock').textContent = data.stok_tersedia || 0;
         document.getElementById('totalSales').textContent = data.total_terjual || 0;
-        document.getElementById('totalRevenue').textContent = formatCurrency(data.total_pemasukan || 0);
+        document.getElementById('totalRevenue').textContent = formatCurrency(data.total_pemasukan);
         document.getElementById('totalWeight').textContent = (data.total_berat || 0).toFixed(2);
         
-        // Update kartu BARU
-        document.getElementById('keuntungan').textContent = formatCurrency(data.keuntungan || 0);
+        // Menambahkan update untuk kartu baru
+        document.getElementById('totalPengeluaran').textContent = formatCurrency(data.total_pengeluaran);
+        
         document.getElementById('persenMati').textContent = `${data.persentase_kematian || 0}%`;
+        document.getElementById('keuntungan').textContent = formatCurrency(data.keuntungan);
 
-        // Update display di modal
         const currentStockDisplay = document.getElementById('currentStockDisplay');
         if(currentStockDisplay) {
             currentStockDisplay.textContent = data.stok_tersedia || 0;
@@ -209,10 +226,9 @@
         document.getElementById('summaryTotalSales').textContent = summary.total_ayam_terjual || 0;
         document.getElementById('summaryTotalStock').textContent = summary.stok_ayam || 0;
         document.getElementById('summaryTotalWeight').textContent = (summary.total_berat_tertimbang || 0).toFixed(2) + ' Kg';
-        document.getElementById('summaryTotalRevenue').textContent = formatCurrency(summary.total_pemasukan || 0);
+        document.getElementById('summaryTotalRevenue').textContent = formatCurrency(summary.total_pemasukan);
     }
 
-    // --- Fungsi untuk Modal Update Stok (tidak ada perubahan signifikan) ---
     function openStockModal() {
         if (!currentKloter) return;
         const stockModal = document.getElementById('stockModal');
@@ -251,15 +267,15 @@
         })
         .then(response => response.json())
         .then(updatedKloter => {
-            // Update data lokal
-            kloterData[updatedKloter.id] = { ...kloterData[updatedKloter.id], ...updatedKloter };
-            currentKloter = kloterData[updatedKloter.id];
+            const fullKloterData = { ...kloterData[updatedKloter.id], ...updatedKloter };
+            kloterData[updatedKloter.id] = fullKloterData;
+            currentKloter = fullKloterData;
             
             updateKloterStats(currentKloter);
-            updateKloterDropdown(Object.values(kloterData)); // Refresh dropdown untuk update sisa stok
-            document.getElementById('kloterSelect').value = currentKloter.id; // Pilih kembali kloter yg aktif
+            updateKloterDropdown(Object.values(kloterData));
+            document.getElementById('kloterSelect').value = currentKloter.id;
             closeStockModal();
-            loadSummaryData(); // Muat ulang summary total
+            loadSummaryData();
         })
         .catch(error => console.error('Error updating stock:', error));
     }

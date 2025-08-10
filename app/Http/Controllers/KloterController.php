@@ -13,15 +13,16 @@ class KloterController extends Controller
      */
     public function index()
     {
-        // PERUBAHAN DI SINI: Kita hapus filter 'where' untuk mengambil semua kloter.
         $kloters = Kloter::with(['pengeluarans', 'kematianAyams', 'dataPenjualans'])->get();
 
-        // Perhitungan metrik tetap berjalan untuk semua kloter
         $kloters->each(function ($kloter) {
             $kloter->total_terjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
             $kloter->total_pemasukan = $kloter->dataPenjualans->sum('harga_total');
             
+            // PERUBAHAN DI SINI: Kita tambahkan properti baru untuk total pengeluaran
             $totalPengeluaran = $kloter->pengeluarans->sum('jumlah_pengeluaran');
+            $kloter->total_pengeluaran = $totalPengeluaran;
+
             $keuntungan = $kloter->total_pemasukan - $totalPengeluaran;
             $kloter->keuntungan = $keuntungan;
 
