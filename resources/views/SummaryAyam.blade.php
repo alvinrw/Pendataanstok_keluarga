@@ -32,7 +32,6 @@
 
         <div id="statsContainer" style="display: none;">
             <div class="stats-grid">
-                <!-- KARTU BARU: DOC Awal -->
                 <div class="stat-card doc-awal">
                     <span class="stat-icon">🐣</span>
                     <div class="stat-value" id="docAwal">0</div>
@@ -42,7 +41,6 @@
                     <span class="stat-icon">🐔</span>
                     <div class="stat-value" id="availableStock">0</div>
                     <div class="stat-label">Stok Tersedia (Ekor)</div>
-                    <button class="update-stock-btn" onclick="openStockModal()">Update Stok</button>
                 </div>
                 <div class="stat-card total-sales">
                     <span class="stat-icon">📊</span>
@@ -72,53 +70,30 @@
             </div>
         </div>
 
+        <!-- PERUBAHAN HTML ADA DI SINI -->
         <div class="summary-section">
             <h3>📈 Ringkasan Total (Hanya Kloter Panen)</h3>
             <div class="summary-grid">
-                <div class="summary-item">
+                <div class="summary-card">
+                    <span class="summary-icon">📋</span>
                     <div class="summary-value" id="summaryTotalKloter">0</div>
                     <div class="summary-label">Total Kloter Panen</div>
                 </div>
-                <div class="summary-item">
-                    <div class="summary-value" id="summaryTotalSales">0</div>
-                    <div class="summary-label">Total Ayam Terjual</div>
-                </div>
-                <div class="summary-item">
+                <div class="summary-card">
+                    <span class="summary-icon">🐔</span>
                     <div class="summary-value" id="summaryTotalStock">0</div>
-                    <div class="summary-label">Total Stok Tersedia</div>
+                    <div class="summary-label">Ayam Tersedia (Ekor)</div>
                 </div>
-                <div class="summary-item">
-                    <div class="summary-value" id="summaryTotalWeight">0 Kg</div>
-                    <div class="summary-label">Total Berat Terjual</div>
+                <div class="summary-card">
+                    <span class="summary-icon">📊</span>
+                    <div class="summary-value" id="summaryTotalSales">0</div>
+                    <div class="summary-label">Total Ayam Terjual (Ekor)</div>
                 </div>
-                <div class="summary-item">
-                    <div class="summary-value" id="summaryTotalRevenue">Rp 0</div>
-                    <div class="summary-label">Total Pemasukan</div>
+                <div class="summary-card">
+                    <span class="summary-icon">💰</span>
+                    <div class="summary-value" id="summaryTotalKeuntungan">Rp 0</div>
+                    <div class="summary-label">Total Keuntungan</div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Update Stok -->
-    <div id="stockModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Update Stok Ayam</h2>
-                <span class="close" onclick="closeStockModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="current-stock">
-                    <div class="current-stock-label">Stok Saat Ini</div>
-                    <div class="current-stock-value" id="currentStockDisplay">0</div>
-                </div>
-                <div class="form-group">
-                    <label for="newStockInput">Jumlah Stok Baru</label>
-                    <input type="number" id="newStockInput" placeholder="Masukkan jumlah stok baru" min="0">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-btn modal-btn-secondary" onclick="closeStockModal()">Batal</button>
-                <button class="modal-btn modal-btn-primary" onclick="updateStock()">Update Stok</button>
             </div>
         </div>
     </div>
@@ -169,7 +144,6 @@
             const option = document.createElement('option');
             option.value = kloter.id;
             
-            // Logika baru untuk dropdown
             if (kloter.stok_tersedia > 0) {
                 option.textContent = `${kloter.nama_kloter} (Siap Jual - Sisa: ${kloter.stok_tersedia} ekor)`;
                 option.disabled = false;
@@ -213,72 +187,21 @@
         document.getElementById('totalPengeluaran').textContent = formatCurrency(data.total_pengeluaran);
         document.getElementById('jumlahMati').textContent = `${data.jumlah_kematian || 0} ekor`;
         document.getElementById('keuntungan').textContent = formatCurrency(data.keuntungan);
-
-        const currentStockDisplay = document.getElementById('currentStockDisplay');
-        if(currentStockDisplay) {
-            currentStockDisplay.textContent = data.stok_tersedia || 0;
-        }
     }
     
+    /**
+     * PERUBAHAN JAVASCRIPT ADA DI SINI
+     */
     function updateSummaryStats(summary) {
         if (!summary) return;
         document.getElementById('summaryTotalKloter').textContent = summary.total_kloter || 0;
         document.getElementById('summaryTotalSales').textContent = summary.total_ayam_terjual || 0;
         document.getElementById('summaryTotalStock').textContent = summary.stok_ayam || 0;
-        document.getElementById('summaryTotalWeight').textContent = (summary.total_berat_tertimbang || 0).toFixed(2) + ' Kg';
-        document.getElementById('summaryTotalRevenue').textContent = formatCurrency(summary.total_pemasukan);
+        
+        // Mengubah elemen untuk menampilkan keuntungan
+        document.getElementById('summaryTotalKeuntungan').textContent = formatCurrency(summary.total_keuntungan);
     }
 
-    function openStockModal() {
-        if (!currentKloter) return;
-        const stockModal = document.getElementById('stockModal');
-        if (stockModal) {
-            stockModal.style.display = 'block';
-            const newStockInput = document.getElementById('newStockInput');
-            if(newStockInput) {
-                newStockInput.value = '';
-                newStockInput.focus();
-            }
-        }
-    }
-
-    function closeStockModal() {
-        const stockModal = document.getElementById('stockModal');
-        if (stockModal) {
-            stockModal.style.display = 'none';
-        }
-    }
-
-    function updateStock() {
-        if (!currentKloter) return;
-        const newStockInput = document.getElementById('newStockInput');
-        if (!newStockInput) return;
-
-        const newStock = parseInt(newStockInput.value);
-        if (isNaN(newStock) || newStock < 0) { alert('Masukkan jumlah stok yang valid'); return; }
-
-        fetch(`/kloters/${currentKloter.id}/update-stock`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ new_stock: newStock })
-        })
-        .then(response => response.json())
-        .then(updatedKloter => {
-            const fullKloterData = { ...kloterData[updatedKloter.id], ...updatedKloter };
-            kloterData[updatedKloter.id] = fullKloterData;
-            currentKloter = fullKloterData;
-            
-            updateKloterStats(currentKloter);
-            updateKloterDropdown(Object.values(kloterData));
-            document.getElementById('kloterSelect').value = currentKloter.id;
-            closeStockModal();
-            loadSummaryData();
-        })
-        .catch(error => console.error('Error updating stock:', error));
-    }
 </script>
 </body>
 </html>

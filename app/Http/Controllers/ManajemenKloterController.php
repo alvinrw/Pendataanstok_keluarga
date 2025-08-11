@@ -43,20 +43,11 @@ class ManajemenKloterController extends Controller
     /**
      * Menampilkan halaman utama (daftar semua kloter).
      */
-public function index()
-{
-    // Eager load semua relasi yang dibutuhkan
-    $kloters = Kloter::with(['kematianAyams', 'dataPenjualans'])->get();
-
-    $kloters->each(function ($kloter) {
-        $kloter->total_terjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
-        $kloter->total_pemasukan = $kloter->dataPenjualans->sum('harga_total');
-        $kloter->keuntungan = $kloter->total_pemasukan - $kloter->total_pengeluaran;
-        $kloter->jumlah_kematian = $kloter->kematianAyams->sum('jumlah_mati');
-    });
-
-    return view('manajemen.daftar_kloter', compact('kloters'));
-}
+    public function index()
+    {
+        $kloters = Kloter::latest()->get();
+        return view('manajemen.daftar_kloter', compact('kloters'));
+    }
 
     /**
      * Menampilkan form untuk membuat kloter baru (tidak digunakan jika memakai modal,
@@ -81,11 +72,14 @@ public function index()
 
         DB::beginTransaction();
         try {
+            // Inisialisasi data saat kloter dibuat
             $validated['stok_awal'] = 0;
             $validated['stok_tersedia'] = 0;
-            $validated['sisa_ayam_hidup'] = $validated['jumlah_doc'];
-            $validated['total_pengeluaran'] = $validated['harga_beli_doc'];
+            $validated['sisa_ayam_hidup'] = $validated['jumlah_doc']; // Sisa ayam = jumlah awal
+            $validated['total_pengeluaran'] = $validated['harga_beli_doc']; // Pengeluaran awal = harga DOC
+
             $kloter = Kloter::create($validated);
+
             if ($validated['harga_beli_doc'] > 0) {
                 $kloter->pengeluarans()->create([
                     'kategori' => 'Lainnya',
@@ -94,6 +88,7 @@ public function index()
                     'catatan' => 'Biaya pembelian DOC awal'
                 ]);
             }
+
             DB::commit();
             return redirect()->route('manajemen.kloter.index')
                              ->with('success', 'Kloter baru berhasil dibuat & biaya DOC dicatat sebagai pengeluaran.');
@@ -117,6 +112,7 @@ public function index()
      */
     public function detailJson(Kloter $kloter)
     {
+        // Sekarang kita tidak perlu menghitung lagi, cukup ambil data yang sudah tersimpan
         $kloter->load(['pengeluarans' => fn($q) => $q->latest(), 'kematianAyams' => fn($q) => $q->latest(), 'panens' => fn($q) => $q->latest()]);
         
         $data = [
@@ -139,7 +135,9 @@ public function index()
     {
         $validated = $request->validate(['jumlah_doc' => 'required|integer|min:0']);
         $kloter->update(['jumlah_doc' => $validated['jumlah_doc']]);
+        
         $this->updateKloterCalculations($kloter);
+
         return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah DOC berhasil diperbarui.');
     }
     
@@ -229,6 +227,15 @@ public function index()
     public function destroyPanen(Panen $panen)
     {
         $kloter = $panen->kloter;
+
+        $totalTerjual = $kloter->dataPenjualans()->sum('jumlah_ayam_dibeli');
+        $totalPanenSaatIni = $kloter->panens()->sum('jumlah_panen');
+        $totalPanenSetelahHapus = $totalPanenSaatIni - $panen->jumlah_panen;
+
+        if ($totalPanenSetelahHapus < $totalTerjual) {
+            return redirect()->back()->withErrors(['error' => 'Gagal menghapus! Data panen ini tidak dapat dihapus karena sebagian ayamnya sudah terjual. Hapus data penjualan terkait terlebih dahulu.']);
+        }
+        
         $panen->delete();
         $this->updateKloterCalculations($kloter);
         return redirect()->back()->with('success', 'Data panen berhasil dihapus.');
@@ -249,17 +256,4 @@ public function index()
         $this->updateKloterCalculations($kloter);
         return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah ayam berhasil dikoreksi.');
     }
-
-     public function updateStock(Request $request, Kloter $kloter)
-    {
-        $validated = $request->validate([
-            'new_stock' => 'required|integer|min:0',
-        ]);
-
-        $kloter->update(['stok_tersedia' => $validated['new_stock']]);
-        
-        return response()->json($kloter);
-    }
-
-
 }
