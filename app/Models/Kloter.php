@@ -37,4 +37,10 @@ class Kloter extends Model
     {
         return $this->hasMany(DataPenjualan::class);
     }
+
+    public function panens()
+{
+    return $this->hasMany(Panen::class);
+}
+
 }

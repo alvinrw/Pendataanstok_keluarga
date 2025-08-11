@@ -102,24 +102,31 @@ Route::put('/kloters/{kloter}/update-stock', [KloterController::class, 'updateSt
 Route::get('/summaries', [SummaryController::class, 'index']);
 Route::delete('/kloters/{kloter}', [KloterController::class, 'destroy']);
 
+// Di dalam file routes/web.php
+
+// GANTI BLOK LAMA ANDA DENGAN INI
 // ======================================================
 // RUTE UNTUK FITUR MANAJEMEN PEMELIHARAAN AYAM
 // ======================================================
 Route::get('/manajemen-kloter', [ManajemenKloterController::class, 'index'])->name('manajemen.kloter.index');
-Route::get('/manajemen-kloter/create', [ManajemenKloterController::class, 'create'])->name('manajemen.kloter.create');
 Route::post('/manajemen-kloter', [ManajemenKloterController::class, 'store'])->name('manajemen.kloter.store');
-Route::get('/manajemen-kloter/{kloter}', [ManajemenKloterController::class, 'show'])->name('manajemen.kloter.show');
-Route::post('/manajemen-kloter/{kloter}/pengeluaran', [ManajemenKloterController::class, 'storePengeluaran'])->name('manajemen.kloter.storePengeluaran');
-Route::post('/manajemen-kloter/{kloter}/kematian', [ManajemenKloterController::class, 'storeKematian'])->name('manajemen.kloter.storeKematian');
-Route::post('/manajemen-kloter/{kloter}/panen', [ManajemenKloterController::class, 'konfirmasiPanen'])->name('manajemen.kloter.konfirmasiPanen');
-Route::delete('/manajemen-kloter/{kloter}', [ManajemenKloterController::class, 'destroy'])->name('manajemen.kloter.destroy');
 Route::get('/manajemen-kloter/{kloter}/detail-json', [ManajemenKloterController::class, 'detailJson'])->name('manajemen.kloter.detailJson');
-Route::put('/manajemen-kloter/{kloter}/update-status', [ManajemenKloterController::class, 'updateStatus'])->name('manajemen.kloter.updateStatus');
 Route::put('/manajemen-kloter/{kloter}/update-doc', [ManajemenKloterController::class, 'updateDoc'])->name('manajemen.kloter.updateDoc');
-Route::delete('/pengeluaran/{pengeluaran}', [ManajemenKloterController::class, 'destroyPengeluaran'])->name('manajemen.pengeluaran.destroy');
-Route::delete('/kematian/{kematianAyam}', [ManajemenKloterController::class, 'destroyKematian'])->name('manajemen.kematian.destroy');
 Route::put('/manajemen-kloter/{kloter}/update-tanggal', [ManajemenKloterController::class, 'updateTanggalMulai'])->name('manajemen.kloter.updateTanggal');
 Route::put('/manajemen-kloter/{kloter}/koreksi-stok', [ManajemenKloterController::class, 'koreksiStok'])->name('manajemen.kloter.koreksiStok');
+Route::delete('/manajemen-kloter/{kloter}', [ManajemenKloterController::class, 'destroy'])->name('manajemen.kloter.destroy');
 
+// Rute untuk entitas terkait
+Route::post('/manajemen-kloter/{kloter}/pengeluaran', [ManajemenKloterController::class, 'storePengeluaran'])->name('manajemen.kloter.storePengeluaran');
+Route::delete('/pengeluaran/{pengeluaran}', [ManajemenKloterController::class, 'destroyPengeluaran'])->name('manajemen.pengeluaran.destroy');
+Route::post('/manajemen-kloter/{kloter}/kematian', [ManajemenKloterController::class, 'storeKematian'])->name('manajemen.kloter.storeKematian');
+Route::delete('/kematian/{kematianAyam}', [ManajemenKloterController::class, 'destroyKematian'])->name('manajemen.kematian.destroy');
+
+// RUTE BARU UNTUK PANEN PARSIAL
+Route::post('/manajemen-kloter/{kloter}/panen', [ManajemenKloterController::class, 'storePanen'])->name('manajemen.kloter.storePanen');
+Route::delete('/panen/{panen}', [ManajemenKloterController::class, 'destroyPanen'])->name('manajemen.panen.destroy');
+
+// Rute status lama bisa dihapus jika tidak dipakai lagi, atau biarkan saja
+Route::put('/manajemen-kloter/{kloter}/update-status', [ManajemenKloterController::class, 'updateStatus'])->name('manajemen.kloter.updateStatus');
 
 

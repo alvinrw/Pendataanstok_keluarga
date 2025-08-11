@@ -32,6 +32,12 @@
 
         <div id="statsContainer" style="display: none;">
             <div class="stats-grid">
+                <!-- KARTU BARU: DOC Awal -->
+                <div class="stat-card doc-awal">
+                    <span class="stat-icon">🐣</span>
+                    <div class="stat-value" id="docAwal">0</div>
+                    <div class="stat-label">DOC Awal (Ekor)</div>
+                </div>
                 <div class="stat-card available-stock">
                     <span class="stat-icon">🐔</span>
                     <div class="stat-value" id="availableStock">0</div>
@@ -46,12 +52,7 @@
                  <div class="stat-card total-revenue">
                     <span class="stat-icon">💰</span>
                     <div class="stat-value" id="totalRevenue">Rp 0</div>
-                    <div class="stat-label">Total Pemasukan Kloter Ini</div>
-                </div>
-                <div class="stat-card total-weight">
-                    <span class="stat-icon">⚖️</span>
-                    <div class="stat-value" id="totalWeight">0 Kg</div>
-                    <div class="stat-label">Total Berat Terjual (Kg)</div>
+                    <div class="stat-label">Total Pemasukan</div>
                 </div>
                 <div class="stat-card expense">
                     <span class="stat-icon">💸</span>
@@ -168,12 +169,16 @@
             const option = document.createElement('option');
             option.value = kloter.id;
             
-            if (kloter.status === 'Aktif') {
+            // Logika baru untuk dropdown
+            if (kloter.stok_tersedia > 0) {
+                option.textContent = `${kloter.nama_kloter} (Siap Jual - Sisa: ${kloter.stok_tersedia} ekor)`;
+                option.disabled = false;
+            } else if (kloter.sisa_ayam_hidup > 0) {
                 option.textContent = `${kloter.nama_kloter} (Belum Panen)`;
                 option.disabled = true; 
             } else {
-                option.textContent = `${kloter.nama_kloter} (Siap Jual - Sisa: ${kloter.stok_tersedia} ekor)`;
-                option.disabled = false;
+                option.textContent = `${kloter.nama_kloter} (Selesai/Habis)`;
+                option.disabled = true;
             }
             
             select.appendChild(option);
@@ -201,10 +206,10 @@
 
     function updateKloterStats(data) {
         if (!data) return;
+        document.getElementById('docAwal').textContent = data.jumlah_doc || 0;
         document.getElementById('availableStock').textContent = data.stok_tersedia || 0;
         document.getElementById('totalSales').textContent = data.total_terjual || 0;
         document.getElementById('totalRevenue').textContent = formatCurrency(data.total_pemasukan);
-        document.getElementById('totalWeight').textContent = (data.total_berat || 0).toFixed(2) + ' Kg';
         document.getElementById('totalPengeluaran').textContent = formatCurrency(data.total_pengeluaran);
         document.getElementById('jumlahMati').textContent = `${data.jumlah_kematian || 0} ekor`;
         document.getElementById('keuntungan').textContent = formatCurrency(data.keuntungan);

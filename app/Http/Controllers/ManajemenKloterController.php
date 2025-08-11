@@ -6,19 +6,57 @@ use Illuminate\Http\Request;
 use App\Models\Kloter;
 use App\Models\Pengeluaran;
 use App\Models\KematianAyam;
+use App\Models\Panen;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class ManajemenKloterController extends Controller
 {
     /**
+     * "Kalkulator Utama" yang menghitung semua data kloter.
+     * Fungsi ini akan dipanggil setiap kali ada perubahan data.
+     */
+    private function updateKloterCalculations(Kloter $kloter)
+    {
+        // Muat ulang relasi untuk mendapatkan data terbaru
+        $kloter->load(['kematianAyams', 'panens', 'pengeluarans', 'dataPenjualans']);
+
+        $totalMati = $kloter->kematianAyams->sum('jumlah_mati');
+        $totalPanen = $kloter->panens->sum('jumlah_panen');
+        $totalPengeluaran = $kloter->pengeluarans->sum('jumlah_pengeluaran');
+        $totalTerjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
+        
+        // Rumus sisa ayam di kandang
+        $sisaAyamDiKandang = $kloter->jumlah_doc - $totalMati - $totalPanen;
+
+        // Rumus stok yang siap dijual di halaman summary
+        $stokSiapJual = $totalPanen - $totalTerjual;
+
+        // Simpan semua hasil perhitungan ke database
+        $kloter->sisa_ayam_hidup = $sisaAyamDiKandang;
+        $kloter->total_pengeluaran = $totalPengeluaran;
+        $kloter->stok_tersedia = $stokSiapJual;
+
+        $kloter->save();
+    }
+
+    /**
      * Menampilkan halaman utama (daftar semua kloter).
      */
-    public function index()
-    {
-        $kloters = Kloter::latest()->get();
-        return view('manajemen.daftar_kloter', compact('kloters'));
-    }
+public function index()
+{
+    // Eager load semua relasi yang dibutuhkan
+    $kloters = Kloter::with(['kematianAyams', 'dataPenjualans'])->get();
+
+    $kloters->each(function ($kloter) {
+        $kloter->total_terjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
+        $kloter->total_pemasukan = $kloter->dataPenjualans->sum('harga_total');
+        $kloter->keuntungan = $kloter->total_pemasukan - $kloter->total_pengeluaran;
+        $kloter->jumlah_kematian = $kloter->kematianAyams->sum('jumlah_mati');
+    });
+
+    return view('manajemen.daftar_kloter', compact('kloters'));
+}
 
     /**
      * Menampilkan form untuk membuat kloter baru (tidak digunakan jika memakai modal,
@@ -27,30 +65,6 @@ class ManajemenKloterController extends Controller
     public function create()
     {
         return redirect()->route('manajemen.kloter.index');
-    }
-
-    /**
-     * FUNGSI UTAMA: Ini adalah "kalkulator" pribadi untuk setiap kloter.
-     * Akan kita panggil setiap kali ada perubahan data.
-     */
-    private function updateKloterCalculations(Kloter $kloter)
-    {
-        // Hitung ulang semua dari awal agar data selalu akurat
-        $totalMati = $kloter->kematianAyams()->sum('jumlah_mati');
-        $totalPengeluaran = $kloter->pengeluarans()->sum('jumlah_pengeluaran');
-        $sisaAyam = $kloter->jumlah_doc - $totalMati;
-
-        // Simpan hasil perhitungan ke database
-        $kloter->sisa_ayam_hidup = $sisaAyam;
-        $kloter->total_pengeluaran = $totalPengeluaran;
-
-        // LOGIKA SINKRONISASI:
-        // Jika kloter sudah panen, update juga stok tersedianya.
-        if ($kloter->status === 'Selesai Panen') {
-            $kloter->stok_tersedia = $sisaAyam;
-        }
-
-        $kloter->save();
     }
 
     /**
@@ -67,14 +81,11 @@ class ManajemenKloterController extends Controller
 
         DB::beginTransaction();
         try {
-            // Inisialisasi data saat kloter dibuat
             $validated['stok_awal'] = 0;
             $validated['stok_tersedia'] = 0;
-            $validated['sisa_ayam_hidup'] = $validated['jumlah_doc']; // Sisa ayam = jumlah awal
-            $validated['total_pengeluaran'] = $validated['harga_beli_doc']; // Pengeluaran awal = harga DOC
-
+            $validated['sisa_ayam_hidup'] = $validated['jumlah_doc'];
+            $validated['total_pengeluaran'] = $validated['harga_beli_doc'];
             $kloter = Kloter::create($validated);
-
             if ($validated['harga_beli_doc'] > 0) {
                 $kloter->pengeluarans()->create([
                     'kategori' => 'Lainnya',
@@ -83,7 +94,6 @@ class ManajemenKloterController extends Controller
                     'catatan' => 'Biaya pembelian DOC awal'
                 ]);
             }
-
             DB::commit();
             return redirect()->route('manajemen.kloter.index')
                              ->with('success', 'Kloter baru berhasil dibuat & biaya DOC dicatat sebagai pengeluaran.');
@@ -107,13 +117,13 @@ class ManajemenKloterController extends Controller
      */
     public function detailJson(Kloter $kloter)
     {
-        // Sekarang kita tidak perlu menghitung lagi, cukup ambil data yang sudah tersimpan
-        $kloter->load(['pengeluarans' => fn($q) => $q->latest(), 'kematianAyams' => fn($q) => $q->latest()]);
+        $kloter->load(['pengeluarans' => fn($q) => $q->latest(), 'kematianAyams' => fn($q) => $q->latest(), 'panens' => fn($q) => $q->latest()]);
         
         $data = [
             'kloter' => $kloter,
             'rekapan' => [
-                'total_mati' => $kloter->jumlah_doc - $kloter->sisa_ayam_hidup,
+                'total_mati' => $kloter->kematianAyams->sum('jumlah_mati'),
+                'total_panen' => $kloter->panens->sum('jumlah_panen'),
                 'sisa_ayam' => $kloter->sisa_ayam_hidup,
                 'total_pengeluaran' => $kloter->total_pengeluaran
             ]
@@ -123,41 +133,13 @@ class ManajemenKloterController extends Controller
     }
     
     /**
-     * Mengubah status kloter (Aktif / Selesai Panen).
-     */
-    public function updateStatus(Request $request, Kloter $kloter)
-    {
-        $validated = $request->validate([
-            'status' => ['required', Rule::in(['Aktif', 'Selesai Panen'])]
-        ]);
-        
-        $newStatus = $validated['status'];
-        $updateData = ['status' => $newStatus];
-
-        if ($newStatus === 'Selesai Panen') {
-            $totalMati = $kloter->kematianAyams()->sum('jumlah_mati');
-            $sisaAyamHidup = $kloter->jumlah_doc - $totalMati;
-            $updateData['stok_tersedia'] = $sisaAyamHidup;
-        } else {
-            $updateData['stok_tersedia'] = 0;
-            $updateData['tanggal_panen'] = null;
-            $updateData['harga_jual_total'] = null;
-        }
-
-        $kloter->update($updateData);
-        return redirect()->route('manajemen.kloter.index')->with('success', 'Status kloter berhasil diubah.');
-    }
-
-    /**
      * Mengubah jumlah DOC awal.
      */
     public function updateDoc(Request $request, Kloter $kloter)
     {
         $validated = $request->validate(['jumlah_doc' => 'required|integer|min:0']);
         $kloter->update(['jumlah_doc' => $validated['jumlah_doc']]);
-        
         $this->updateKloterCalculations($kloter);
-
         return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah DOC berhasil diperbarui.');
     }
     
@@ -225,45 +207,59 @@ class ManajemenKloterController extends Controller
     }
 
     /**
-     * Memproses konfirmasi panen dari form di dalam detail.
+     * Menyimpan data panen parsial.
      */
-    public function konfirmasiPanen(Request $request, Kloter $kloter)
+    public function storePanen(Request $request, Kloter $kloter)
     {
-        $totalMati = $kloter->kematianAyams()->sum('jumlah_mati');
-        $sisaAyamHidup = $kloter->jumlah_doc - $totalMati;
+        $sisaAyam = $kloter->sisa_ayam_hidup;
         $validated = $request->validate([
-            'harga_jual_total' => 'required|integer|min:0',
+            'jumlah_panen' => "required|integer|min:1|max:{$sisaAyam}",
             'tanggal_panen' => 'required|date',
         ]);
-        $kloter->update([
-            'status' => 'Selesai Panen',
-            'harga_jual_total' => $validated['harga_jual_total'],
-            'tanggal_panen' => $validated['tanggal_panen'],
-            'stok_tersedia' => $sisaAyamHidup,
-        ]);
-        return redirect()->back()->with('success', 'Panen berhasil dikonfirmasi!');
-    }
 
-    public function koreksiStok(Request $request, Kloter $kloter)
-    {
-        $validated = $request->validate([
-            'sisa_ayam_hidup' => 'required|integer|min:0'
-        ]);
-
-        $sisaAyamBaru = $validated['sisa_ayam_hidup'];
-        $totalMati = $kloter->kematianAyams()->sum('jumlah_mati');
-
-        // Hitung mundur untuk menemukan DOC awal yang seharusnya
-        $docAwalBaru = $sisaAyamBaru + $totalMati;
-
-        // Update kedua nilai di database
-        $kloter->jumlah_doc = $docAwalBaru;
-        $kloter->sisa_ayam_hidup = $sisaAyamBaru;
-        $kloter->save();
-
-        // Panggil kalkulator utama untuk memastikan semua data lain sinkron
+        $kloter->panens()->create($validated);
         $this->updateKloterCalculations($kloter);
 
-        return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah ayam berhasil dikoreksi dan DOC awal telah disesuaikan.');
+        return redirect()->back()->with('success', 'Data panen berhasil dicatat.');
     }
+
+    /**
+     * Menghapus data panen.
+     */
+    public function destroyPanen(Panen $panen)
+    {
+        $kloter = $panen->kloter;
+        $panen->delete();
+        $this->updateKloterCalculations($kloter);
+        return redirect()->back()->with('success', 'Data panen berhasil dihapus.');
+    }
+    
+    /**
+     * Mengoreksi stok akhir dan menyesuaikan DOC awal.
+     */
+    public function koreksiStok(Request $request, Kloter $kloter)
+    {
+        $validated = $request->validate(['sisa_ayam_hidup' => 'required|integer|min:0']);
+        $sisaAyamBaru = $validated['sisa_ayam_hidup'];
+        $totalMati = $kloter->kematianAyams()->sum('jumlah_mati');
+        $totalPanen = $kloter->panens()->sum('jumlah_panen');
+        $docAwalBaru = $sisaAyamBaru + $totalMati + $totalPanen;
+        $kloter->jumlah_doc = $docAwalBaru;
+        $kloter->save();
+        $this->updateKloterCalculations($kloter);
+        return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah ayam berhasil dikoreksi.');
+    }
+
+     public function updateStock(Request $request, Kloter $kloter)
+    {
+        $validated = $request->validate([
+            'new_stock' => 'required|integer|min:0',
+        ]);
+
+        $kloter->update(['stok_tersedia' => $validated['new_stock']]);
+        
+        return response()->json($kloter);
+    }
+
+
 }

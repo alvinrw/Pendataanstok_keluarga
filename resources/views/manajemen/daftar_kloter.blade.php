@@ -21,8 +21,6 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #e9ecef; white-space: nowrap; }
         th { background-color: #f8f9fa; font-size: 0.9em; text-transform: uppercase; color: #6c757d; }
-        .status-aktif { color: #ffc107; font-weight: bold; }
-        .status-selesai { color: #28a745; font-weight: bold; }
         .actions { display: flex; gap: 10px; align-items: center;}
         .swal2-popup { width: 80% !important; max-width: 950px !important; }
         .modal-content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; text-align: left; }
@@ -58,7 +56,8 @@
                 <thead>
                     <tr>
                         <th>Nama Kloter</th>
-                        <th>Status</th>
+                        <th>Sisa Ayam di Kandang</th>
+                        <th>Stok Siap Jual</th>
                         <th>Tanggal Mulai</th>
                         <th>DOC Awal</th>
                         <th>Aksi</th>
@@ -68,19 +67,13 @@
                     @forelse ($kloters as $kloter)
                         <tr>
                             <td><strong>{{ $kloter->nama_kloter }}</strong></td>
-                            <td>
-                                @if ($kloter->status == 'Aktif')
-                                    <span class="status-aktif">Belum Siap Panen</span>
-                                @else
-                                    <span class="status-selesai">Sudah Panen</span>
-                                @endif
-                            </td>
+                            <td><strong style="color: #007bff;">{{ $kloter->sisa_ayam_hidup }} ekor</strong></td>
+                            <td><strong style="color: #28a745;">{{ $kloter->stok_tersedia }} ekor</strong></td>
                             <td>{{ \Carbon\Carbon::parse($kloter->tanggal_mulai)->format('d F Y') }}</td>
                             <td>{{ $kloter->jumlah_doc }} ekor</td>
                             <td>
                                 <div class="actions">
                                     <button class="btn btn-blue" onclick="openDetailModal({{ $kloter->id }})">Detail</button>
-                                    <button type="button" class="btn btn-orange" onclick="openUpdateStatusModal({{ $kloter->id }}, '{{ $kloter->status }}', '{{ $kloter->nama_kloter }}')">Ubah Status</button>
                                     <form action="{{ route('manajemen.kloter.destroy', $kloter->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus kloter ini? Semua data terkait akan hilang.');">
                                         @csrf
                                         @method('DELETE')
@@ -90,7 +83,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" style="text-align: center; padding: 40px;">Belum ada data kloter. Silakan buat yang baru.</td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 40px;">Belum ada data kloter. Silakan buat yang baru.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -120,33 +113,6 @@
             confirmButtonColor: '#28a745',
             preConfirm: () => {
                 document.getElementById('form-create-kloter').submit();
-            }
-        });
-    }
-
-    function openUpdateStatusModal(kloterId, currentStatus, kloterName) {
-        Swal.fire({
-            title: `Ubah Status Kloter "${kloterName}"`,
-            input: 'select',
-            inputOptions: { 'Aktif': 'Belum Siap Panen', 'Selesai Panen': 'Sudah Panen' },
-            inputValue: currentStatus,
-            showCancelButton: true,
-            confirmButtonText: 'Simpan Perubahan',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#fd7e14',
-            inputValidator: (value) => !value && 'Anda harus memilih status!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/manajemen-kloter/${kloterId}/update-status`;
-                form.innerHTML = `
-                    <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="status" value="${result.value}">
-                `;
-                document.body.appendChild(form);
-                form.submit();
             }
         });
     }
@@ -193,6 +159,22 @@
             });
             if (kloter.pengeluarans.length === 0) pengeluaranHtml = '<tr><td colspan="3" style="text-align:center;">Belum ada data.</td></tr>';
 
+            let panenHtml = '';
+            kloter.panens.forEach(item => {
+                panenHtml += `<tr>
+                    <td>${new Date(item.tanggal_panen).toLocaleDateString('id-ID')}</td>
+                    <td>${item.jumlah_panen} ekor</td>
+                    <td>
+                        <form action="/panen/${item.id}" method="POST" onsubmit="return confirm('Hapus data panen ini?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-red btn-sm">Hapus</button>
+                        </form>
+                    </td>
+                </tr>`;
+            });
+            if (kloter.panens.length === 0) panenHtml = '<tr><td colspan="3" style="text-align:center;">Belum ada data.</td></tr>';
+
             const modalHtml = `
                 <div class="modal-content-grid">
                     <div class="modal-card">
@@ -201,15 +183,20 @@
                         <div class="editable-item"><p><strong>Tanggal Mulai:</strong> ${new Date(kloter.tanggal_mulai).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'})}</p> <button class="btn btn-orange btn-sm" onclick="openEditTanggalModal(${kloter.id}, '${kloter.tanggal_mulai}')">Edit</button></div>
                         <hr>
                         <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openKematianModal(${kloter.id})">Input Jumlah Kematian</button>
-                        <button class="btn btn-blue" style="width:100%;" onclick="openPengeluaranModal(${kloter.id})">Input Data Keperluan</button>
+                        <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openPengeluaranModal(${kloter.id})">Input Data Keperluan</button>
+                        <button class="btn btn-green" style="width:100%;" onclick="openPanenModal(${kloter.id})">Input Panen</button>
                     </div>
                     <div class="modal-card">
                         <h3>📜 Riwayat & Rekapan</h3>
-                        <div style="max-height: 150px; overflow-y: auto; margin-bottom: 10px;">
+                        <div style="max-height: 120px; overflow-y: auto; margin-bottom: 10px;">
+                            <strong>Riwayat Panen:</strong>
+                            <table class="modal-rekapan-table"><thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>${panenHtml}</tbody></table>
+                        </div>
+                        <div style="max-height: 120px; overflow-y: auto; margin-bottom: 10px;">
                             <strong>Riwayat Kematian:</strong>
                             <table class="modal-rekapan-table"><thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>${kematianHtml}</tbody></table>
                         </div>
-                        <div style="max-height: 150px; overflow-y: auto;">
+                        <div style="max-height: 120px; overflow-y: auto;">
                             <strong>Riwayat Pengeluaran:</strong>
                             <table class="modal-rekapan-table"><thead><tr><th>Kategori</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>${pengeluaranHtml}</tbody></table>
                         </div>
@@ -217,8 +204,9 @@
                 </div>
                 <div class="modal-summary-box">
                     <div class="summary-item"><span>💰 Total Pengeluaran:</span><strong>Rp ${rekapan.total_pengeluaran.toLocaleString('id-ID')}</strong></div>
+                    <div class="summary-item"><span>🌾 Jumlah yang Sudah Terpanen:</span><strong>${rekapan.total_panen} ekor</strong></div>
                     <div class="summary-item">
-                        <span>🐓 Jumlah Ayam Sekarang:</span>
+                        <span>🐓 Jumlah Ayam Kloter Ini (di Kandang):</span>
                         <div class="editable-item">
                             <strong>${rekapan.sisa_ayam} ekor</strong>
                             <button class="btn btn-orange btn-sm" onclick="openKoreksiStokModal(${kloter.id}, ${rekapan.sisa_ayam})">Koreksi</button>
@@ -325,6 +313,23 @@
             showCancelButton: true,
             confirmButtonText: 'Simpan',
             preConfirm: () => document.getElementById('form-pengeluaran').submit()
+        });
+    }
+    
+    function openPanenModal(kloterId) {
+        Swal.fire({
+            title: 'Catat Panen Parsial',
+            html: `
+                <form id="form-panen" action="/manajemen-kloter/${kloterId}/panen" method="POST">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="number" name="jumlah_panen" class="swal2-input" placeholder="Jumlah Ayam Dipanen" required min="1">
+                    <input type="date" name="tanggal_panen" class="swal2-input" value="{{ date('Y-m-d') }}" required>
+                </form>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan Panen',
+            confirmButtonColor: '#28a745',
+            preConfirm: () => { document.getElementById('form-panen').submit(); }
         });
     }
 </script>
