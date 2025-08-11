@@ -10,25 +10,24 @@ class KloterController extends Controller
 {
     /**
      * Menyediakan data SEMUA kloter untuk dropdown.
+     * Perhitungan sekarang lebih sederhana karena membaca data yang sudah disimpan.
      */
     public function index()
     {
-        $kloters = Kloter::with(['pengeluarans', 'kematianAyams', 'dataPenjualans'])->get();
+        // Hanya perlu mengambil relasi data penjualan untuk menghitung pemasukan
+        $kloters = Kloter::with('dataPenjualans')->get();
 
         $kloters->each(function ($kloter) {
+            // 1. Ambil data penjualan dari relasi
             $kloter->total_terjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
             $kloter->total_pemasukan = $kloter->dataPenjualans->sum('harga_total');
+            $kloter->total_berat = $kloter->dataPenjualans->sum('berat_total') / 1000; // Ubah ke Kg
             
-            // PERUBAHAN DI SINI: Kita tambahkan properti baru untuk total pengeluaran
-            $totalPengeluaran = $kloter->pengeluarans->sum('jumlah_pengeluaran');
-            $kloter->total_pengeluaran = $totalPengeluaran;
+            // 2. Hitung keuntungan (Pemasukan - Pengeluaran yang sudah tersimpan di DB)
+            $kloter->keuntungan = $kloter->total_pemasukan - $kloter->total_pengeluaran;
 
-            $keuntungan = $kloter->total_pemasukan - $totalPengeluaran;
-            $kloter->keuntungan = $keuntungan;
-
-            $totalMati = $kloter->kematianAyams->sum('jumlah_mati');
-            $persentaseKematian = ($kloter->jumlah_doc > 0) ? ($totalMati / $kloter->jumlah_doc) * 100 : 0;
-            $kloter->persentase_kematian = round($persentaseKematian, 2);
+            // 3. Hitung jumlah kematian (DOC Awal - Sisa Ayam yang sudah tersimpan di DB)
+            $kloter->jumlah_kematian = $kloter->jumlah_doc - $kloter->sisa_ayam_hidup;
         });
 
         return response()->json($kloters);

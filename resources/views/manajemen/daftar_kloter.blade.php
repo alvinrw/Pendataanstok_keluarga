@@ -32,7 +32,7 @@
         .modal-rekapan-table td { padding: 8px 5px; border-bottom: 1px solid #f2f2f2; }
         .modal-rekapan-table tr:last-child td { border-bottom: none; }
         .modal-summary-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; }
-        .summary-item { display: flex; justify-content: space-between; font-size: 1.1em; margin-bottom: 10px; }
+        .summary-item { display: flex; justify-content: space-between; font-size: 1.1em; margin-bottom: 10px; align-items: center; }
         .editable-item { display: flex; justify-content: space-between; align-items: center; gap: 10px;}
     </style>
 </head>
@@ -40,8 +40,6 @@
     <div class="container">
         <div class="header">
             <h1>Manajemen Kloter</h1>
-            <!-- PERUBAHAN 1: Tombol diubah menjadi button dengan onclick -->
-             <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
             <button type="button" class="btn btn-green" onclick="openCreateKloterModal()">Tambah Kloter Baru</button>
         </div>
 
@@ -100,25 +98,20 @@
     </div>
 
 <script>
-    // PERUBAHAN 2: Fungsi baru untuk membuka modal tambah kloter
     function openCreateKloterModal() {
         Swal.fire({
             title: 'Tambah Kloter Baru',
             html: `
                 <form id="form-create-kloter" action="{{ route('manajemen.kloter.store') }}" method="POST" style="text-align: left;">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    
-                    <label for="swal-nama_kloter" style="display: block; margin-bottom: 5px;">Nama Kloter</label>
-                    <input id="swal-nama_kloter" type="text" name="nama_kloter" class="swal2-input" placeholder="Contoh: Kloter Agustus 2025" required>
-                    
-                    <label for="swal-tanggal_mulai" style="display: block; margin-bottom: 5px; margin-top: 10px;">Tanggal Ayam Masuk</label>
-                    <input id="swal-tanggal_mulai" type="date" name="tanggal_mulai" class="swal2-input" value="{{ date('Y-m-d') }}" required>
-
-                    <label for="swal-jumlah_doc" style="display: block; margin-bottom: 5px; margin-top: 10px;">DOC Awal (Jumlah Ayam)</label>
-                    <input id="swal-jumlah_doc" type="number" name="jumlah_doc" class="swal2-input" placeholder="Contoh: 100" required min="1">
-
-                    <label for="swal-harga_beli_doc" style="display: block; margin-bottom: 5px; margin-top: 10px;">Harga Beli DOC (Wajib)</label>
-                    <input id="swal-harga_beli_doc" type="number" name="harga_beli_doc" class="swal2-input" placeholder="Contoh: 800000" min="0">
+                    <label style="display: block; margin-bottom: 5px;">Nama Kloter</label>
+                    <input type="text" name="nama_kloter" class="swal2-input" placeholder="Contoh: Kloter Agustus 2025" required>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Tanggal Ayam Masuk</label>
+                    <input type="date" name="tanggal_mulai" class="swal2-input" value="{{ date('Y-m-d') }}" required>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">DOC Awal (Jumlah Ayam)</label>
+                    <input type="number" name="jumlah_doc" class="swal2-input" placeholder="Contoh: 100" required min="1">
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Harga Beli DOC (Wajib)</label>
+                    <input type="number" name="harga_beli_doc" class="swal2-input" placeholder="Contoh: 800000" required min="0">
                 </form>
             `,
             showCancelButton: true,
@@ -126,11 +119,11 @@
             cancelButtonText: 'Batal',
             confirmButtonColor: '#28a745',
             preConfirm: () => {
-                // Saat tombol simpan diklik, submit form di dalam modal
                 document.getElementById('form-create-kloter').submit();
             }
         });
     }
+
     function openUpdateStatusModal(kloterId, currentStatus, kloterName) {
         Swal.fire({
             title: `Ubah Status Kloter "${kloterName}"`,
@@ -224,7 +217,13 @@
                 </div>
                 <div class="modal-summary-box">
                     <div class="summary-item"><span>💰 Total Pengeluaran:</span><strong>Rp ${rekapan.total_pengeluaran.toLocaleString('id-ID')}</strong></div>
-                    <div class="summary-item"><span>🐓 Jumlah Ayam Sekarang:</span><strong>${rekapan.sisa_ayam} ekor</strong></div>
+                    <div class="summary-item">
+                        <span>🐓 Jumlah Ayam Sekarang:</span>
+                        <div class="editable-item">
+                            <strong>${rekapan.sisa_ayam} ekor</strong>
+                            <button class="btn btn-orange btn-sm" onclick="openKoreksiStokModal(${kloter.id}, ${rekapan.sisa_ayam})">Koreksi</button>
+                        </div>
+                    </div>
                 </div>`;
 
             Swal.fire({ title: `Detail Kloter: ${kloter.nama_kloter}`, html: modalHtml, showCloseButton: true, showConfirmButton: false });
@@ -232,6 +231,35 @@
         } catch (error) {
             Swal.fire('Error!', error.message, 'error');
         }
+    }
+    
+    function openKoreksiStokModal(kloterId, currentSisa) {
+        Swal.fire({
+            title: 'Koreksi Jumlah Ayam Sekarang',
+            text: 'DOC Awal akan disesuaikan secara otomatis.',
+            input: 'number',
+            inputValue: currentSisa,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan Koreksi',
+            inputValidator: (value) => {
+                if (!value || value < 0) {
+                    return 'Masukkan jumlah yang valid!'
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/manajemen-kloter/${kloterId}/koreksi-stok`;
+                form.innerHTML = `
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="sisa_ayam_hidup" value="${result.value}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 
     function openEditTanggalModal(kloterId, currentTanggal) {

@@ -43,7 +43,7 @@
                     <div class="stat-value" id="totalSales">0</div>
                     <div class="stat-label">Total Ayam Terjual (Ekor)</div>
                 </div>
-                <div class="stat-card total-revenue">
+                 <div class="stat-card total-revenue">
                     <span class="stat-icon">💰</span>
                     <div class="stat-value" id="totalRevenue">Rp 0</div>
                     <div class="stat-label">Total Pemasukan Kloter Ini</div>
@@ -60,8 +60,8 @@
                 </div>
                 <div class="stat-card mortality">
                     <span class="stat-icon">💀</span>
-                    <div class="stat-value" id="persenMati">0%</div>
-                    <div class="stat-label">Persentase Kematian</div>
+                    <div class="stat-value" id="jumlahMati">0</div>
+                    <div class="stat-label">Jumlah Kematian</div>
                 </div>
                 <div class="stat-card profit">
                     <span class="stat-icon">📈</span>
@@ -98,6 +98,7 @@
         </div>
     </div>
 
+    <!-- Modal Update Stok -->
     <div id="stockModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -140,7 +141,7 @@
                 acc[kloter.id] = kloter;
                 return acc;
             }, {});
-            updateKloterDropdown(kloters);
+            updateKloterDropdown(Object.values(kloterData));
             loadSummaryData();
         })
         .catch(error => console.error('Error loading kloter data:', error));
@@ -198,20 +199,14 @@
         updateKloterStats(currentKloter);
     }
 
-    /**
-     * PERUBAHAN JAVASCRIPT ADA DI SINI
-     */
     function updateKloterStats(data) {
         if (!data) return;
         document.getElementById('availableStock').textContent = data.stok_tersedia || 0;
         document.getElementById('totalSales').textContent = data.total_terjual || 0;
         document.getElementById('totalRevenue').textContent = formatCurrency(data.total_pemasukan);
-        document.getElementById('totalWeight').textContent = (data.total_berat || 0).toFixed(2);
-        
-        // Menambahkan update untuk kartu baru
+        document.getElementById('totalWeight').textContent = (data.total_berat || 0).toFixed(2) + ' Kg';
         document.getElementById('totalPengeluaran').textContent = formatCurrency(data.total_pengeluaran);
-        
-        document.getElementById('persenMati').textContent = `${data.persentase_kematian || 0}%`;
+        document.getElementById('jumlahMati').textContent = `${data.jumlah_kematian || 0} ekor`;
         document.getElementById('keuntungan').textContent = formatCurrency(data.keuntungan);
 
         const currentStockDisplay = document.getElementById('currentStockDisplay');

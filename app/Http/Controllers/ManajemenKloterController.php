@@ -30,7 +30,7 @@ class ManajemenKloterController extends Controller
     }
 
     /**
-     * FUNGSI BARU: Ini adalah "kalkulator" pribadi untuk setiap kloter.
+     * FUNGSI UTAMA: Ini adalah "kalkulator" pribadi untuk setiap kloter.
      * Akan kita panggil setiap kali ada perubahan data.
      */
     private function updateKloterCalculations(Kloter $kloter)
@@ -44,7 +44,7 @@ class ManajemenKloterController extends Controller
         $kloter->sisa_ayam_hidup = $sisaAyam;
         $kloter->total_pengeluaran = $totalPengeluaran;
 
-        // PERBAIKAN LOGIKA INTI DI SINI:
+        // LOGIKA SINKRONISASI:
         // Jika kloter sudah panen, update juga stok tersedianya.
         if ($kloter->status === 'Selesai Panen') {
             $kloter->stok_tersedia = $sisaAyam;
@@ -242,5 +242,28 @@ class ManajemenKloterController extends Controller
             'stok_tersedia' => $sisaAyamHidup,
         ]);
         return redirect()->back()->with('success', 'Panen berhasil dikonfirmasi!');
+    }
+
+    public function koreksiStok(Request $request, Kloter $kloter)
+    {
+        $validated = $request->validate([
+            'sisa_ayam_hidup' => 'required|integer|min:0'
+        ]);
+
+        $sisaAyamBaru = $validated['sisa_ayam_hidup'];
+        $totalMati = $kloter->kematianAyams()->sum('jumlah_mati');
+
+        // Hitung mundur untuk menemukan DOC awal yang seharusnya
+        $docAwalBaru = $sisaAyamBaru + $totalMati;
+
+        // Update kedua nilai di database
+        $kloter->jumlah_doc = $docAwalBaru;
+        $kloter->sisa_ayam_hidup = $sisaAyamBaru;
+        $kloter->save();
+
+        // Panggil kalkulator utama untuk memastikan semua data lain sinkron
+        $this->updateKloterCalculations($kloter);
+
+        return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah ayam berhasil dikoreksi dan DOC awal telah disesuaikan.');
     }
 }

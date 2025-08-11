@@ -119,7 +119,7 @@ Route::put('/manajemen-kloter/{kloter}/update-doc', [ManajemenKloterController::
 Route::delete('/pengeluaran/{pengeluaran}', [ManajemenKloterController::class, 'destroyPengeluaran'])->name('manajemen.pengeluaran.destroy');
 Route::delete('/kematian/{kematianAyam}', [ManajemenKloterController::class, 'destroyKematian'])->name('manajemen.kematian.destroy');
 Route::put('/manajemen-kloter/{kloter}/update-tanggal', [ManajemenKloterController::class, 'updateTanggalMulai'])->name('manajemen.kloter.updateTanggal');
-
+Route::put('/manajemen-kloter/{kloter}/koreksi-stok', [ManajemenKloterController::class, 'koreksiStok'])->name('manajemen.kloter.koreksiStok');
 
 
 
