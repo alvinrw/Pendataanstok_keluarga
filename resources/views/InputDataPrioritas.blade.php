@@ -578,7 +578,10 @@
         </div>
     </div>
 
-    <script>
+<script>
+    // Menunggu sampai seluruh struktur halaman (DOM) selesai dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+
         // Set tanggal hari ini sebagai default dan fokus ke input pertama
         document.getElementById('date').valueAsDate = new Date();
         document.getElementById('activityName').focus();
@@ -609,11 +612,11 @@
             document.getElementById('notificationOverlay').classList.remove('show');
         }
 
-        function goToMainMenu() {
+        window.goToMainMenu = function() {
             window.location.href = "{{ route('welcome') }}";
         }
 
-        function addAnother() {
+        window.addAnother = function() {
             hideNotification();
             document.getElementById('scheduleForm').reset();
             document.getElementById('date').valueAsDate = new Date();
@@ -621,79 +624,70 @@
             document.getElementById('activityName').focus();
         }
 
-        // === HANDLER SUBMIT FORM YANG BARU DAN LEBIH BAIK ===
-        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!validateForm()) {
-                return;
-            }
-
-            const form = e.target;
-            const formData = new FormData(form);
-            const submitBtn = document.getElementById('submitBtn');
-
-            // Non-aktifkan tombol untuk mencegah klik ganda
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Menyimpan...';
-
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                body: formData
-            })
-            .then(async response => {
-                // Jika respons TIDAK sukses (misal: error 422, 500)
-                if (!response.ok) {
-                    // Coba ambil detail error dari body respons
-                    const errorData = await response.json().catch(() => null);
-                    // Lemparkan error agar ditangkap oleh blok .catch
-                    throw errorData || new Error(Server merespons dengan status ${response.status});
-                }
-                // Jika sukses, lanjutkan
-                return response.json();
-            })
-            .then(data => {
-                // Ini hanya berjalan jika server merespons dengan sukses
-                console.log('Success:', data);
-                showSuccessNotification();
-            })
-            .catch(error => {
-                // INI BLOK YANG MENANGANI SEMUA JENIS ERROR
-                console.error('Error Details:', error);
+        // Handler utama untuk submit form
+        const scheduleForm = document.getElementById('scheduleForm');
+        if (scheduleForm) {
+            scheduleForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Mencegah refresh halaman
                 
-                let userMessage = 'Gagal menyimpan jadwal! Terjadi kesalahan tak terduga.';
-
-                // Jika error berasal dari validasi Laravel (422)
-                if (error && error.errors) {
-                    // Ambil pesan error validasi yang pertama
-                    const firstErrorKey = Object.keys(error.errors)[0];
-                    userMessage = error.errors[firstErrorKey][0];
-                } 
-                // Jika ada pesan error umum dari server
-                else if (error && error.message) {
-                    userMessage = error.message;
+                if (!validateForm()) {
+                    return;
                 }
 
-                // Tampilkan pesan error yang jelas kepada pengguna
-                alert(Terjadi Kesalahan:\n\n${userMessage}\n\nSilakan periksa kembali data Anda atau cek log di Railway untuk info teknis.);
-            })
-            .finally(() => {
-                // Apapun hasilnya (sukses atau gagal), aktifkan kembali tombolnya
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '💾 Simpan Jadwal';
+                const form = e.target;
+                const formData = new FormData(form);
+                const submitBtn = document.getElementById('submitBtn');
+
+                // Non-aktifkan tombol untuk mencegah klik ganda
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Menyimpan...';
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(async response => {
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => null);
+                        throw errorData || new Error(`Server merespons dengan status ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    showSuccessNotification(); // Tampilkan popup sukses yang cantik
+                })
+                .catch(error => {
+                    console.error('Error Details:', error);
+                    let userMessage = 'Gagal menyimpan jadwal! Terjadi kesalahan tak terduga.';
+                    if (error && error.errors) {
+                        const firstErrorKey = Object.keys(error.errors)[0];
+                        userMessage = error.errors[firstErrorKey][0];
+                    } else if (error && error.message) {
+                        userMessage = error.message;
+                    }
+                    alert(`Terjadi Kesalahan:\n\n${userMessage}`);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '💾 Simpan Jadwal';
+                });
             });
-        });
+        }
 
         // Event listener lainnya (tidak berubah)
-        document.getElementById('notificationOverlay').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideNotification();
-            }
-        });
+        const notificationOverlay = document.getElementById('notificationOverlay');
+        if (notificationOverlay) {
+            notificationOverlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideNotification();
+                }
+            });
+        }
 
         document.querySelectorAll('input[required], textarea[required]').forEach(field => {
             field.addEventListener('blur', function() {
@@ -704,7 +698,6 @@
                     formGroup.classList.remove('error');
                 }
             });
-
             field.addEventListener('input', function() {
                 const formGroup = this.closest('.form-group');
                 if (this.value.trim()) {
@@ -712,6 +705,8 @@
                 }
             });
         });
-    </script>
+
+    }); // Akhir dari event listener DOMContentLoaded
+</script>
 </body>
 </html>
