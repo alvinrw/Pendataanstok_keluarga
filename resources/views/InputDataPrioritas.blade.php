@@ -651,7 +651,7 @@
                     // Coba ambil detail error dari body respons
                     const errorData = await response.json().catch(() => null);
                     // Lemparkan error agar ditangkap oleh blok .catch
-                    throw errorData || new Error(`Server merespons dengan status ${response.status}`);
+                    throw errorData || new Error(Server merespons dengan status ${response.status});
                 }
                 // Jika sukses, lanjutkan
                 return response.json();
@@ -679,7 +679,7 @@
                 }
 
                 // Tampilkan pesan error yang jelas kepada pengguna
-                alert(`Terjadi Kesalahan:\n\n${userMessage}\n\nSilakan periksa kembali data Anda atau cek log di Railway untuk info teknis.`);
+                alert(Terjadi Kesalahan:\n\n${userMessage}\n\nSilakan periksa kembali data Anda atau cek log di Railway untuk info teknis.);
             })
             .finally(() => {
                 // Apapun hasilnya (sukses atau gagal), aktifkan kembali tombolnya
