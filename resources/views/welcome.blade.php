@@ -554,6 +554,10 @@
                     <span class="icon">📊</span>
                     <span>Summary Penjualan Ayam</span>
                 </a>
+                <a href="{{ route('manajemen.kloter.index') }}" class="option-btn">
+                    <span class="icon">📊</span>
+                    <span>Rincian Ayam</span>
+                </a>
             </div>
             <div id="ayamSummary" class="summary-box">
                 <p>📈 Summary Penjualan Ayam: [Summary Data akan ditampilkan di sini]</p>

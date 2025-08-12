@@ -1,0 +1,93 @@
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; color: #34495e; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; color: #2c3e50; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        
+        .btn { padding: 12px 24px; text-decoration: none; color: white; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; border: none; cursor: pointer; display: inline-block; }
+        .btn-primary-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-primary-gradient:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3); }
+        
+        .back-btn { color: #556080; text-decoration: none; font-weight: 600; transition: color 0.3s; }
+        .back-btn:hover { color: #667eea; }
+
+        .kloter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .kloter-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; }
+        .kloter-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+        .card-header { padding: 20px; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; border-bottom: 4px solid #667eea; }
+        .card-header h3 { font-size: 1.3rem; margin: 0; }
+        .card-body { padding: 25px; flex-grow: 1; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 1rem; padding: 12px 0; border-bottom: 1px solid #f0f2f5; }
+        .info-item:last-child { border-bottom: none; }
+        .info-item span { color: #5a6a7b; }
+        .info-item strong { color: #2c3e50; font-size: 1.1rem; }
+        .card-footer { background-color: #f8f9fa; padding: 15px 25px; border-top: 1px solid #e9ecef; }
+        .actions { display: flex; gap: 10px; }
+        .btn-sm { padding: 8px 16px; font-size: 0.9em; font-weight: 500; border-radius: 6px; }
+        .btn-blue { background: #3498db; } .btn-blue:hover { background: #2980b9; }
+        .btn-red { background: #e74c3c; } .btn-red:hover { background: #c0392b; }
+        .btn-orange { background: #f39c12; } .btn-orange:hover { background: #e67e22; }
+        .btn-green { background: #2ecc71; } .btn-green:hover { background: #27ae60; }
+        .no-data { background: white; border-radius: 15px; padding: 50px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        /* SweetAlert2 Modal Styles */
+        .swal2-popup { width: 85% !important; max-width: 950px !important; border-radius: 15px !important; }
+        .modal-content-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; text-align: left; }
+        .modal-card { padding: 20px; border: 1px solid #e9ecef; border-radius: 12px; background: #fdfdfd; }
+        .modal-card h3 { margin-top: 0; font-size: 1.3em; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-rekapan-table { width: 100%; font-size: 0.9em; }
+        .modal-rekapan-table th { background: #f1f3f5; padding: 8px; }
+        .modal-rekapan-table td { padding: 8px 5px; border-bottom: 1px solid #f2f2f2; }
+        .modal-rekapan-table tr:last-child td { border-bottom: none; }
+        .modal-summary-box { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px; border-radius: 12px; margin-top: 20px; border-top: 3px solid #667eea; }
+        .summary-item { display: flex; justify-content: space-between; font-size: 1.1em; margin-bottom: 12px; align-items: center; }
+        .summary-item:last-child { margin-bottom: 0; }
+        .summary-item span { font-weight: 500; }
+        .summary-item strong { font-weight: bold; font-size: 1.2em; color: #2c3e50; }
+        .editable-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; }
+
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    .kloter-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .modal-content-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* Mobile (≤600px) */
+@media (max-width: 600px) {
+    .summary-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+    }
+    .summary-item span {
+        font-size: 0.9em;
+    }
+    .summary-item strong {
+        font-size: 1.1em;
+    }
+    .modal-summary-box {
+        padding: 15px;
+    }
+    .modal-rekapan-table {
+        font-size: 0.8em;
+    }
+    .modal-rekapan-table th,
+    .modal-rekapan-table td {
+        padding: 5px;
+    }
+}
+

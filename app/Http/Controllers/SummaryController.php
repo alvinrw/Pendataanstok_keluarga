@@ -3,59 +3,43 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Summary;
+use App\Models\Kloter;
 
 class SummaryController extends Controller
 {
-    // public function index()
-    // {
-    //     // Ambil semua data summary dari tabel `summaries`
-    //     $summaries = Summary::all();
-
-    //     // Kirim ke view
-      
-    // }
-
-public function index()
-{
-    $summaries = Summary::all();
-    $summary = Summary::latest()->first(); // Ambil data summary terbaru
-
-    $stokAyam = $summary ? $summary->stok_ayam : 0;
-    $totalAyamTerjual = $summary ? $summary->total_ayam_terjual : 0;
-    $totalBeratTertimbang = $summary ? $summary->total_berat_tertimbang : 0;
-    $totalPemasukan = $summary ? $summary->total_pemasukan : 0;
-
-    return view('SummaryAyam', compact(
-        'summaries',
-        'stokAyam',
-        'totalAyamTerjual',
-        'totalBeratTertimbang',
-        'totalPemasukan'
-    ));
-}
-
-
-
-    public function updateStok(Request $request)
+    /**
+     * Menyediakan data ringkasan TOTAL dari SEMUA kloter yang sudah pernah panen.
+     */
+    public function index()
     {
-        $request->validate([
-            'stok_ayam' => 'required|integer|min:0',
-        ]);
+        // Ambil semua kloter yang memiliki setidaknya satu catatan panen.
+        // Kita juga muat relasi yang dibutuhkan untuk perhitungan.
+        $klotersPanen = Kloter::whereHas('panens')->with(['dataPenjualans', 'pengeluarans'])->get();
 
-        // Ambil entri paling baru atau buat baru jika belum ada
-        $summary = Summary::latest()->first();
-        if (!$summary) {
-            $summary = new Summary();
+        // Hitung total dari koleksi kloter yang sudah difilter
+        $totalKloterPanen = $klotersPanen->count();
+        $totalStokTersedia = $klotersPanen->sum('stok_tersedia');
+        
+        $totalAyamTerjual = 0;
+        $totalPemasukan = 0;
+        $totalPengeluaran = $klotersPanen->sum('total_pengeluaran');
+
+        // Kita perlu loop untuk menjumlahkan data dari relasi
+        foreach ($klotersPanen as $kloter) {
+            $totalAyamTerjual += $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
+            $totalPemasukan += $kloter->dataPenjualans->sum('harga_total');
         }
 
-        $summary->stok_ayam = $request->stok_ayam;
-        $summary->save();
+        $totalKeuntungan = $totalPemasukan - $totalPengeluaran;
 
-        return response()->json([
-            'success' => true,
-            'stok_ayam' => $summary->stok_ayam,
-        ]);
+        // Siapkan data untuk dikirim sebagai JSON
+        $summaryData = [
+            'total_kloter' => $totalKloterPanen,
+            'stok_ayam' => $totalStokTersedia,
+            'total_ayam_terjual' => $totalAyamTerjual,
+            'total_keuntungan' => $totalKeuntungan,
+        ];
+
+        return response()->json($summaryData);
     }
 }
-
