@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Penjualan Ayam</title>
     <link rel="stylesheet" href="{{ asset('css/SummaryAyam.css') }}">
+    <style>
+        /* Menambahkan sedikit gaya agar kartu yang tidak aktif terlihat jelas */
+        select option:disabled {
+            color: #ccc;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -62,6 +68,11 @@
                     <div class="stat-value" id="jumlahMati">0</div>
                     <div class="stat-label">Jumlah Kematian</div>
                 </div>
+                <div class="stat-card feed">
+                    <span class="stat-icon">🌾</span>
+                    <div class="stat-value" id="totalPakan">0 Kg</div>
+                    <div class="stat-label">Total Pakan Terpakai</div>
+                </div>
                 <div class="stat-card profit">
                     <span class="stat-icon">📈</span>
                     <div class="stat-value" id="keuntungan">Rp 0</div>
@@ -70,9 +81,8 @@
             </div>
         </div>
 
-        <!-- PERUBAHAN HTML ADA DI SINI -->
         <div class="summary-section">
-            <h3>📈 Ringkasan Total (Hanya Kloter Panen)</h3>
+            <h3>📈 Ringkasan Total (Hanya dari Kloter yang Pernah Panen)</h3>
             <div class="summary-grid">
                 <div class="summary-card">
                     <span class="summary-icon">📋</span>
@@ -186,22 +196,20 @@
         document.getElementById('totalRevenue').textContent = formatCurrency(data.total_pemasukan);
         document.getElementById('totalPengeluaran').textContent = formatCurrency(data.total_pengeluaran);
         document.getElementById('jumlahMati').textContent = `${data.jumlah_kematian || 0} ekor`;
+        
+        // PERBAIKAN DI SINI: Menambahkan baris yang hilang
+        document.getElementById('totalPakan').textContent = `${data.total_pakan_kg || 0} Kg`;
+
         document.getElementById('keuntungan').textContent = formatCurrency(data.keuntungan);
     }
     
-    /**
-     * PERUBAHAN JAVASCRIPT ADA DI SINI
-     */
     function updateSummaryStats(summary) {
         if (!summary) return;
         document.getElementById('summaryTotalKloter').textContent = summary.total_kloter || 0;
         document.getElementById('summaryTotalSales').textContent = summary.total_ayam_terjual || 0;
         document.getElementById('summaryTotalStock').textContent = summary.stok_ayam || 0;
-        
-        // Mengubah elemen untuk menampilkan keuntungan
         document.getElementById('summaryTotalKeuntungan').textContent = formatCurrency(summary.total_keuntungan);
     }
-
 </script>
 </body>
 </html>

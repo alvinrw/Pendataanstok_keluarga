@@ -13,18 +13,18 @@ class KloterController extends Controller
      */
     public function index()
     {
-        // Eager load semua relasi yang dibutuhkan
         $kloters = Kloter::with(['pengeluarans', 'kematianAyams', 'dataPenjualans'])->get();
 
         $kloters->each(function ($kloter) {
-            // 1. Ambil data penjualan dari relasi
             $kloter->total_terjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
             $kloter->total_pemasukan = $kloter->dataPenjualans->sum('harga_total');
             
-            // 2. Hitung keuntungan (Pemasukan - Pengeluaran yang sudah tersimpan di DB)
-            $kloter->keuntungan = $kloter->total_pemasukan - $kloter->total_pengeluaran;
+            // PERUBAHAN DI SINI: Kita tambahkan properti baru untuk total pakan
+            $kloter->total_pakan_kg = $kloter->pengeluarans->sum('jumlah_pakan_kg');
 
-            // 3. PERBAIKAN DI SINI: Hitung jumlah kematian langsung dari relasinya
+            $keuntungan = $kloter->total_pemasukan - $kloter->total_pengeluaran;
+            $kloter->keuntungan = $keuntungan;
+
             $kloter->jumlah_kematian = $kloter->kematianAyams->sum('jumlah_mati');
         });
 
