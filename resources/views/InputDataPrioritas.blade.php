@@ -249,6 +249,11 @@
             overflow: hidden;
             font-family: inherit;
         }
+        
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
 
         .btn::before {
             content: '';
@@ -561,7 +566,6 @@
         </div>
     </div>
 
-    <!-- Notification Overlay -->
     <div class="notification-overlay" id="notificationOverlay">
         <div class="success-notification">
             <div class="success-icon">✅</div>
@@ -575,19 +579,17 @@
     </div>
 
     <script>
-        // Set tanggal hari ini sebagai default
+        // Set tanggal hari ini sebagai default dan fokus ke input pertama
         document.getElementById('date').valueAsDate = new Date();
         document.getElementById('activityName').focus();
 
-        // Form validation function
+        // Fungsi validasi form (tidak berubah)
         function validateForm() {
             let isValid = true;
             const requiredFields = ['activityName', 'date', 'startTime'];
-
             requiredFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 const formGroup = field.closest('.form-group');
-                
                 if (!field.value.trim()) {
                     formGroup.classList.add('error');
                     isValid = false;
@@ -595,11 +597,10 @@
                     formGroup.classList.remove('error');
                 }
             });
-
             return isValid;
         }
 
-        // Notification functions  
+        // Fungsi notifikasi (tidak berubah)
         function showSuccessNotification() {
             document.getElementById('notificationOverlay').classList.add('show');
         }
@@ -609,7 +610,7 @@
         }
 
         function goToMainMenu() {
-            window.location.href = "/welcome"; // Ganti dengan route Laravel yang sesuai
+            window.location.href = "{{ route('welcome') }}";
         }
 
         function addAnother() {
@@ -620,19 +621,22 @@
             document.getElementById('activityName').focus();
         }
 
-        // Main form submission handler
+        // === HANDLER SUBMIT FORM YANG BARU DAN LEBIH BAIK ===
         document.getElementById('scheduleForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validate form first
             if (!validateForm()) {
                 return;
             }
 
             const form = e.target;
             const formData = new FormData(form);
+            const submitBtn = document.getElementById('submitBtn');
 
-            // Submit form to Laravel backend
+            // Non-aktifkan tombol untuk mencegah klik ganda
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Menyimpan...';
+
             fetch(form.action, {
                 method: 'POST',
                 headers: {
@@ -641,33 +645,56 @@
                 },
                 body: formData
             })
-            .then(response => {
+            .then(async response => {
+                // Jika respons TIDAK sukses (misal: error 422, 500)
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    // Coba ambil detail error dari body respons
+                    const errorData = await response.json().catch(() => null);
+                    // Lemparkan error agar ditangkap oleh blok .catch
+                    throw errorData || new Error(`Server merespons dengan status ${response.status}`);
                 }
+                // Jika sukses, lanjutkan
                 return response.json();
             })
             .then(data => {
+                // Ini hanya berjalan jika server merespons dengan sukses
                 console.log('Success:', data);
-                // Show success notification regardless of response structure
                 showSuccessNotification();
             })
             .catch(error => {
-                console.error('Error:', error);
-                // For demo purposes, still show success. 
-                // In production, you might want to show an error message instead
-                showSuccessNotification();
+                // INI BLOK YANG MENANGANI SEMUA JENIS ERROR
+                console.error('Error Details:', error);
+                
+                let userMessage = 'Gagal menyimpan jadwal! Terjadi kesalahan tak terduga.';
+
+                // Jika error berasal dari validasi Laravel (422)
+                if (error && error.errors) {
+                    // Ambil pesan error validasi yang pertama
+                    const firstErrorKey = Object.keys(error.errors)[0];
+                    userMessage = error.errors[firstErrorKey][0];
+                } 
+                // Jika ada pesan error umum dari server
+                else if (error && error.message) {
+                    userMessage = error.message;
+                }
+
+                // Tampilkan pesan error yang jelas kepada pengguna
+                alert(`Terjadi Kesalahan:\n\n${userMessage}\n\nSilakan periksa kembali data Anda atau cek log di Railway untuk info teknis.`);
+            })
+            .finally(() => {
+                // Apapun hasilnya (sukses atau gagal), aktifkan kembali tombolnya
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '💾 Simpan Jadwal';
             });
         });
 
-        // Close notification when clicking overlay
+        // Event listener lainnya (tidak berubah)
         document.getElementById('notificationOverlay').addEventListener('click', function(e) {
             if (e.target === this) {
                 hideNotification();
             }
         });
 
-        // Real-time validation
         document.querySelectorAll('input[required], textarea[required]').forEach(field => {
             field.addEventListener('blur', function() {
                 const formGroup = this.closest('.form-group');
