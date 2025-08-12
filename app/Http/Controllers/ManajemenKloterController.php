@@ -121,7 +121,8 @@ class ManajemenKloterController extends Controller
                 'total_mati' => $kloter->kematianAyams->sum('jumlah_mati'),
                 'total_panen' => $kloter->panens->sum('jumlah_panen'),
                 'sisa_ayam' => $kloter->sisa_ayam_hidup,
-                'total_pengeluaran' => $kloter->total_pengeluaran
+                'total_pengeluaran' => $kloter->total_pengeluaran,
+                'total_pakan_kg' => $kloter->pengeluarans->sum('jumlah_pakan_kg'),
             ]
         ];
         
@@ -182,6 +183,8 @@ class ManajemenKloterController extends Controller
             'kategori' => ['required', Rule::in(['Pakan', 'Obat', 'Lainnya'])],
             'jumlah_pengeluaran' => 'required|integer|min:0',
             'tanggal_pengeluaran' => 'required|date',
+            'catatan' => 'nullable|string|max:255',
+            'jumlah_pakan_kg' => 'required_if:kategori,Pakan|nullable|numeric|min:0',
         ]);
         $kloter->pengeluarans()->create($validated);
         $this->updateKloterCalculations($kloter);

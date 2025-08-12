@@ -6,267 +6,274 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Manajemen Kloter Pemeliharaan</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="{{ asset('css/daftar_kloter.css') }}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; color: #34495e; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; color: #2c3e50; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        
+        .btn { padding: 12px 24px; text-decoration: none; color: white; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; border: none; cursor: pointer; display: inline-block; }
+        .btn-primary-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-primary-gradient:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3); }
+        
+        .back-btn { color: #556080; text-decoration: none; font-weight: 600; transition: color 0.3s; }
+        .back-btn:hover { color: #667eea; }
+
+        .kloter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .kloter-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; }
+        .kloter-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+        .card-header { padding: 20px; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; border-bottom: 4px solid #667eea; }
+        .card-header h3 { font-size: 1.3rem; margin: 0; }
+        .card-body { padding: 25px; flex-grow: 1; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 1rem; padding: 12px 0; border-bottom: 1px solid #f0f2f5; }
+        .info-item:last-child { border-bottom: none; }
+        .info-item span { color: #5a6a7b; }
+        .info-item strong { color: #2c3e50; font-size: 1.1rem; }
+        .card-footer { background-color: #f8f9fa; padding: 15px 25px; border-top: 1px solid #e9ecef; }
+        .actions { display: flex; gap: 10px; }
+        .btn-sm { padding: 8px 16px; font-size: 0.9em; font-weight: 500; border-radius: 6px; }
+        .btn-blue { background: #3498db; } .btn-blue:hover { background: #2980b9; }
+        .btn-red { background: #e74c3c; } .btn-red:hover { background: #c0392b; }
+        .btn-orange { background: #f39c12; } .btn-orange:hover { background: #e67e22; }
+        .btn-green { background: #2ecc71; } .btn-green:hover { background: #27ae60; }
+        .no-data { background: white; border-radius: 15px; padding: 50px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        /* SweetAlert2 Modal Styles */
+        .swal2-popup { width: 85% !important; max-width: 950px !important; border-radius: 15px !important; }
+        .modal-content-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; text-align: left; }
+        .modal-card { padding: 20px; border: 1px solid #e9ecef; border-radius: 12px; background: #fdfdfd; }
+        .modal-card h3 { margin-top: 0; font-size: 1.3em; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-rekapan-table { width: 100%; font-size: 0.9em; }
+        .modal-rekapan-table th { background: #f1f3f5; padding: 8px; }
+        .modal-rekapan-table td { padding: 8px 5px; border-bottom: 1px solid #f2f2f2; }
+        .modal-rekapan-table tr:last-child td { border-bottom: none; }
+        .modal-summary-box { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px; border-radius: 12px; margin-top: 20px; border-top: 3px solid #667eea; }
+        .summary-item { display: flex; justify-content: space-between; font-size: 1.1em; margin-bottom: 12px; align-items: center; }
+        .summary-item:last-child { margin-bottom: 0; }
+        .summary-item span { font-weight: 500; }
+        .summary-item strong { font-weight: bold; font-size: 1.2em; color: #2c3e50; }
+        .editable-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; }
+
+        @media (max-width: 768px) {
+            .header-actions { flex-direction: column; align-items: stretch; }
+            .modal-content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🐔 Manajemen Kloter</h1>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
-                <button type="button" class="btn btn-green" onclick="openCreateKloterModal()">+ Tambah Kloter Baru</button>
-            </div>
+        </div>
+
+        <div class="header-actions">
+            <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
+            <button type="button" class="btn btn-primary-gradient" onclick="openCreateKloterModal()">+ Tambah Kloter Baru</button>
         </div>
 
         @if(session('success'))
-            <div class="success-message">
-                ✅ {{ session('success') }}
-            </div>
+            <p style="padding: 15px; background-color: #d4edda; color: #155724; border-radius: 8px; margin-bottom: 20px;">{{ session('success') }}</p>
         @endif
-
         @if ($errors->any())
-            <div class="error-message">
-                <strong>❌ Error!</strong>
-                <ul style="margin-top: 10px;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div style="padding: 15px; background-color: #f8d7da; color: #721c24; border-radius: 8px; margin-bottom: 20px;">
+                <strong>Error!</strong>
+                <ul>@foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
             </div>
         @endif
 
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>🏷️ Nama Kloter</th>
-                        <th>🐔 Sisa Ayam di Kandang</th>
-                        <th>✅ Stok Siap Jual</th>
-                        <th>📅 Tanggal Mulai</th>
-                        <th>🐣 DOC Awal</th>
-                        <th>⚙️ Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($kloters as $kloter)
-                        <tr>
-                            <td><strong>{{ $kloter->nama_kloter }}</strong></td>
-                            <td><strong style="color: #007bff;">{{ $kloter->sisa_ayam_hidup }} ekor</strong></td>
-                            <td><strong style="color: #28a745;">{{ $kloter->stok_tersedia }} ekor</strong></td>
-                            <td>{{ \Carbon\Carbon::parse($kloter->tanggal_mulai)->format('d F Y') }}</td>
-                            <td>{{ $kloter->jumlah_doc }} ekor</td>
-                            <td>
-                                <div class="actions">
-                                    <button class="btn btn-blue btn-sm" onclick="openDetailModal({{ $kloter->id }})">📋 Detail</button>
-                                    <form action="{{ route('manajemen.kloter.destroy', $kloter->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus kloter ini? Semua data terkait akan hilang.');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-red btn-sm">🗑️ Hapus</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="empty-state">
-                                📋 Belum ada data kloter.<br>
-                                <small>Silakan buat kloter baru untuk memulai.</small>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <div class="kloter-grid">
+            @forelse ($kloters as $kloter)
+                <div class="kloter-card">
+                    <div class="card-header">
+                        <h3>{{ $kloter->nama_kloter }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span>🐓 Sisa di Kandang</span>
+                            <strong style="color: #007bff;">{{ $kloter->sisa_ayam_hidup }} ekor</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>📦 Stok Siap Jual</span>
+                            <strong style="color: #28a745;">{{ $kloter->stok_tersedia }} ekor</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>🐣 DOC Awal</span>
+                            <strong>{{ $kloter->jumlah_doc }} ekor</strong>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="actions">
+                            <button class="btn btn-sm btn-blue" onclick="openDetailModal({{ $kloter->id }})">⚙️ Detail & Aksi</button>
+                            <form action="{{ route('manajemen.kloter.destroy', $kloter->id) }}" method="POST" onsubmit="return confirm('Anda yakin ingin menghapus kloter ini? Semua data terkait (penjualan, pengeluaran, dll) akan hilang secara permanen.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-red">🗑️ Hapus</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="no-data">
+                    <h3>Belum ada data kloter.</h3>
+                    <p>Silakan buat yang baru untuk memulai.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 
 <script>
-    function openCreateKloterModal() {
+
+        function formatNumberInput(inputElem) {
+        let value = inputElem.value;
+        // Hapus semua karakter kecuali angka
+        let numberString = value.replace(/[^0-9]/g, '');
+        if (numberString) {
+            // Format ulang dengan pemisah ribuan Indonesia (titik)
+            let formatted = parseInt(numberString, 10).toLocaleString('id-ID');
+            inputElem.value = formatted;
+        } else {
+            inputElem.value = '';
+        }
+    }
+
+
+     function openCreateKloterModal() {
         Swal.fire({
-            title: '🆕 Tambah Kloter Baru',
+            title: 'Tambah Kloter Baru',
             html: `
                 <form id="form-create-kloter" action="{{ route('manajemen.kloter.store') }}" method="POST" style="text-align: left;">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">📝 Nama Kloter</label>
+                    <!-- Input tersembunyi untuk nilai asli -->
+                    <input type="hidden" name="harga_beli_doc" id="harga_beli_doc_real">
+
+                    <label style="display: block; margin-bottom: 5px;">Nama Kloter</label>
                     <input type="text" name="nama_kloter" class="swal2-input" placeholder="Contoh: Kloter Agustus 2025" required>
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600; color: #333;">📅 Tanggal Ayam Masuk</label>
+                    
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Tanggal Ayam Masuk</label>
                     <input type="date" name="tanggal_mulai" class="swal2-input" value="{{ date('Y-m-d') }}" required>
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600; color: #333;">🐣 DOC Awal (Jumlah Ayam)</label>
+
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">DOC Awal (Jumlah Ayam)</label>
                     <input type="number" name="jumlah_doc" class="swal2-input" placeholder="Contoh: 100" required min="1">
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600; color: #333;">💰 Harga Beli DOC (Wajib)</label>
-                    <input type="number" name="harga_beli_doc" class="swal2-input" placeholder="Contoh: 800000" required min="0">
+
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Harga Beli DOC (Wajib)</label>
+                    <input id="harga_beli_doc_formatted" type="text" class="swal2-input" placeholder="Contoh: 800.000" required oninput="formatNumberInput(this)">
                 </form>
             `,
             showCancelButton: true,
-            confirmButtonText: '💾 Simpan Kloter',
-            cancelButtonText: '❌ Batal',
+            confirmButtonText: 'Simpan Kloter',
+            cancelButtonText: 'Batal',
             confirmButtonColor: '#28a745',
-            width: 600,
             preConfirm: () => {
+                // Ambil nilai yang sudah diformat, hapus titiknya, lalu kirim
+                const formattedInput = document.getElementById('harga_beli_doc_formatted');
+                const realInput = document.getElementById('harga_beli_doc_real');
+                realInput.value = formattedInput.value.replace(/\./g, '');
                 document.getElementById('form-create-kloter').submit();
             }
         });
     }
-
+    
+    
     async function openDetailModal(kloterId) {
-        Swal.fire({ 
-            title: '⏳ Memuat data kloter...', 
-            didOpen: () => Swal.showLoading(), 
-            allowOutsideClick: false 
-        });
+        Swal.fire({ title: 'Memuat data kloter...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
             const response = await fetch(`/manajemen-kloter/${kloterId}/detail-json`);
             if (!response.ok) throw new Error('Gagal mengambil data dari server.');
             
-            const data = await response.json();
-            const { kloter, rekapan } = data;
+            const { kloter, rekapan } = await response.json();
 
-            let kematianHtml = '';
-            kloter.kematian_ayams.forEach(item => {
-                kematianHtml += `<tr>
-                    <td>${new Date(item.tanggal_kematian).toLocaleDateString('id-ID')}</td>
-                    <td>${item.jumlah_mati} ekor</td>
-                    <td>
-                        <form action="/kematian/${item.id}" method="POST" onsubmit="return confirm('Hapus data kematian ini?')">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" class="btn btn-red btn-sm">🗑️</button>
-                        </form>
-                    </td>
-                </tr>`;
-            });
-            if (kloter.kematian_ayams.length === 0) kematianHtml = '<tr><td colspan="3" style="text-align:center; color: #6c757d;">Belum ada data kematian.</td></tr>';
+            const createHistoryHtml = (items, type) => {
+                if (items.length === 0) return '<tr><td colspan="3" style="text-align:center; padding:10px;">Belum ada data.</td></tr>';
+                return items.map(item => {
+                    const date = new Date(item.tanggal_panen || item.tanggal_kematian).toLocaleDateString('id-ID');
+                    const amount = item.jumlah_panen || item.jumlah_mati;
+                    const routeName = type === 'panen' ? 'panen' : 'kematian';
+                    return `<tr>
+                        <td>${date}</td>
+                        <td>${amount} ekor</td>
+                        <td>
+                            <form action="/${routeName}/${item.id}" method="POST" onsubmit="return confirm('Hapus data ${type} ini?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-red btn-sm" style="padding: 4px 8px; font-size: 0.8em;">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>`;
+                }).join('');
+            };
 
-            let pengeluaranHtml = '';
-            kloter.pengeluarans.forEach(item => {
-                pengeluaranHtml += `<tr>
+            const pengeluaranHtml = kloter.pengeluarans.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding:10px;">Belum ada data.</td></tr>' :
+                kloter.pengeluarans.map(item => `<tr>
                     <td>${item.kategori}</td>
+                    <td>${item.jumlah_pakan_kg ? item.jumlah_pakan_kg + ' Kg' : '-'}</td>
                     <td>Rp ${Number(item.jumlah_pengeluaran).toLocaleString('id-ID')}</td>
                     <td>
                         <form action="/pengeluaran/${item.id}" method="POST" onsubmit="return confirm('Hapus data pengeluaran ini?')">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" class="btn btn-red btn-sm">🗑️</button>
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-red btn-sm" style="padding: 4px 8px; font-size: 0.8em;">Hapus</button>
                         </form>
                     </td>
-                </tr>`;
-            });
-            if (kloter.pengeluarans.length === 0) pengeluaranHtml = '<tr><td colspan="3" style="text-align:center; color: #6c757d;">Belum ada data pengeluaran.</td></tr>';
-
-            let panenHtml = '';
-            kloter.panens.forEach(item => {
-                panenHtml += `<tr>
-                    <td>${new Date(item.tanggal_panen).toLocaleDateString('id-ID')}</td>
-                    <td>${item.jumlah_panen} ekor</td>
-                    <td>
-                        <form action="/panen/${item.id}" method="POST" onsubmit="return confirm('Hapus data panen ini?')">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" class="btn btn-red btn-sm">🗑️</button>
-                        </form>
-                    </td>
-                </tr>`;
-            });
-            if (kloter.panens.length === 0) panenHtml = '<tr><td colspan="3" style="text-align:center; color: #6c757d;">Belum ada data panen.</td></tr>';
+                </tr>`).join('');
 
             const modalHtml = `
                 <div class="modal-content-grid">
                     <div class="modal-card">
                         <h3>📝 Input & Edit Data</h3>
-                        <div class="editable-item">
-                            <p><strong>🐣 DOC Awal:</strong> ${kloter.jumlah_doc} ekor</p> 
-                            <button class="btn btn-orange btn-sm" onclick="openEditDocModal(${kloter.id}, ${kloter.jumlah_doc})">✏️ Edit</button>
-                        </div>
-                        <div class="editable-item">
-                            <p><strong>📅 Tanggal Mulai:</strong> ${new Date(kloter.tanggal_mulai).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'})}</p> 
-                            <button class="btn btn-orange btn-sm" onclick="openEditTanggalModal(${kloter.id}, '${kloter.tanggal_mulai}')">✏️ Edit</button>
-                        </div>
-                        <hr style="margin: 15px 0; border: 1px solid #e9ecef;">
+                        <div class="editable-item"><p><strong>DOC Awal:</strong> ${kloter.jumlah_doc} ekor</p> <button class="btn btn-sm btn-orange" onclick="openEditDocModal(${kloter.id}, ${kloter.jumlah_doc})">Edit</button></div>
+                        <div class="editable-item"><p><strong>Tgl Mulai:</strong> ${new Date(kloter.tanggal_mulai).toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'})}</p> <button class="btn btn-sm btn-orange" onclick="openEditTanggalModal(${kloter.id}, '${kloter.tanggal_mulai}')">Edit</button></div>
+                        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
                         <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openKematianModal(${kloter.id})">💀 Input Kematian</button>
-                        <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openPengeluaranModal(${kloter.id})">💸 Input Keperluan</button>
-                        <button class="btn btn-green" style="width:100%;" onclick="openPanenModal(${kloter.id})">🌾 Input Panen</button>
+                        <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openPengeluaranModal(${kloter.id})">💸 Input Pengeluaran</button>
+                        <button class="btn btn-green" style="width:100%;" onclick="openPanenModal(${kloter.id})">🚜 Input Panen</button>
                     </div>
                     <div class="modal-card">
-                        <h3>📜 Riwayat & Rekapan</h3>
-                        <div class="scrollable-section">
-                            <strong>🌾 Riwayat Panen:</strong>
-                            <table class="modal-rekapan-table">
-                                <thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr></thead>
-                                <tbody>${panenHtml}</tbody>
-                            </table>
+                        <h3>📜 Riwayat Data</h3>
+                        <strong style="font-size: 0.9em;">Riwayat Panen:</strong>
+                        <div style="max-height: 120px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; border-radius: 5px;">
+                            <table class="modal-rekapan-table"><thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>${createHistoryHtml(kloter.panens, 'panen')}</tbody></table>
                         </div>
-                        <div class="scrollable-section">
-                            <strong>💀 Riwayat Kematian:</strong>
-                            <table class="modal-rekapan-table">
-                                <thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr></thead>
-                                <tbody>${kematianHtml}</tbody>
-                            </table>
+                        <strong style="font-size: 0.9em;">Riwayat Kematian:</strong>
+                        <div style="max-height: 120px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; border-radius: 5px;">
+                            <table class="modal-rekapan-table"><thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>${createHistoryHtml(kloter.kematian_ayams, 'kematian')}</tbody></table>
                         </div>
-                        <div class="scrollable-section">
-                            <strong>💸 Riwayat Pengeluaran:</strong>
-                            <table class="modal-rekapan-table">
-                                <thead><tr><th>Kategori</th><th>Jumlah</th><th>Aksi</th></tr></thead>
-                                <tbody>${pengeluaranHtml}</tbody>
-                            </table>
+                        <strong style="font-size: 0.9em;">Riwayat Pengeluaran:</strong>
+                        <div style="max-height: 120px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px;">
+                            <table class="modal-rekapan-table"><thead><tr><th>Kategori</th><th>Pakan</th><th>Harga</th><th>Aksi</th></tr></thead><tbody>${pengeluaranHtml}</tbody></table>
                         </div>
                     </div>
                 </div>
                 <div class="modal-summary-box">
+                    <div class="summary-item"><span>💰 Total Pengeluaran</span><strong>Rp ${rekapan.total_pengeluaran.toLocaleString('id-ID')}</strong></div>
+                    <div class="summary-item"><span>🌾 Akumulasi Pakan</span><strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong></div>
                     <div class="summary-item">
-                        <span>💰 Total Pengeluaran:</span>
-                        <strong>Rp ${rekapan.total_pengeluaran.toLocaleString('id-ID')}</strong>
-                    </div>
-                    <div class="summary-item">
-                        <span>🌾 Jumlah yang Sudah Terpanen:</span>
-                        <strong>${rekapan.total_panen} ekor</strong>
-                    </div>
-                    <div class="summary-item">
-                        <span>🐓 Jumlah Ayam Kloter Ini (di Kandang):</span>
-                        <div class="editable-item" style="margin: 0;">
+                        <span>🐓 Sisa Ayam (di Kandang)</span>
+                        <div class="editable-item">
                             <strong>${rekapan.sisa_ayam} ekor</strong>
-                            <button class="btn btn-orange btn-sm" onclick="openKoreksiStokModal(${kloter.id}, ${rekapan.sisa_ayam})">🔧 Koreksi</button>
+                            <button class="btn btn-orange btn-sm" onclick="openKoreksiStokModal(${kloter.id}, ${rekapan.sisa_ayam})">Koreksi</button>
                         </div>
                     </div>
                 </div>`;
 
-            Swal.fire({ 
-                title: `📋 Detail Kloter: ${kloter.nama_kloter}`, 
-                html: modalHtml, 
-                showCloseButton: true, 
-                showConfirmButton: false,
-                width: '90%'
-            });
+            Swal.fire({ title: `Detail Kloter: ${kloter.nama_kloter}`, html: modalHtml, showCloseButton: true, showConfirmButton: false });
 
         } catch (error) {
-            Swal.fire('❌ Error!', error.message, 'error');
+            Swal.fire('Error!', error.message, 'error');
         }
     }
     
+    // --- FUNGSI-FUNGSI MODAL LAINNYA (TETAP SAMA, HANYA DIPERSINGKAT) ---
     function openKoreksiStokModal(kloterId, currentSisa) {
         Swal.fire({
-            title: '🔧 Koreksi Jumlah Ayam Sekarang',
-            text: 'DOC Awal akan disesuaikan secara otomatis.',
-            input: 'number',
-            inputValue: currentSisa,
-            showCancelButton: true,
-            confirmButtonText: '💾 Simpan Koreksi',
-            cancelButtonText: '❌ Batal',
-            confirmButtonColor: '#fd7e14',
-            inputValidator: (value) => {
-                if (!value || value < 0) {
-                    return 'Masukkan jumlah yang valid!'
-                }
-            }
+            title: 'Koreksi Jumlah Ayam', text: 'DOC Awal akan disesuaikan otomatis.', input: 'number', inputValue: currentSisa, showCancelButton: true, confirmButtonText: 'Simpan Koreksi',
+            inputValidator: (v) => !v || v < 0 ? 'Masukkan jumlah yang valid!' : null
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = `/manajemen-kloter/${kloterId}/koreksi-stok`;
-                form.innerHTML = `
-                    <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="sisa_ayam_hidup" value="${result.value}">
-                `;
+                form.innerHTML = `<input type="hidden" name="_method" value="PUT"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="sisa_ayam_hidup" value="${result.value}">`;
                 document.body.appendChild(form);
                 form.submit();
             }
@@ -275,108 +282,94 @@
 
     function openEditTanggalModal(kloterId, currentTanggal) {
         Swal.fire({
-            title: '📅 Edit Tanggal Mulai',
-            html: `
-                <form id="form-edit-tanggal" action="/manajemen-kloter/${kloterId}/update-tanggal" method="POST" style="text-align: left;">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="_method" value="PUT">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">📅 Tanggal Mulai Baru:</label>
-                    <input type="date" name="tanggal_mulai" class="swal2-input" value="${currentTanggal}" required>
-                </form>
-            `,
-            showCancelButton: true,
-            confirmButtonText: '💾 Simpan Perubahan',
-            cancelButtonText: '❌ Batal',
-            confirmButtonColor: '#fd7e14',
-            preConfirm: () => document.getElementById('form-edit-tanggal').submit()
+            title: 'Edit Tanggal Mulai',
+            html: `<form id="form-edit-tanggal" action="/manajemen-kloter/${kloterId}/update-tanggal" method="POST"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="PUT"><input type="date" name="tanggal_mulai" class="swal2-input" value="${currentTanggal}" required></form>`,
+            showCancelButton: true, confirmButtonText: 'Simpan', preConfirm: () => document.getElementById('form-edit-tanggal').submit()
         });
     }
 
     function openEditDocModal(kloterId, currentDoc) {
         Swal.fire({
-            title: '🐣 Edit Jumlah DOC Awal',
-            html: `
-                <form id="form-edit-doc" action="/manajemen-kloter/${kloterId}/update-doc" method="POST" style="text-align: left;">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="_method" value="PUT">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">🐣 Jumlah DOC Awal:</label>
-                    <input type="number" name="jumlah_doc" class="swal2-input" value="${currentDoc}" required min="0">
-                </form>
-            `,
-            showCancelButton: true,
-            confirmButtonText: '💾 Simpan Perubahan',
-            cancelButtonText: '❌ Batal',
-            confirmButtonColor: '#fd7e14',
-            preConfirm: () => document.getElementById('form-edit-doc').submit()
+            title: 'Edit Jumlah DOC Awal',
+            html: `<form id="form-edit-doc" action="/manajemen-kloter/${kloterId}/update-doc" method="POST"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="PUT"><input type="number" name="jumlah_doc" class="swal2-input" value="${currentDoc}" required min="0"></form>`,
+            showCancelButton: true, confirmButtonText: 'Simpan', preConfirm: () => document.getElementById('form-edit-doc').submit()
         });
     }
 
     function openKematianModal(kloterId) {
         Swal.fire({
-            title: '💀 Catat Kematian Ayam',
-            html: `
-                <form id="form-kematian" action="/manajemen-kloter/${kloterId}/kematian" method="POST" style="text-align: left;">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">💀 Jumlah Mati:</label>
-                    <input type="number" name="jumlah_mati" class="swal2-input" placeholder="Jumlah Mati" required min="1">
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600;">📅 Tanggal Kematian:</label>
-                    <input type="date" name="tanggal_kematian" class="swal2-input" value="{{ date('Y-m-d') }}" required>
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600;">📝 Catatan (opsional):</label>
-                    <textarea name="catatan" class="swal2-textarea" placeholder="Catatan tambahan..."></textarea>
-                </form>
-            `,
-            showCancelButton: true,
-            confirmButtonText: '💾 Simpan',
-            cancelButtonText: '❌ Batal',
-            confirmButtonColor: '#007bff',
-            preConfirm: () => document.getElementById('form-kematian').submit()
+            title: 'Catat Kematian Ayam',
+            html: `<form id="form-kematian" action="/manajemen-kloter/${kloterId}/kematian" method="POST"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="number" name="jumlah_mati" class="swal2-input" placeholder="Jumlah Mati" required min="1"><input type="date" name="tanggal_kematian" class="swal2-input" value="{{ date('Y-m-d') }}" required><textarea name="catatan" class="swal2-textarea" placeholder="Catatan (opsional)"></textarea></form>`,
+            showCancelButton: true, confirmButtonText: 'Simpan', preConfirm: () => document.getElementById('form-kematian').submit()
         });
     }
+    
+    function togglePakanInput(selectedValue) {
+        const pakanGroup = document.getElementById('pakan-input-group');
+        const pakanInput = pakanGroup.querySelector('input');
+        if (selectedValue === 'Pakan') {
+            pakanGroup.style.display = 'block';
+            pakanInput.required = true;
+        } else {
+            pakanGroup.style.display = 'none';
+            pakanInput.required = false;
+            pakanInput.value = '';
+        }
+    }
+
+
 
     function openPengeluaranModal(kloterId) {
         Swal.fire({
-            title: '💸 Input Data Keperluan',
+            title: 'Input Data Keperluan',
             html: `
                 <form id="form-pengeluaran" action="/manajemen-kloter/${kloterId}/pengeluaran" method="POST" style="text-align: left;">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">📂 Kategori:</label>
-                    <select name="kategori" class="swal2-select" required>
+                    <!-- Input tersembunyi untuk nilai asli -->
+                    <input type="hidden" name="jumlah_pengeluaran" id="jumlah_pengeluaran_real">
+                    
+                    <label style="display: block; margin-bottom: 5px;">📂 Kategori</label>
+                    <select name="kategori" id="swal-kategori" class="swal2-select" required onchange="togglePakanInput(this.value)">
                         <option value="">Pilih Kategori</option>
                         <option value="Pakan">🌾 Pakan</option>
                         <option value="Obat">💊 Obat</option>
                         <option value="Lainnya">📦 Lainnya</option>
                     </select>
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600;">💰 Harga (Rp):</label>
-                    <input type="number" name="jumlah_pengeluaran" class="swal2-input" placeholder="Harga (Rp)" required min="0">
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600;">📅 Tanggal Pengeluaran:</label>
+
+                    <div id="pakan-input-group" style="display: none; margin-top: 10px;">
+                        <label style="display: block; margin-bottom: 5px;">⚖️ Jumlah Pakan (Kg)</label>
+                        <input type="number" step="0.01" name="jumlah_pakan_kg" class="swal2-input" placeholder="Contoh: 50.5">
+                    </div>
+
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">💰 Harga (Rp)</label>
+                    <input id="jumlah_pengeluaran_formatted" type="text" class="swal2-input" placeholder="Masukkan jumlah pengeluaran" required oninput="formatNumberInput(this)">
+                    
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📅 Tanggal Pengeluaran</label>
                     <input type="date" name="tanggal_pengeluaran" class="swal2-input" value="{{ date('Y-m-d') }}" required>
+
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📝 Keterangan (Opsional)</label>
+                    <textarea name="catatan" class="swal2-textarea" placeholder="Contoh: Pembelian pakan BR-1 2 karung"></textarea>
                 </form>
             `,
             showCancelButton: true,
-            confirmButtonText: '💾 Simpan',
-            cancelButtonText: '❌ Batal',
-            confirmButtonColor: '#007bff',
-            preConfirm: () => document.getElementById('form-pengeluaran').submit()
+            confirmButtonText: 'Simpan',
+            preConfirm: () => {
+                // Ambil nilai yang sudah diformat, hapus titiknya, lalu kirim
+                const formattedInput = document.getElementById('jumlah_pengeluaran_formatted');
+                const realInput = document.getElementById('jumlah_pengeluaran_real');
+                realInput.value = formattedInput.value.replace(/\./g, '');
+                document.getElementById('form-pengeluaran').submit();
+            }
         });
     }
     
+    
     function openPanenModal(kloterId) {
         Swal.fire({
-            title: '🌾 Catat Panen Parsial',
-            html: `
-                <form id="form-panen" action="/manajemen-kloter/${kloterId}/panen" method="POST" style="text-align: left;">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">🐔 Jumlah Ayam Dipanen:</label>
-                    <input type="number" name="jumlah_panen" class="swal2-input" placeholder="Jumlah Ayam Dipanen" required min="1">
-                    <label style="display: block; margin-bottom: 8px; margin-top: 15px; font-weight: 600;">📅 Tanggal Panen:</label>
-                    <input type="date" name="tanggal_panen" class="swal2-input" value="{{ date('Y-m-d') }}" required>
-                </form>
-            `,
-            showCancelButton: true,
-            confirmButtonText: '🌾 Simpan Panen',
-            cancelButtonText: '❌ Batal',
-            confirmButtonColor: '#28a745',
-            preConfirm: () => { document.getElementById('form-panen').submit(); }
+            title: 'Catat Panen Parsial',
+            html: `<form id="form-panen" action="/manajemen-kloter/${kloterId}/panen" method="POST"><input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="number" name="jumlah_panen" class="swal2-input" placeholder="Jumlah Ayam Dipanen" required min="1"><input type="date" name="tanggal_panen" class="swal2-input" value="{{ date('Y-m-d') }}" required></form>`,
+            showCancelButton: true, confirmButtonText: 'Simpan Panen', confirmButtonColor: '#28a745',
+            preConfirm: () => document.getElementById('form-panen').submit()
         });
     }
 </script>
