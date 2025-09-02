@@ -307,121 +307,7 @@
             border-color: #c3d4e8;
         }
 
-        /* Enhanced notification styles */
-        .notification-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .notification-overlay.show {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .success-notification {
-            background: white;
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 420px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-            transform: scale(0.8);
-            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .success-notification::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-        }
-
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 2.5rem;
-            animation: bounce 0.6s ease 0.3s both;
-        }
-
-        .success-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 12px;
-        }
-
-        .success-message {
-            font-size: 1.1rem;
-            color: #7f8c8d;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        .notification-btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 10px;
-        }
-
-        .notification-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-        }
-
-        .notification-btn.secondary {
-            background: transparent;
-            color: #6c757d;
-            border: 2px solid #e8ecf4;
-        }
-
-        .notification-btn.secondary:hover {
-            background: #f8f9fa;
-            border-color: #c3d4e8;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes popIn {
-            to { transform: scale(1); }
-        }
-
-        @keyframes bounce {
-            0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
-            40%, 43% { transform: translate3d(0, -20px, 0); }
-            70% { transform: translate3d(0, -10px, 0); }
-            90% { transform: translate3d(0, -4px, 0); }
-        }
 
         /* Form validation styles */
         .form-group.error input,
@@ -566,152 +452,201 @@
         </div>
     </div>
 
-    <div class="notification-overlay" id="notificationOverlay">
-        <div class="success-notification">
-            <div class="success-icon">✅</div>
-            <h3 class="success-title">Berhasil!</h3>
-            <p class="success-message">Jadwal baru telah berhasil ditambahkan ke dalam sistem Anda.</p>
-            <div style="margin-top: 25px;">
-                <button class="notification-btn" onclick="goToMainMenu()">Kembali ke Menu</button>
-                <button class="notification-btn secondary" onclick="addAnother()">Tambah Lagi</button>
-            </div>
-        </div>
-    </div>
+
 
     <script>
-        // Set tanggal hari ini sebagai default dan fokus ke input pertama
-        document.getElementById('date').valueAsDate = new Date();
-        document.getElementById('activityName').focus();
-
-        // Fungsi validasi form (tidak berubah)
-        function validateForm() {
-            let isValid = true;
-            const requiredFields = ['activityName', 'date', 'startTime'];
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                const formGroup = field.closest('.form-group');
-                if (!field.value.trim()) {
-                    formGroup.classList.add('error');
-                    isValid = false;
-                } else {
-                    formGroup.classList.remove('error');
-                }
-            });
-            return isValid;
-        }
-
-        // Fungsi notifikasi (tidak berubah)
-        function showSuccessNotification() {
-            document.getElementById('notificationOverlay').classList.add('show');
-        }
-
-        function hideNotification() {
-            document.getElementById('notificationOverlay').classList.remove('show');
-        }
-
-        function goToMainMenu() {
-            window.location.href = "{{ route('welcome') }}";
-        }
-
-        function addAnother() {
-            hideNotification();
-            document.getElementById('scheduleForm').reset();
-            document.getElementById('date').valueAsDate = new Date();
-            document.getElementById('medium').checked = true;
-            document.getElementById('activityName').focus();
-        }
-
-        // === HANDLER SUBMIT FORM YANG BARU DAN LEBIH BAIK ===
-        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Optimized Form Handler dengan mempertahankan Laravel backend
+        const FormHandler = {
+            // Cache DOM elements saat init
+            elements: null,
             
-            if (!validateForm()) {
-                return;
-            }
+            // State untuk prevent double submission
+            isSubmitting: false,
 
-            const form = e.target;
-            const formData = new FormData(form);
-            const submitBtn = document.getElementById('submitBtn');
+            // Required fields configuration
+            requiredFields: ['activityName', 'date', 'startTime'],
 
-            // Non-aktifkan tombol untuk mencegah klik ganda
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Menyimpan...';
+            // Initialize form handler
+            init() {
+                this.cacheElements();
+                this.setDefaults();
+                this.bindEvents();
+            },
 
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                body: formData
-            })
-            .then(async response => {
-                // Jika respons TIDAK sukses (misal: error 422, 500)
-                if (!response.ok) {
-                    // Coba ambil detail error dari body respons
-                    const errorData = await response.json().catch(() => null);
-                    // Lemparkan error agar ditangkap oleh blok .catch
-                    throw errorData || new Error(Server merespons dengan status ${response.status});
-                }
-                // Jika sukses, lanjutkan
-                return response.json();
-            })
-            .then(data => {
-                // Ini hanya berjalan jika server merespons dengan sukses
-                console.log('Success:', data);
-                showSuccessNotification();
-            })
-            .catch(error => {
-                // INI BLOK YANG MENANGANI SEMUA JENIS ERROR
-                console.error('Error Details:', error);
+            // Cache semua elements yang diperlukan
+            cacheElements() {
+                this.elements = {
+                    form: document.getElementById('scheduleForm'),
+                    submitBtn: document.getElementById('submitBtn'),
+                    activityName: document.getElementById('activityName'),
+                    date: document.getElementById('date'),
+                    csrfToken: document.querySelector('meta[name="csrf-token"]')
+                };
+            },
+
+            // Set default values
+            setDefaults() {
+                this.elements.date.valueAsDate = new Date();
+                this.elements.activityName.focus();
+            },
+
+            // Bind all event listeners
+            bindEvents() {
+                // Form submission
+                this.elements.form.addEventListener('submit', this.handleSubmit.bind(this));
                 
-                let userMessage = 'Gagal menyimpan jadwal! Terjadi kesalahan tak terduga.';
+                // Real-time validation
+                this.requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener('blur', () => this.validateField(field));
+                        field.addEventListener('input', () => this.clearFieldError(field));
+                    }
+                });
+            },
 
-                // Jika error berasal dari validasi Laravel (422)
-                if (error && error.errors) {
-                    // Ambil pesan error validasi yang pertama
-                    const firstErrorKey = Object.keys(error.errors)[0];
-                    userMessage = error.errors[firstErrorKey][0];
-                } 
-                // Jika ada pesan error umum dari server
-                else if (error && error.message) {
-                    userMessage = error.message;
+            // Validate individual field
+            validateField(field) {
+                const formGroup = field.closest('.form-group');
+                const isValid = field.value.trim() !== '';
+                
+                formGroup.classList.toggle('error', !isValid);
+                return isValid;
+            },
+
+            // Clear field error
+            clearFieldError(field) {
+                if (field.value.trim()) {
+                    field.closest('.form-group').classList.remove('error');
                 }
+            },
 
-                // Tampilkan pesan error yang jelas kepada pengguna
-                alert(Terjadi Kesalahan:\n\n${userMessage}\n\nSilakan periksa kembali data Anda atau cek log di Railway untuk info teknis.);
-            })
-            .finally(() => {
-                // Apapun hasilnya (sukses atau gagal), aktifkan kembali tombolnya
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '💾 Simpan Jadwal';
-            });
-        });
+            // Validate entire form
+            validateForm() {
+                let isValid = true;
+                
+                this.requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field && !this.validateField(field)) {
+                        isValid = false;
+                    }
+                });
 
-        // Event listener lainnya (tidak berubah)
-        document.getElementById('notificationOverlay').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideNotification();
+                return isValid;
+            },
+
+            // Handle form submission dengan optimisasi
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                // Prevent double submission
+                if (this.isSubmitting) return;
+                
+                // Validate form
+                if (!this.validateForm()) return;
+
+                this.setSubmittingState(true);
+
+                try {
+                    const formData = new FormData(this.elements.form);
+                    const response = await this.submitToServer(formData);
+                    
+                    if (response.ok) {
+                        this.handleSuccess();
+                    } else {
+                        await this.handleServerError(response);
+                    }
+                } catch (error) {
+                    this.handleNetworkError(error);
+                } finally {
+                    this.setSubmittingState(false);
+                }
+            },
+
+            // Submit data to Laravel server
+            async submitToServer(formData) {
+                return fetch(this.elements.form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': this.elements.csrfToken.getAttribute('content'),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+            },
+
+            // Handle success - simple redirect or alert
+            handleSuccess() {
+                alert('✅ Jadwal berhasil disimpan!');
+                // Option 1: Redirect ke halaman utama
+                window.location.href = "{{ route('welcome') }}";
+                
+                // Option 2: Reset form untuk input lagi
+                // this.resetForm();
+            },
+
+            // Handle server errors (422, 500, etc)
+            async handleServerError(response) {
+                try {
+                    const errorData = await response.json();
+                    let errorMessage = 'Terjadi kesalahan pada server.';
+
+                    if (errorData.errors) {
+                        // Laravel validation errors
+                        const firstError = Object.values(errorData.errors)[0];
+                        errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
+                    } else if (errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+
+                    this.showError(errorMessage);
+                } catch {
+                    this.showError(`Server error: ${response.status}`);
+                }
+            },
+
+            // Handle network errors
+            handleNetworkError(error) {
+                console.error('Network error:', error);
+                this.showError('Gagal terhubung ke server. Periksa koneksi internet Anda.');
+            },
+
+            // Set submitting state
+            setSubmittingState(isSubmitting) {
+                this.isSubmitting = isSubmitting;
+                this.elements.submitBtn.disabled = isSubmitting;
+                this.elements.submitBtn.textContent = isSubmitting ? 
+                    'Menyimpan...' : 
+                    '💾 Simpan Jadwal';
+            },
+
+            // Show error message
+            showError(message) {
+                alert(`❌ Gagal menyimpan jadwal!\n\n${message}\n\nSilakan coba lagi.`);
+            },
+
+            // Reset form untuk input lagi
+            resetForm() {
+                this.elements.form.reset();
+                this.setDefaults();
+                
+                // Clear error states
+                document.querySelectorAll('.form-group.error').forEach(group => {
+                    group.classList.remove('error');
+                });
+                
+                // Reset priority to medium
+                document.getElementById('medium').checked = true;
             }
-        });
+        };
 
-        document.querySelectorAll('input[required], textarea[required]').forEach(field => {
-            field.addEventListener('blur', function() {
-                const formGroup = this.closest('.form-group');
-                if (!this.value.trim()) {
-                    formGroup.classList.add('error');
-                } else {
-                    formGroup.classList.remove('error');
-                }
-            });
-
-            field.addEventListener('input', function() {
-                const formGroup = this.closest('.form-group');
-                if (this.value.trim()) {
-                    formGroup.classList.remove('error');
-                }
-            });
-        });
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => FormHandler.init());
+        } else {
+            FormHandler.init();
+        }
     </script>
 </body>
 </html>
