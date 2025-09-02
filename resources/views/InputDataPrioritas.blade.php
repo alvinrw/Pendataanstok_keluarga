@@ -454,6 +454,7 @@
 
 
 
+
     <script>
         // Optimized Form Handler dengan mempertahankan Laravel backend
         const FormHandler = {
@@ -507,6 +508,7 @@
 
             // Validate individual field
             validateField(field) {
+
                 const formGroup = field.closest('.form-group');
                 const isValid = field.value.trim() !== '';
                 
@@ -519,6 +521,7 @@
                 if (field.value.trim()) {
                     field.closest('.form-group').classList.remove('error');
                 }
+
             },
 
             // Validate entire form
@@ -648,5 +651,6 @@
             FormHandler.init();
         }
     </script>
+
 </body>
 </html>
