@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +25,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -38,7 +39,7 @@
         .header h1 {
             font-size: 2.2rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
@@ -65,14 +66,14 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .btn-back {
             background: linear-gradient(135deg, #6c5ce7 0%, #5a4fcf 100%);
             margin-bottom: 25px;
         }
-        
+
         .action-btn {
             padding: 8px 15px;
             font-size: 0.9rem;
@@ -80,17 +81,17 @@
         }
 
         .btn-edit {
-             background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
         }
-        
+
         .btn-delete {
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
-        
+
         .btn-save {
-             background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
         }
-        
+
         .btn-cancel {
             background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
         }
@@ -168,7 +169,7 @@
         .summary-amount {
             font-size: 2rem;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .summary-info {
@@ -181,7 +182,7 @@
             background: white;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             border: 1px solid #e9ecef;
         }
 
@@ -194,15 +195,14 @@
             border-collapse: collapse;
         }
 
-        th, td {
+        th,
+        td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #e9ecef;
             vertical-align: middle;
-        }
-        
-        td:last-child {
             white-space: nowrap;
+            /* Prevent text wrapping globally */
         }
 
         th {
@@ -216,13 +216,13 @@
         tbody tr:hover {
             background: #f1f3f5;
         }
-        
+
         .no-data-row td {
             text-align: center;
             padding: 50px;
             color: #6c757d;
         }
-        
+
         .no-data-row:hover {
             background: white;
         }
@@ -237,7 +237,7 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         .modal-content {
@@ -247,13 +247,20 @@
             border-radius: 15px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             animation: slide-down 0.3s ease-out;
         }
-        
+
         @keyframes slide-down {
-            from { transform: translateY(-30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -301,7 +308,7 @@
             font-size: 1rem;
             font-family: inherit;
         }
-        
+
         .form-group textarea {
             resize: vertical;
             min-height: 80px;
@@ -326,13 +333,14 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .filter-buttons {
                 justify-content: center;
             }
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -342,9 +350,9 @@
         </div>
 
         <div class="content">
-           <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
+            <a href="{{ route('welcome') }}" class="btn btn-back">← Kembali ke Menu Utama</a>
 
-            
+
             <!-- Filter Section -->
             <div class="filter-section">
                 <div class="filter-row">
@@ -369,7 +377,7 @@
                 <div class="summary-amount" id="total-amount">Rp 0</div>
                 <div class="summary-info" id="summary-info">Dari seluruh data</div>
             </div>
-            
+
             <div class="table-section">
                 <div class="table-container">
                     <table>
@@ -396,26 +404,28 @@
                 <h2 id="modal-title">Edit Transaksi</h2>
                 <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
-            
-           <form id="saleForm" method="POST">
-    @csrf
+
+            <form id="saleForm" method="POST">
+                @csrf
 
                 <input type="hidden" id="sale-id">
                 <div class="form-group">
                     <label for="modal-tanggal">Tanggal:</label>
                     <input type="date" id="modal-tanggal" name="tanggal" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="modal-total">Total Harga (Rp):</label>
-                  <input type="number" id="modal-total" name="total_harga" placeholder="Contoh: 50000" min="0" required>
+                    <input type="number" id="modal-total" name="total_harga" placeholder="Contoh: 50000" min="0"
+                        required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="modal-catatan">Catatan:</label>
-                   <textarea id="modal-catatan" name="catatan" placeholder="Contoh: Pembelian 2 buku dan 1 pensil"></textarea>
+                    <textarea id="modal-catatan" name="catatan"
+                        placeholder="Contoh: Pembelian 2 buku dan 1 pensil"></textarea>
                 </div>
-                
+
                 <div class="modal-buttons">
                     <button type="button" class="btn btn-cancel" onclick="closeModal()">Batal</button>
                     <button type="submit" class="btn btn-save">Simpan</button>
@@ -433,7 +443,7 @@
         let filteredData = [...salesData]; // Copy untuk data yang difilter
 
         // Menjalankan fungsi saat halaman selesai dimuat
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             populateTable();
             updateSummary();
         });
@@ -452,7 +462,7 @@
                 const itemDate = new Date(item.tanggal);
                 const start = startDate ? new Date(startDate) : new Date('1900-01-01');
                 const end = endDate ? new Date(endDate) : new Date('2100-12-31');
-                
+
                 return itemDate >= start && itemDate <= end;
             });
 
@@ -472,12 +482,12 @@
         function updateSummary() {
             const total = filteredData.reduce((sum, item) => sum + parseFloat(item.total_harga || 0), 0);
             const count = filteredData.length;
-            
+
             document.getElementById('total-amount').textContent = formatCurrency(total);
-            
+
             const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
-            
+
             let info = '';
             if (startDate || endDate) {
                 if (startDate && endDate) {
@@ -490,7 +500,7 @@
             } else {
                 info = `Dari seluruh data (${count} transaksi)`;
             }
-            
+
             document.getElementById('summary-info').textContent = info;
         }
 
@@ -510,18 +520,18 @@
             document.getElementById('modal-catatan').value = itemToEdit.catatan;
 
             // Set form action untuk edit
-           saleForm.action = `/penjualan-toko/${itemToEdit.id}`;
-            
+            saleForm.action = `/penjualan-toko/${itemToEdit.id}`;
+
             let methodInput = document.createElement('input');
             methodInput.type = 'hidden';
             methodInput.name = '_method';
             methodInput.value = 'PUT';
             methodInput.id = 'method-field';
-            
+
             // Hapus _method lama kalau ada
             const existingMethod = document.getElementById('method-field');
             if (existingMethod) existingMethod.remove();
-            
+
             saleForm.appendChild(methodInput);
 
             modal.style.display = 'block';
@@ -538,22 +548,22 @@
                 },
                 body: JSON.stringify({ _method: 'DELETE' })
             })
-            .then(response => {
-                if (response.ok) {
-                    // Hapus item dari array salesData
-                    salesData = salesData.filter(item => item.id !== id);
-                    filteredData = filteredData.filter(item => item.id !== id);
-                    // Refresh tabel dan summary
-                    populateTable();
-                    updateSummary();
-                } else {
-                    alert('Gagal menghapus data.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat menghapus.');
-            });
+                .then(response => {
+                    if (response.ok) {
+                        // Hapus item dari array salesData
+                        salesData = salesData.filter(item => item.id !== id);
+                        filteredData = filteredData.filter(item => item.id !== id);
+                        // Refresh tabel dan summary
+                        populateTable();
+                        updateSummary();
+                    } else {
+                        alert('Gagal menghapus data.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menghapus.');
+                });
         }
 
         // --- Fungsi Tampilan ---
@@ -592,7 +602,7 @@
             if (isNaN(amount)) return 'Rp 0';
             return 'Rp ' + Number(amount).toLocaleString('id-ID');
         }
-        
+
         function formatDate(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
@@ -609,4 +619,5 @@
     </script>
 
 </body>
+
 </html>
