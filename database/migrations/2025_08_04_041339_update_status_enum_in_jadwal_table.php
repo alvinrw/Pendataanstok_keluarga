@@ -5,14 +5,15 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB; // ⬅️ Tambahkan ini
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up()
     {
-        DB::statement("ALTER TABLE jadwals MODIFY status ENUM('pending', 'done', 'cancel', 'ongoing') DEFAULT 'ongoing'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE jadwals MODIFY status ENUM('pending', 'done', 'cancel', 'ongoing') DEFAULT 'ongoing'");
+        }
     }
 
     /**
@@ -20,6 +21,8 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::statement("ALTER TABLE jadwals MODIFY status ENUM('pending', 'done', 'cancel') DEFAULT 'pending'");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE jadwals MODIFY status ENUM('pending', 'done', 'cancel') DEFAULT 'pending'");
+        }
     }
 };

@@ -158,10 +158,16 @@
                     </div>
 
                     <div class="discount-section">
-                        <h4>🎯 Diskon 5%</h4>
-                        <div class="radio-group">
-                            <label><input type="radio" name="diskon" value="1" id="diskon-ya"> Ya, berikan diskon 5%</label>
-                            <label><input type="radio" name="diskon" value="0" id="diskon-tidak" checked> Tidak ada diskon</label>
+                        <h4>🎯 Diskon Kustom</h4>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 1.1em;">
+                                <input type="checkbox" id="diskon-checkbox" style="width: 20px; height: 20px;"> Berikan Diskon?
+                            </label>
+                            <div id="diskon-input-container" style="display: none; margin-top: 15px; animation: slideIn 0.3s ease;">
+                                <label for="diskon-persen">Persentase Diskon (%):</label>
+                                <input type="number" id="diskon-persen" min="0" max="100" placeholder="0 - 100" value="0" style="font-size: 1.2em; font-weight: bold; color: #d63031;">
+                                <small style="color: #636e72;">Masukkan nilai antara 0 sampai 100.</small>
+                            </div>
                         </div>
                     </div>
 
@@ -170,7 +176,7 @@
                         <div class="calc-row"><span>Berat per Ayam (Harga ÷ 75):</span><span id="berat-per-ayam">0 gram</span></div>
                         <div class="calc-row"><span>Total Berat:</span><span id="total-berat-calc">0 gram</span></div>
                         <div class="calc-row"><span>Harga Sebelum Diskon:</span><span id="harga-sebelum">Rp 0</span></div>
-                        <div class="calc-row"><span>Diskon (5%):</span><span id="nilai-diskon">Rp 0</span></div>
+                        <div class="calc-row"><span>Nilai Diskon:</span><span id="nilai-diskon">Rp 0 (0%)</span></div>
                         <div class="calc-row total"><span>Total Akhir:</span><span id="total-akhir">Rp 0</span></div>
                     </div>
 
@@ -198,6 +204,12 @@
         const hargaTotalInput = document.getElementById('harga_total_input');
         const submitBtn = document.getElementById('submit-btn');
         const form = document.getElementById('form-penjualan');
+        // Hidden inputs
+        const hiddenDiskon = document.createElement('input');
+        hiddenDiskon.type = 'hidden';
+        hiddenDiskon.name = 'diskon';
+        hiddenDiskon.id = 'diskon_hidden_bool';
+        form.appendChild(hiddenDiskon);
 
         let currentStock = 0;
         let selectedKloterName = '';
@@ -232,6 +244,10 @@
         function resetFormInputs() {
             form.reset();
             document.getElementById('tanggal').valueAsDate = new Date();
+            // Reset discount checkbox and input
+            document.getElementById('diskon-checkbox').checked = false;
+            document.getElementById('diskon-persen').value = 0;
+            document.getElementById('diskon-input-container').style.display = 'none';
             calculateValues();
         }
         
@@ -278,19 +294,41 @@
 
             const harga = parseRupiah(hargaTotalInput.value);
             const jumlah = parseInt(jumlahAyamInput.value) || 0;
-            const diskon = document.querySelector('input[name="diskon"]:checked').value === '1';
+            
+            // Logika Diskon Kustom
+            const enableDiskon = document.getElementById('diskon-checkbox').checked;
+            const diskonContainer = document.getElementById('diskon-input-container');
+            const diskonInput = document.getElementById('diskon-persen');
+            
+            // Set value untuk hidden input 'diskon' (boolean 1 atau 0) agar validasi backend lolos
+            hiddenDiskon.value = enableDiskon ? '1' : '0';
+
+            // Toggle tampilan input
+            diskonContainer.style.display = enableDiskon ? 'block' : 'none';
+            
+            let persenDiskon = enableDiskon ? parseFloat(diskonInput.value) || 0 : 0;
+
+            // Validasi Max 100%
+            if (persenDiskon > 100) {
+                persenDiskon = 100;
+                diskonInput.value = 100;
+            } else if (persenDiskon < 0) {
+                persenDiskon = 0;
+                diskonInput.value = 0;
+            }
 
             const beratPerAyam = harga > 0 ? harga / 75 : 0;
-            const totalBerat = beratPerAyam ; // Total berat = berat per ayam * jumlah ayam
-            const hargaAsli = harga ; // Harga asli = harga per ayam * jumlah ayam
+            const totalBerat = beratPerAyam ; 
+            const hargaAsli = harga ; 
 
-            const nilaiDiskon = diskon ? hargaAsli * 0.05 : 0;
+            const nilaiDiskon = (hargaAsli * persenDiskon) / 100;
             const totalAkhir = hargaAsli - nilaiDiskon;
 
             document.getElementById('berat-per-ayam').textContent = Math.round(beratPerAyam).toLocaleString('id-ID') + ' gram';
             document.getElementById('total-berat-calc').textContent = Math.round(totalBerat).toLocaleString('id-ID') + ' gram';
             document.getElementById('harga-sebelum').textContent = formatCurrency(hargaAsli);
-            document.getElementById('nilai-diskon').textContent = formatCurrency(nilaiDiskon);
+            // Update tampilan diskon dengan persen
+            document.getElementById('nilai-diskon').textContent = formatCurrency(nilaiDiskon) + ` (${Math.round(persenDiskon)}%)`;
             document.getElementById('total-akhir').textContent = formatCurrency(totalAkhir);
 
             return { totalBerat: Math.round(totalBerat), hargaAsli: Math.round(hargaAsli), totalAkhir: Math.round(totalAkhir) };
@@ -298,7 +336,9 @@
 
         hargaTotalInput.addEventListener('input', () => { formatRupiahInput(hargaTotalInput); calculateValues(); });
         jumlahAyamInput.addEventListener('input', calculateValues);
-        document.querySelectorAll('input[name="diskon"]').forEach(radio => radio.addEventListener('change', calculateValues));
+        // Event Listener Baru untuk Diskon
+        document.getElementById('diskon-checkbox').addEventListener('change', calculateValues);
+        document.getElementById('diskon-persen').addEventListener('input', calculateValues);
 
         form.addEventListener('submit', function(e) {
             const calculations = calculateValues();
