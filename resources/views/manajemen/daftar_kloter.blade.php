@@ -7,103 +7,372 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Manajemen Kloter Pemeliharaan</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
-<style>
-    
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; color: #34495e; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-size: 2.5rem; color: #2c3e50; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        
-        .btn { padding: 12px 24px; text-decoration: none; color: white; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; border: none; cursor: pointer; display: inline-block; }
-        .btn-primary-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .btn-primary-gradient:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3); }
-        
-        .back-btn { color: #556080; text-decoration: none; font-weight: 600; transition: color 0.3s; }
-        .back-btn:hover { color: #667eea; }
 
-        .kloter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
-        .kloter-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; }
-        .kloter-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
-        .card-header { padding: 20px; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; border-bottom: 4px solid #667eea; }
-        .card-header h3 { font-size: 1.3rem; margin: 0; }
-        .card-body { padding: 25px; flex-grow: 1; }
-        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 1rem; padding: 12px 0; border-bottom: 1px solid #f0f2f5; }
-        .info-item:last-child { border-bottom: none; }
-        .info-item span { color: #5a6a7b; }
-        .info-item strong { color: #2c3e50; font-size: 1.1rem; }
-        .card-footer { background-color: #f8f9fa; padding: 15px 25px; border-top: 1px solid #e9ecef; }
-        .actions { display: flex; gap: 10px; }
-        .btn-sm { padding: 8px 16px; font-size: 0.9em; font-weight: 500; border-radius: 6px; }
-        .btn-blue { background: #3498db; } .btn-blue:hover { background: #2980b9; }
-        .btn-red { background: #e74c3c; } .btn-red:hover { background: #c0392b; }
-        .btn-orange { background: #f39c12; } .btn-orange:hover { background: #e67e22; }
-        .btn-green { background: #2ecc71; } .btn-green:hover { background: #27ae60; }
-        .no-data { background: white; border-radius: 15px; padding: 50px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #34495e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            text-decoration: none;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-primary-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-primary-gradient:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-btn {
+            color: #556080;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .back-btn:hover {
+            color: #667eea;
+        }
+
+        .kloter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .kloter-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .kloter-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            border-bottom: 4px solid #667eea;
+        }
+
+        .card-header h3 {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 25px;
+            flex-grow: 1;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item span {
+            color: #5a6a7b;
+        }
+
+        .info-item strong {
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .card-footer {
+            background-color: #f8f9fa;
+            padding: 15px 25px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        .btn-blue {
+            background: #3498db;
+        }
+
+        .btn-blue:hover {
+            background: #2980b9;
+        }
+
+        .btn-red {
+            background: #e74c3c;
+        }
+
+        .btn-red:hover {
+            background: #c0392b;
+        }
+
+        .btn-orange {
+            background: #f39c12;
+        }
+
+        .btn-orange:hover {
+            background: #e67e22;
+        }
+
+        .btn-green {
+            background: #2ecc71;
+        }
+
+        .btn-green:hover {
+            background: #27ae60;
+        }
+
+        .no-data {
+            background: white;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
 
         /* SweetAlert2 Modal Styles */
-        .swal2-popup { width: 85% !important; max-width: 950px !important; border-radius: 15px !important; }
-        .modal-content-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; text-align: left; }
-        .modal-card { padding: 20px; border: 1px solid #e9ecef; border-radius: 12px; background: #fdfdfd; }
-        .modal-card h3 { margin-top: 0; font-size: 1.3em; color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 15px; }
-        .modal-rekapan-table { width: 100%; font-size: 0.9em; }
-        .modal-rekapan-table th { background: #f1f3f5; padding: 8px; }
-        .modal-rekapan-table td { padding: 8px 5px; border-bottom: 1px solid #f2f2f2; }
-        .modal-rekapan-table tr:last-child td { border-bottom: none; }
-        .modal-summary-box { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px; border-radius: 12px; margin-top: 20px; border-top: 3px solid #667eea; }
-        .summary-item { display: flex; justify-content: space-between; font-size: 1.1em; margin-bottom: 12px; align-items: center; }
-        .summary-item:last-child { margin-bottom: 0; }
-        .summary-item span { font-weight: 500; }
-        .summary-item strong { font-weight: bold; font-size: 1.2em; color: #2c3e50; }
-        .editable-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; }
+        .swal2-popup {
+            width: 85% !important;
+            max-width: 950px !important;
+            border-radius: 15px !important;
+        }
 
-/* Tablet (≤1024px) */
-@media (max-width: 1024px) {
-    .header h1 {
-        font-size: 2rem;
-    }
-    .kloter-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-    }
-    .card-body {
-        padding: 20px;
-    }
-    .modal-content-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-}
+        .modal-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 25px;
+            text-align: left;
+        }
 
-/* Mobile (≤600px) */
-@media (max-width: 600px) {
-    .summary-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 3px;
-    }
-    .summary-item span {
-        font-size: 0.9em;
-    }
-    .summary-item strong {
-        font-size: 1.1em;
-    }
-    .modal-summary-box {
-        padding: 15px;
-    }
-    .modal-rekapan-table {
-        font-size: 0.8em;
-    }
-    .modal-rekapan-table th,
-    .modal-rekapan-table td {
-        padding: 5px;
-    }
-}
+        .modal-card {
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            background: #fdfdfd;
+        }
 
+        .modal-card h3 {
+            margin-top: 0;
+            font-size: 1.3em;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
 
-</style>
+        .modal-rekapan-table {
+            width: 100%;
+            font-size: 0.9em;
+        }
+
+        .modal-rekapan-table th {
+            background: #f1f3f5;
+            padding: 8px;
+        }
+
+        .modal-rekapan-table td {
+            padding: 8px 5px;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+        .modal-rekapan-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .modal-summary-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-top: 3px solid #667eea;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-item span {
+            font-weight: 500;
+        }
+
+        .summary-item strong {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+
+        .editable-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        /* Tablet (≤1024px) */
+        @media (max-width: 1024px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .kloter-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .modal-content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Mobile (≤600px) */
+        @media (max-width: 600px) {
+            .summary-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 3px;
+            }
+
+            .summary-item span {
+                font-size: 0.9em;
+            }
+
+            .summary-item strong {
+                font-size: 1.1em;
+                word-break: break-word;
+            }
+
+            .modal-summary-box {
+                padding: 15px;
+            }
+
+            .modal-rekapan-table {
+                font-size: 0.7em;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .modal-rekapan-table th,
+            .modal-rekapan-table td {
+                padding: 4px 2px;
+                font-size: 0.85em;
+            }
+
+            /* Fix untuk Analisis Keuntungan di mobile */
+            .modal-card {
+                font-size: 0.9em;
+            }
+
+            .modal-card h3 {
+                font-size: 1.2em !important;
+                word-break: break-word;
+            }
+
+            /* Fix untuk angka yang panjang */
+            .modal-card strong {
+                word-break: break-word;
+                display: inline-block;
+                max-width: 100%;
+            }
+
+            /* Fix untuk Rasio Performa */
+            .modal-card>div {
+                font-size: 0.85em;
+            }
+
+            /* Fix untuk tabel yang terlalu lebar */
+            .modal-content-grid {
+                gap: 15px;
+            }
+
+            /* Pastikan angka tidak terpotong */
+            div[style*="display: flex"] {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -206,8 +475,8 @@
                     <label style="display: block; margin-bottom: 5px; margin-top: 10px;">DOC Awal (Jumlah Ayam)</label>
                     <input type="number" name="jumlah_doc" class="swal2-input" placeholder="Contoh: 100" required min="1">
 
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Harga Beli DOC (Wajib)</label>
-                    <input id="harga_beli_doc_formatted" type="text" class="swal2-input" placeholder="Contoh: 800.000" required oninput="formatNumberInput(this)">
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">💰 Total Harga Beli DOC (Wajib)</label>
+                    <input id="harga_beli_doc_formatted" type="text" class="swal2-input" placeholder="Contoh: 600.000 (untuk semua DOC)" required oninput="formatNumberInput(this)">
                 </form>
             `,
                 showCancelButton: true,
@@ -232,7 +501,7 @@
                 const response = await fetch(`/manajemen-kloter/${kloterId}/detail-json`);
                 if (!response.ok) throw new Error('Gagal mengambil data dari server.');
 
-                const { kloter, rekapan } = await response.json();
+                const { kloter, rekapan, analytics } = await response.json();
 
                 const createHistoryHtml = (items, type) => {
                     if (items.length === 0) return '<tr><td colspan="3" style="text-align:center; padding:10px;">Belum ada data.</td></tr>';
@@ -253,13 +522,14 @@
                     }).join('');
                 };
 
-                const pengeluaranHtml = kloter.pengeluarans.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding:10px;">Belum ada data.</td></tr>' :
+                const pengeluaranHtml = kloter.pengeluarans.length === 0 ? '<tr><td colspan="5" style="text-align:center; padding:10px;">Belum ada data.</td></tr>' :
                     kloter.pengeluarans.map(item => `<tr>
                     <td>${item.kategori}</td>
                     <td>${item.jumlah_pakan_kg ? item.jumlah_pakan_kg + ' Kg' : '-'}</td>
                     <td>Rp ${Number(item.jumlah_pengeluaran).toLocaleString('id-ID')}</td>
                     <td>
-                        <form action="/pengeluaran/${item.id}" method="POST" onsubmit="return confirm('Hapus data pengeluaran ini?')">
+                        <button class="btn btn-orange btn-sm" style="padding: 6px 10px; font-size: 1.1em; margin-right: 5px;" onclick="openEditPengeluaranModal(${item.id}, '${item.kategori}', ${item.jumlah_pengeluaran}, '${item.tanggal_pengeluaran}', '${item.catatan || ''}', ${item.jumlah_pakan_kg || 0})" title="Edit">✏️</button>
+                        <form action="/pengeluaran/${item.id}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus data pengeluaran ini?')">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">
                             <button type="submit" class="btn btn-red btn-sm" style="padding: 6px 10px; font-size: 1.1em;" title="Hapus">🗑️</button>
                         </form>
@@ -293,6 +563,293 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- BUSINESS ANALYTICS SECTION -->
+                <div class="modal-content-grid" style="margin-top: 20px;">
+                    <!-- Analisis Keuntungan Card -->
+                    <div class="modal-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                        <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">💰 Analisis Keuntungan</h3>
+                        <div style="margin: 15px 0; font-size: 0.95em;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">Total Pengeluaran:</span>
+                                <strong style="word-break: break-word;">Rp ${(analytics.breakdown_pengeluaran.DOC.nominal + analytics.breakdown_pengeluaran.Pakan.nominal + analytics.breakdown_pengeluaran.Obat.nominal + analytics.breakdown_pengeluaran['Listrik/Air'].nominal + analytics.breakdown_pengeluaran['Tenaga Kerja'].nominal + analytics.breakdown_pengeluaran['Pemeliharaan Kandang'].nominal + analytics.breakdown_pengeluaran.Lainnya.nominal).toLocaleString('id-ID')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.3); flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">Total Pemasukan:</span>
+                                <strong style="word-break: break-word;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
+                                <span style="font-size: 1.1em; font-weight: 600;">Keuntungan Bersih:</span>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.6em; font-weight: bold; word-break: break-word;">Rp ${analytics.keuntungan_bersih.toLocaleString('id-ID')}</div>
+                                    <small style="opacity: 0.9; white-space: nowrap;">Margin: ${analytics.margin_keuntungan}%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rasio Performa Card -->
+                    <div class="modal-card">
+                        <h3>📊 Rasio Performa</h3>
+                        <div style="margin: 15px 0;">
+                            <!-- FCR with Details -->
+                            <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <span style="font-weight: 600;">🌾 FCR (Feed Conversion Ratio)</span>
+                                    <strong style="font-size: 1.3em; color: ${analytics.fcr <= 1.7 ? '#10b981' : analytics.fcr <= 2.0 ? '#f59e0b' : '#ef4444'};">
+                                        ${analytics.fcr > 0 ? analytics.fcr : '-'}
+                                    </strong>
+                                </div>
+                                
+                                <!-- FCR Breakdown Details -->
+                                <div style="background: white; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 0.9em;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span style="color: #666;">📦 Total Pakan:</span>
+                                        <strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span style="color: #666;">⚖️ Total Berat Terjual:</span>
+                                        <strong>${analytics.total_berat_terjual.toLocaleString('id-ID')} Kg</strong>
+                                    </div>
+                                    <div style="border-top: 1px solid #e5e7eb; margin: 8px 0; padding-top: 8px;">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span style="color: #666;">📊 Rumus:</span>
+                                            <span style="font-family: monospace; font-size: 0.85em;">${rekapan.total_pakan_kg} ÷ ${analytics.total_berat_terjual.toFixed(2)} = ${analytics.fcr}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <small style="color: #666; display: block; margin-top: 8px;">
+                                    ${analytics.fcr <= 1.7 ? '✅ Sangat Efisien! Butuh ' + analytics.fcr + ' Kg pakan untuk 1 Kg daging' :
+                        analytics.fcr <= 2.0 ? '⚠️ Normal. Butuh ' + analytics.fcr + ' Kg pakan untuk 1 Kg daging' :
+                            analytics.fcr > 0 ? '❌ Kurang Efisien. Butuh ' + analytics.fcr + ' Kg pakan untuk 1 Kg daging' :
+                                '⚠️ Belum ada data penjualan atau pakan belum diinput'}
+                                </small>
+                            </div>
+                            
+                            <!-- Margin Keuntungan -->
+                            <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                    <span style="font-weight: 600;">💰 Margin Keuntungan</span>
+                                    <strong style="font-size: 1.3em; color: ${analytics.margin_keuntungan >= 25 ? '#10b981' : analytics.margin_keuntungan >= 15 ? '#f59e0b' : '#ef4444'};">
+                                        ${analytics.margin_keuntungan}%
+                                    </strong>
+                                </div>
+                                <small style="color: #666;">
+                                    ${analytics.margin_keuntungan >= 25 ? '✅ Sangat Bagus!' : analytics.margin_keuntungan >= 15 ? '⚠️ Normal' : '❌ Kurang Menguntungkan'}
+                                </small>
+                            </div>
+                            
+                            <!-- Mortality Rate -->
+                            <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                    <span style="font-weight: 600;">💀 Tingkat Kematian</span>
+                                    <strong style="font-size: 1.3em; color: ${analytics.mortality_rate <= 5 ? '#10b981' : analytics.mortality_rate <= 10 ? '#f59e0b' : '#ef4444'};">
+                                        ${analytics.mortality_rate}%
+                                    </strong>
+                                </div>
+                                <small style="color: #666;">
+                                    ${analytics.mortality_rate <= 5 ? '✅ Sangat Baik!' : analytics.mortality_rate <= 10 ? '⚠️ Normal' : '❌ Perlu Perhatian'}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown Pengeluaran Detail (Updated with 6 categories) -->
+                <div class="modal-card" style="margin-top: 20px;">
+                    <h3>📊 Breakdown Pengeluaran Detail</h3>
+                    <div style="margin: 15px 0;">
+                        ${Object.entries(analytics.breakdown_pengeluaran).map(([kategori, data]) => {
+                                    if (data.nominal === 0) return '';
+                                    const icons = {
+                                        'DOC': '🐣',
+                                        'Pakan': '🌾',
+                                        'Obat': '💊',
+                                        'Listrik/Air': '💡',
+                                        'Tenaga Kerja': '👷',
+                                        'Pemeliharaan Kandang': '🔧',
+                                        'Lainnya': '📦'
+                                    };
+                                    const colors = {
+                                        'DOC': '#f97316',
+                                        'Pakan': '#10b981',
+                                        'Obat': '#3b82f6',
+                                        'Listrik/Air': '#f59e0b',
+                                        'Tenaga Kerja': '#8b5cf6',
+                                        'Pemeliharaan Kandang': '#ef4444',
+                                        'Lainnya': '#6b7280'
+                                    };
+                                    return `
+                                <div style="margin-bottom: 12px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span>${icons[kategori]} ${kategori}</span>
+                                        <strong>${data.persentase}%</strong>
+                                    </div>
+                                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                        <div style="background: ${colors[kategori]}; height: 100%; width: ${data.persentase}%;"></div>
+                                    </div>
+                                    <small style="color: #666;">Rp ${data.nominal.toLocaleString('id-ID')}</small>
+                                </div>
+                            `;
+                                }).join('')}
+                    </div>
+                </div>
+
+                <!-- KESIMPULAN PERFORMA KLOTER -->
+                <div class="modal-card" style="margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">📋 Kesimpulan Performa Kloter</h3>
+                    <div style="margin: 15px 0; font-size: 0.95em;">
+                        ${(() => {
+                        // Calculate overall performance score
+                        let score = 0;
+                        let issues = [];
+                        let strengths = [];
+
+                        // FCR Analysis
+                        if (analytics.fcr > 0) {
+                            if (analytics.fcr <= 1.7) {
+                                score += 35;
+                                strengths.push('Efisiensi pakan sangat baik (FCR ' + analytics.fcr + ')');
+                            } else if (analytics.fcr <= 2.0) {
+                                score += 25;
+                                strengths.push('Efisiensi pakan normal (FCR ' + analytics.fcr + ')');
+                            } else {
+                                score += 10;
+                                issues.push('FCR tinggi (' + analytics.fcr + '), perlu optimasi pakan');
+                            }
+                        } else {
+                            issues.push('Data FCR belum tersedia (belum ada penjualan atau input pakan)');
+                        }
+
+                        // Margin Analysis
+                        if (analytics.margin_keuntungan >= 25) {
+                            score += 35;
+                            strengths.push('Margin keuntungan sangat bagus (' + analytics.margin_keuntungan + '%)');
+                        } else if (analytics.margin_keuntungan >= 15) {
+                            score += 25;
+                            strengths.push('Margin keuntungan normal (' + analytics.margin_keuntungan + '%)');
+                        } else if (analytics.margin_keuntungan > 0) {
+                            score += 10;
+                            issues.push('Margin keuntungan rendah (' + analytics.margin_keuntungan + '%), perlu evaluasi harga jual');
+                        } else {
+                            issues.push('Belum menguntungkan (margin ' + analytics.margin_keuntungan + '%)');
+                        }
+
+                        // Mortality Analysis
+                        if (analytics.mortality_rate <= 5) {
+                            score += 30;
+                            strengths.push('Tingkat kematian sangat rendah (' + analytics.mortality_rate + '%)');
+                        } else if (analytics.mortality_rate <= 10) {
+                            score += 20;
+                            strengths.push('Tingkat kematian normal (' + analytics.mortality_rate + '%)');
+                        } else {
+                            score += 5;
+                            issues.push('Tingkat kematian tinggi (' + analytics.mortality_rate + '%), perlu perhatian kesehatan');
+                        }
+
+                        // Overall Rating
+                        let rating = '';
+                        let emoji = '';
+                        let recommendation = '';
+
+                        if (score >= 85) {
+                            rating = 'EXCELLENT';
+                            emoji = '🏆';
+                            recommendation = 'Kloter ini berjalan sangat baik! Pertahankan manajemen yang sudah ada.';
+                        } else if (score >= 70) {
+                            rating = 'BAIK';
+                            emoji = '✅';
+                            recommendation = 'Performa kloter baik, ada beberapa area yang bisa dioptimalkan.';
+                        } else if (score >= 50) {
+                            rating = 'CUKUP';
+                            emoji = '⚠️';
+                            recommendation = 'Performa cukup, perlu perbaikan di beberapa aspek untuk meningkatkan profit.';
+                        } else {
+                            rating = 'PERLU PERBAIKAN';
+                            emoji = '❌';
+                            recommendation = 'Performa kurang optimal, evaluasi menyeluruh diperlukan.';
+                        }
+
+                        return `
+                                <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                    <div style="text-align: center; margin-bottom: 10px;">
+                                        <div style="font-size: 2.5em;">${emoji}</div>
+                                        <div style="font-size: 1.4em; font-weight: bold; margin-top: 5px;">${rating}</div>
+                                        <div style="font-size: 1.1em; opacity: 0.9;">Skor Performa: ${score}/100</div>
+                                    </div>
+                                </div>
+                                
+                                ${strengths.length > 0 ? `
+                                    <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                                        <strong style="display: block; margin-bottom: 8px;">✅ Kekuatan:</strong>
+                                        <ul style="margin: 0; padding-left: 20px;">
+                                            ${strengths.map(s => '<li>' + s + '</li>').join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                                
+                                ${issues.length > 0 ? `
+                                    <div style="background: rgba(239, 68, 68, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                                        <strong style="display: block; margin-bottom: 8px;">⚠️ Perlu Perhatian:</strong>
+                                        <ul style="margin: 0; padding-left: 20px;">
+                                            ${issues.map(i => '<li>' + i + '</li>').join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                                
+                                <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; border-left: 4px solid white;">
+                                    <strong>💡 Rekomendasi:</strong>
+                                    <p style="margin: 5px 0 0 0;">${recommendation}</p>
+                                </div>
+                            `;
+                    })()}
+                    </div>
+                </div>
+
+                <!-- STATISTIK PENJUALAN -->
+                <div class="modal-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
+                    <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">📊 Statistik Penjualan</h3>
+                    <div style="margin: 15px 0; font-size: 0.95em;">
+                        ${(() => {
+                        const penjualans = kloter.data_penjualans || [];
+                        const jumlahCustomer = penjualans.length;
+                        const totalAyamTerjual = penjualans.reduce((sum, p) => sum + (p.jumlah_ayam_dibeli || 0), 0);
+                        const totalBeratGram = penjualans.reduce((sum, p) => sum + (p.berat_total || 0), 0);
+                        const rataAyam = jumlahCustomer > 0 ? (totalAyamTerjual / jumlahCustomer).toFixed(1) : 0;
+                        const rataBeratKg = jumlahCustomer > 0 ? ((totalBeratGram / 1000) / jumlahCustomer).toFixed(2) : 0;
+
+                        return `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
+                            <span style="opacity: 0.9;">👥 Jumlah Customer:</span>
+                            <strong>${jumlahCustomer} pembeli</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
+                            <span style="opacity: 0.9;">📦 Rata-rata Pembelian/Customer:</span>
+                            <strong>${rataAyam} ekor (${rataBeratKg} Kg)</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
+                            <span style="opacity: 0.9;">🐔 Total Ayam Terjual:</span>
+                            <strong>${totalAyamTerjual} ekor (${analytics.total_berat_terjual.toFixed(2)} Kg karkas)</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.3); flex-wrap: wrap; gap: 5px;">
+                            <span style="opacity: 0.9;">💵 Total Pemasukan:</span>
+                            <strong style="word-break: break-word;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</strong>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                <span style="font-size: 1.05em; font-weight: 600;">🔬 Estimasi Berat Hidup:</span>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.4em; font-weight: bold; word-break: break-word;">${(analytics.total_berat_terjual / 0.8).toFixed(2)} Kg</div>
+                                    <small style="opacity: 0.9; white-space: nowrap;">Karkas = 80% dari berat hidup</small>
+                                </div>
+                            </div>
+                        </div>
+                            `;
+                    })()}
+                    </div>
+                </div>
+
                 <div class="modal-summary-box">
                     <div class="summary-item"><span>💰 Total Pengeluaran</span><strong>Rp ${rekapan.total_pengeluaran.toLocaleString('id-ID')}</strong></div>
                     <div class="summary-item"><span>🌾 Akumulasi Pakan</span><strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong></div>
@@ -381,9 +938,17 @@
                     <select name="kategori" id="swal-kategori" class="swal2-select" required onchange="togglePakanInput(this.value)">
                         <option value="">Pilih Kategori</option>
                         <option value="Pakan">🌾 Pakan</option>
-                        <option value="Obat">💊 Obat</option>
+                        <option value="Obat">💊 Obat/Vitamin</option>
+                        <option value="Listrik/Air">💡 Listrik/Air</option>
+                        <option value="Tenaga Kerja">👷 Tenaga Kerja</option>
+                        <option value="Pemeliharaan Kandang">🔧 Pemeliharaan Kandang</option>
                         <option value="Lainnya">📦 Lainnya</option>
                     </select>
+                    
+                    <div style="background: #d1ecf1; border: 1px solid #0c5460; border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 0.9em;">
+                        <strong style="color: #0c5460;">ℹ️ Catatan:</strong>
+                        <p style="margin: 5px 0 0 0; color: #0c5460;">Modal DOC sudah otomatis tercatat sebagai pengeluaran "DOC" saat buat kloter.</p>
+                    </div>
 
                     <div id="pakan-input-group" style="display: none; margin-top: 10px;">
                         <label style="display: block; margin-bottom: 5px;">⚖️ Jumlah Pakan (Kg)</label>
@@ -448,6 +1013,67 @@
                 confirmButtonColor: '#28a745',
                 preConfirm: () => document.getElementById('form-panen').submit()
             });
+        }
+
+        function openEditPengeluaranModal(pengeluaranId, kategori, jumlah, tanggal, catatan, pakanKg) {
+            Swal.fire({
+                title: 'Edit Data Pengeluaran',
+                html: `
+                <form id="form-edit-pengeluaran" action="/pengeluaran/${pengeluaranId}" method="POST" style="text-align: left;">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="hidden" name="jumlah_pengeluaran" id="edit_jumlah_pengeluaran_real">
+                    
+                    <label style="display: block; margin-bottom: 5px;">📂 Kategori</label>
+                    <select name="kategori" id="edit-kategori" class="swal2-select" required onchange="togglePakanInputEdit(this.value)">
+                        <option value="DOC" ${kategori === 'DOC' ? 'selected' : ''}>🐣 DOC</option>
+                        <option value="Pakan" ${kategori === 'Pakan' ? 'selected' : ''}>🌾 Pakan</option>
+                        <option value="Obat" ${kategori === 'Obat' ? 'selected' : ''}>💊 Obat/Vitamin</option>
+                        <option value="Listrik/Air" ${kategori === 'Listrik/Air' ? 'selected' : ''}>💡 Listrik/Air</option>
+                        <option value="Tenaga Kerja" ${kategori === 'Tenaga Kerja' ? 'selected' : ''}>👷 Tenaga Kerja</option>
+                        <option value="Pemeliharaan Kandang" ${kategori === 'Pemeliharaan Kandang' ? 'selected' : ''}>🔧 Pemeliharaan Kandang</option>
+                        <option value="Lainnya" ${kategori === 'Lainnya' ? 'selected' : ''}>📦 Lainnya</option>
+                    </select>
+
+                    <div id="edit-pakan-input-group" style="display: ${kategori === 'Pakan' ? 'block' : 'none'}; margin-top: 10px;">
+                        <label style="display: block; margin-bottom: 5px;">⚖️ Jumlah Pakan (Kg)</label>
+                        <input type="number" step="0.01" name="jumlah_pakan_kg" id="edit-pakan-kg" class="swal2-input" value="${pakanKg}" placeholder="Contoh: 50.5">
+                    </div>
+
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">💰 Harga (Rp)</label>
+                    <input id="edit_jumlah_pengeluaran_formatted" type="text" class="swal2-input" value="${Number(jumlah).toLocaleString('id-ID')}" required oninput="formatNumberInput(this)">
+                    
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📅 Tanggal Pengeluaran</label>
+                    <input type="date" name="tanggal_pengeluaran" class="swal2-input" value="${tanggal}" required>
+
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📝 Keterangan (Opsional)</label>
+                    <textarea name="catatan" class="swal2-textarea" placeholder="Contoh: Pembelian pakan BR-1 2 karung">${catatan}</textarea>
+                </form>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan Perubahan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#28a745',
+                preConfirm: () => {
+                    const formattedInput = document.getElementById('edit_jumlah_pengeluaran_formatted');
+                    const realInput = document.getElementById('edit_jumlah_pengeluaran_real');
+                    realInput.value = formattedInput.value.replace(/\./g, '');
+                    document.getElementById('form-edit-pengeluaran').submit();
+                }
+            });
+        }
+
+        function togglePakanInputEdit(selectedValue) {
+            const pakanGroup = document.getElementById('edit-pakan-input-group');
+            const pakanInput = document.getElementById('edit-pakan-kg');
+            if (selectedValue === 'Pakan') {
+                pakanGroup.style.display = 'block';
+                pakanInput.required = true;
+            } else {
+                pakanGroup.style.display = 'none';
+                pakanInput.required = false;
+                pakanInput.value = '';
+            }
         }
     </script>
 </body>

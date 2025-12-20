@@ -118,6 +118,7 @@ Route::delete('/manajemen-kloter/{kloter}', [ManajemenKloterController::class, '
 
 // Rute untuk entitas terkait
 Route::post('/manajemen-kloter/{kloter}/pengeluaran', [ManajemenKloterController::class, 'storePengeluaran'])->name('manajemen.kloter.storePengeluaran');
+Route::put('/pengeluaran/{pengeluaran}', [ManajemenKloterController::class, 'updatePengeluaran'])->name('manajemen.pengeluaran.update');
 Route::delete('/pengeluaran/{pengeluaran}', [ManajemenKloterController::class, 'destroyPengeluaran'])->name('manajemen.pengeluaran.destroy');
 Route::post('/manajemen-kloter/{kloter}/kematian', [ManajemenKloterController::class, 'storeKematian'])->name('manajemen.kloter.storeKematian');
 Route::delete('/kematian/{kematianAyam}', [ManajemenKloterController::class, 'destroyKematian'])->name('manajemen.kematian.destroy');
