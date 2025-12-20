@@ -688,7 +688,6 @@
                 <hr>
                 <div class="item-row"><span>Tanggal:</span> <span>${data.tanggalFormatted}</span></div>
                 <div class="item-row"><span>Pembeli:</span> <span>${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}</span></div>
-                <div class="item-row"><span>Kloter:</span> <span>${data.kloterName}</span></div>
                 <hr>
                 <div><strong>Ayam Kampung</strong></div>
                 <div class="item-row"><span>- Qty</span> <span>${data.jumlahAyam} ekor</span></div>
@@ -701,144 +700,184 @@
                 <div class="footer"><p>Terima kasih atas pembelian Anda!</p></div>
             </div>`;
 
-            // Template 2: Nota Formal (untuk PDF & Cetak)
+            // Template 2: Nota untuk Print - CLEAN & PROFESSIONAL
             const receiptHtmlForPrint = `
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Invoice - ${data.pembeli}</title>
+                <meta charset="UTF-8">
+                <title>Invoice ${data.id}</title>
                 <style>
-                    body {
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                        font-size: 12px;
-                        line-height: 1.5;
-                        color: #333;
+                    @page { margin: 15mm; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    body { 
+                        margin: 0; 
+                        padding: 20px;
+                        font-family: Arial, sans-serif; 
+                        font-size: 14px; 
+                        color: #000 !important;
+                        line-height: 1.6;
                     }
-                    .invoice-box {
-                        width: 190mm;
-                        min-height: 270mm;
-                        box-sizing: border-box;
-                        padding: 15mm;
-                        margin: auto;
-                        background: white;
+                    h1 { 
+                        text-align: center; 
+                        margin: 0 0 8px 0; 
+                        font-size: 28px;
+                        font-weight: bold;
+                        color: #000 !important;
                     }
-                    .header {
+                    .company-info {
                         text-align: center;
-                        margin-bottom: 20px;
-                        page-break-inside: avoid;
+                        margin: 0 0 30px 0;
+                        font-size: 13px;
+                        color: #000 !important;
                     }
                     .info-table {
                         width: 100%;
-                        margin-bottom: 30px;
+                        margin-bottom: 25px;
                         border-collapse: collapse;
-                        page-break-inside: avoid;
                     }
                     .info-table td {
-                        padding: 5px 0;
-                        vertical-align: top;
-                    }
-                    .items-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    .items-table th,
-                    .items-table td {
-                        border: 1px solid #ddd;
-                        padding: 10px;
-                        text-align: left;
-                    }
-                    .items-table th {
-                        background-color: #f2f2f2;
-                        font-weight: bold;
-                    }
-                    .text-right {
-                        text-align: right;
-                    }
-                    .summary-footer-wrapper {
-                        page-break-inside: avoid;
-                    }
-                    .summary-container {
-                        display: flex;
-                        justify-content: flex-end;
-                    }
-                    .summary-box {
-                        width: 45%;
-                        max-width: 300px;
-                    }
-                    .summary-line {
-                        display: flex;
-                        justify-content: space-between;
                         padding: 8px 0;
-                        border-bottom: 1px solid #eee;
+                        border: none;
+                        color: #000 !important;
+                        font-size: 14px;
                     }
-                    .summary-line.total-row {
-                        border-top: 2px solid #333;
+                    .invoice-number {
+                        background: #e0e0e0 !important;
+                        padding: 8px 15px;
+                        border: 2px solid #000 !important;
+                        display: inline-block;
+                        font-weight: bold;
+                        color: #000 !important;
+                    }
+                    table.items { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        margin: 20px 0;
+                    }
+                    table.items th, 
+                    table.items td { 
+                        padding: 14px; 
+                        text-align: left; 
+                        border: 2px solid #000 !important;
+                        color: #000 !important;
+                        font-size: 14px;
+                    }
+                    table.items th { 
+                        background-color: #000 !important;
+                        color: #fff !important;
                         font-weight: bold;
                         font-size: 14px;
                     }
+                    table.items td {
+                        background-color: #fff !important;
+                    }
+                    .text-right { text-align: right; }
+                    .text-center { text-align: center; }
+                    
+                    .summary-table {
+                        width: 350px;
+                        float: right;
+                        margin-top: 15px;
+                        border-collapse: collapse;
+                    }
+                    .summary-table td {
+                        padding: 12px 15px;
+                        border: none;
+                        color: #000 !important;
+                        font-size: 14px;
+                    }
+                    .summary-table tr.subtotal td {
+                        border-bottom: 2px solid #000 !important;
+                    }
+                    .summary-table tr.total {
+                        background: #000 !important;
+                        color: #fff !important;
+                        font-weight: bold;
+                        font-size: 16px;
+                    }
+                    .summary-table tr.total td {
+                        padding: 14px 15px;
+                        border: 2px solid #000 !important;
+                        color: #fff !important;
+                    }
                     .footer {
+                        clear: both;
                         text-align: center;
-                        border-top: 1px solid #ddd;
-                        padding-top: 15px;
-                        margin-top: 30px;
-                        font-size: 10px;
-                        color: #666;
+                        margin-top: 70px;
+                        padding-top: 25px;
+                        border-top: 3px solid #000 !important;
+                    }
+                    .footer p {
+                        margin: 8px 0;
+                        color: #000 !important;
+                    }
+                    .footer .thank {
+                        font-weight: bold;
+                        font-size: 15px;
+                        margin-bottom: 10px;
+                        color: #000 !important;
+                    }
+                    @media print {
+                        body { padding: 0; }
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     }
                 </style>
             </head>
             <body>
-                <div class="invoice-box">
-                    <div class="header">
-                        <h1>Nota Pembelian</h1>
-                    </div>
-                    <table class="info-table">
-                        <tbody>
-                            <tr>
-                                <td><strong>Pembeli:</strong><br>${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}</td>
-                                <td class="text-right"><strong>Invoice #:</strong> INV-${data.id}<br><strong>Tanggal:</strong> ${data.tanggalFormatted}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Penjual:</strong><br>Eko Wahyudi</td>
-                                <td class="text-right"><strong>Kloter:</strong><br>${data.kloterName}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th>Produk</th>
-                                <th class="text-right">Jumlah</th>
-                                <th class="text-right">Berat Total</th>
-                                <th class="text-right">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Ayam Kampung Segar</td>
-                                <td class="text-right">${data.jumlahAyam} ekor</td>
-                                <td class="text-right">${formatNumber(beratTotal)} gr</td>
-                                <td class="text-right">${formatCurrency(subtotal)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="summary-footer-wrapper">
-                        <div class="summary-container">
-                            <div class="summary-box">
-                                <div class="summary-line">
-                                    <span>Subtotal</span>
-                                    <span class="text-right">${formatCurrency(subtotal)}</span>
-                                </div>
-                                ${hasDiskon ? `<div class="summary-line"><span style="color: #e74c3c;">Diskon</span><span class="text-right" style="color: #e74c3c;">- ${formatCurrency(diskonAmount)}</span></div>` : ''}
-                                <div class="summary-line total-row">
-                                    <span>TOTAL</span>
-                                    <span class="text-right">${formatCurrency(hargaTotalFinal)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="footer">
-                            <p>Terima kasih atas pembelian Anda!</p>
-                        </div>
-                    </div>
+                <h1>NOTA PEMBELIAN</h1>
+                <div class="company-info">Peternakan Ayam Kampung - Eko Wahyudi</div>
+                
+                <table class="info-table">
+                    <tr>
+                        <td style="width: 50%;"><strong>Pembeli:</strong> ${data.pembeli.charAt(0).toUpperCase() + data.pembeli.slice(1)}</td>
+                        <td style="width: 50%; text-align: right;"><span class="invoice-number">INV-${data.id}</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Penjual:</strong> Eko Wahyudi</td>
+                        <td style="text-align: right;"><strong>Tanggal:</strong> ${data.tanggalFormatted}</td>
+                    </tr>
+                </table>
+
+                <table class="items">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Produk</th>
+                            <th class="text-center" style="width: 15%;">Jumlah</th>
+                            <th class="text-right" style="width: 20%;">Berat</th>
+                            <th class="text-right" style="width: 25%;">Harga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ayam Kampung Segar</td>
+                            <td class="text-center">${data.jumlahAyam} ekor</td>
+                            <td class="text-right">${formatNumber(beratTotal)} gram</td>
+                            <td class="text-right">${formatCurrency(subtotal)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="summary-table">
+                    <tr class="subtotal">
+                        <td><strong>Subtotal</strong></td>
+                        <td class="text-right">${formatCurrency(subtotal)}</td>
+                    </tr>
+                    ${hasDiskon ? `
+                    <tr class="subtotal">
+                        <td style="color: #856404;"><strong>Diskon (5%)</strong></td>
+                        <td class="text-right" style="color: #856404;">- ${formatCurrency(diskonAmount)}</td>
+                    </tr>
+                    ` : ''}
+                    <tr class="total">
+                        <td><strong>TOTAL</strong></td>
+                        <td class="text-right"><strong>${formatCurrency(hargaTotalFinal)}</strong></td>
+                    </tr>
+                </table>
+
+                <div class="footer">
+                    <p class="thank">Terima kasih atas pembelian Anda!</p>
+                    <p style="font-size: 11px; color: #666;">Nota ini sah sebagai bukti pembayaran yang sah</p>
                 </div>
             </body>
             </html>`;
@@ -848,16 +887,11 @@
                 html: receiptHtmlForDisplay,
                 width: 400,
                 showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: '📥 Unduh PDF',
-                denyButtonText: '🖨️ Cetak Struk',
+                confirmButtonText: '🖨️ Cetak Struk',
                 cancelButtonText: 'Tutup',
                 confirmButtonColor: '#3498db',
-                denyButtonColor: '#6c757d',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    downloadPdf(receiptHtmlForPrint, `Nota_${data.pembeli}_${data.id}.pdf`);
-                } else if (result.isDenied) {
                     printContent(receiptHtmlForPrint);
                 }
             });
