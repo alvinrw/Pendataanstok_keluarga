@@ -105,18 +105,20 @@ class Kloter extends Model
 
     /**
      * Calculate FCR (Feed Conversion Ratio)
-     * Formula: Total Pakan (Kg) ÷ Total Berat Ayam Terjual (Kg)
+     * Formula: Total Pakan (Kg) ÷ Total Berat Ayam Hidup (Kg)
+     * Berat Hidup = Berat Karkas ÷ 0.8 (karena karkas = 80% dari berat hidup)
      */
     public function getFcrAttribute()
     {
         $totalPakanKg = $this->pengeluarans()->sum('jumlah_pakan_kg');
-        $totalBeratTerjual = $this->total_berat_terjual;
+        $totalBeratKarkas = $this->total_berat_terjual; // dalam Kg
+        $totalBeratHidup = $totalBeratKarkas / 0.8; // konversi ke berat hidup
 
-        if ($totalBeratTerjual <= 0) {
+        if ($totalBeratHidup <= 0) {
             return 0;
         }
 
-        return round($totalPakanKg / $totalBeratTerjual, 2);
+        return round($totalPakanKg / $totalBeratHidup, 2);
     }
 
     /**

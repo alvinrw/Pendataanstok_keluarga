@@ -608,23 +608,16 @@
                                         <strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <span style="color: #666;">⚖️ Total Berat Terjual:</span>
-                                        <strong>${analytics.total_berat_terjual.toLocaleString('id-ID')} Kg</strong>
+                                        <span style="color: #666;">⚖️ Total Berat Hidup:</span>
+                                        <strong>${(analytics.total_berat_terjual / 0.8).toFixed(2)} Kg</strong>
                                     </div>
                                     <div style="border-top: 1px solid #e5e7eb; margin: 8px 0; padding-top: 8px;">
                                         <div style="display: flex; justify-content: space-between;">
                                             <span style="color: #666;">📊 Rumus:</span>
-                                            <span style="font-family: monospace; font-size: 0.85em;">${rekapan.total_pakan_kg} ÷ ${analytics.total_berat_terjual.toFixed(2)} = ${analytics.fcr}</span>
+                                            <span style="font-family: monospace; font-size: 0.85em;">${rekapan.total_pakan_kg} ÷ ${(analytics.total_berat_terjual / 0.8).toFixed(2)} = ${analytics.fcr}</span>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <small style="color: #666; display: block; margin-top: 8px;">
-                                    ${analytics.fcr <= 1.7 ? '✅ Sangat Efisien! Butuh ' + analytics.fcr + ' Kg pakan untuk 1 Kg daging' :
-                        analytics.fcr <= 2.0 ? '⚠️ Normal. Butuh ' + analytics.fcr + ' Kg pakan untuk 1 Kg daging' :
-                            analytics.fcr > 0 ? '❌ Kurang Efisien. Butuh ' + analytics.fcr + ' Kg pakan untuk 1 Kg daging' :
-                                '⚠️ Belum ada data penjualan atau pakan belum diinput'}
-                                </small>
                             </div>
                             
                             <!-- Margin Keuntungan -->
@@ -635,9 +628,6 @@
                                         ${analytics.margin_keuntungan}%
                                     </strong>
                                 </div>
-                                <small style="color: #666;">
-                                    ${analytics.margin_keuntungan >= 25 ? '✅ Sangat Bagus!' : analytics.margin_keuntungan >= 15 ? '⚠️ Normal' : '❌ Kurang Menguntungkan'}
-                                </small>
                             </div>
                             
                             <!-- Mortality Rate -->
@@ -807,46 +797,83 @@
                     </div>
                 </div>
 
-                <!-- STATISTIK PENJUALAN -->
+                <!-- STATISTIK PENJUALAN & BISNIS -->
                 <div class="modal-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
-                    <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">📊 Statistik Penjualan</h3>
+                    <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">📊 Resume Bisnis Kloter</h3>
                     <div style="margin: 15px 0; font-size: 0.95em;">
                         ${(() => {
-                        const penjualans = kloter.data_penjualans || [];
-                        const jumlahCustomer = penjualans.length;
-                        const totalAyamTerjual = penjualans.reduce((sum, p) => sum + (p.jumlah_ayam_dibeli || 0), 0);
-                        const totalBeratGram = penjualans.reduce((sum, p) => sum + (p.berat_total || 0), 0);
-                        const rataAyam = jumlahCustomer > 0 ? (totalAyamTerjual / jumlahCustomer).toFixed(1) : 0;
-                        const rataBeratKg = jumlahCustomer > 0 ? ((totalBeratGram / 1000) / jumlahCustomer).toFixed(2) : 0;
+                            const penjualans = kloter.data_penjualans || [];
+                            const jumlahCustomer = penjualans.length;
+                            const totalAyamTerjual = penjualans.reduce((sum, p) => sum + (p.jumlah_ayam_dibeli || 0), 0);
+                            const totalBeratGram = penjualans.reduce((sum, p) => sum + (p.berat_total || 0), 0);
+                            const rataAyam = jumlahCustomer > 0 ? (totalAyamTerjual / jumlahCustomer).toFixed(1) : 0;
+                            const rataBeratKg = jumlahCustomer > 0 ? ((totalBeratGram / 1000) / jumlahCustomer).toFixed(2) : 0;
+                            const totalPengeluaran = analytics.breakdown_pengeluaran.DOC.nominal + analytics.breakdown_pengeluaran.Pakan.nominal + analytics.breakdown_pengeluaran.Obat.nominal + analytics.breakdown_pengeluaran['Listrik/Air'].nominal + analytics.breakdown_pengeluaran['Tenaga Kerja'].nominal + analytics.breakdown_pengeluaran['Pemeliharaan Kandang'].nominal + analytics.breakdown_pengeluaran.Lainnya.nominal;
+                            const beratHidup = (analytics.total_berat_terjual / 0.8).toFixed(2);
+                            const totalKematian = kloter.kematian_ayams.reduce((sum, k) => sum + (k.jumlah_mati || 0), 0);
+                            
+                            return `
+                        <!-- PENJUALAN -->
+                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">📈 Penjualan</div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">👥 Jumlah Customer:</span>
+                                <strong>${jumlahCustomer} pembeli</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">📦 Rata-rata/Customer:</span>
+                                <strong>${rataAyam} ekor (${rataBeratKg} Kg)</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">🐔 Total Terjual:</span>
+                                <strong>${totalAyamTerjual} ekor (${analytics.total_berat_terjual.toFixed(2)} Kg karkas)</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">🔬 Estimasi Berat Hidup:</span>
+                                <strong>${beratHidup} Kg</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">💵 Total Pemasukan:</span>
+                                <strong style="word-break: break-word;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</strong>
+                            </div>
+                        </div>
 
-                        return `
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
-                            <span style="opacity: 0.9;">👥 Jumlah Customer:</span>
-                            <strong>${jumlahCustomer} pembeli</strong>
+                        <!-- OPERASIONAL -->
+                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">⚙️ Operasional</div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">💰 Total Pengeluaran:</span>
+                                <strong style="word-break: break-word;">Rp ${totalPengeluaran.toLocaleString('id-ID')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">🌾 Total Pakan:</span>
+                                <strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">💀 Total Kematian:</span>
+                                <strong style="color: #fca5a5;">${totalKematian} ekor</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px;">
+                                <span style="opacity: 0.9;">📊 FCR (Pakan/Berat Hidup):</span>
+                                <strong style="color: ${analytics.fcr <= 1.8 ? '#86efac' : analytics.fcr <= 2.5 ? '#fde047' : '#fca5a5'};">${analytics.fcr}</strong>
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
-                            <span style="opacity: 0.9;">📦 Rata-rata Pembelian/Customer:</span>
-                            <strong>${rataAyam} ekor (${rataBeratKg} Kg)</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
-                            <span style="opacity: 0.9;">🐔 Total Ayam Terjual:</span>
-                            <strong>${totalAyamTerjual} ekor (${analytics.total_berat_terjual.toFixed(2)} Kg karkas)</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.3); flex-wrap: wrap; gap: 5px;">
-                            <span style="opacity: 0.9;">💵 Total Pemasukan:</span>
-                            <strong style="word-break: break-word;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</strong>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                                <span style="font-size: 1.05em; font-weight: 600;">🔬 Estimasi Berat Hidup:</span>
-                                <div style="text-align: right;">
-                                    <div style="font-size: 1.4em; font-weight: bold; word-break: break-word;">${(analytics.total_berat_terjual / 0.8).toFixed(2)} Kg</div>
-                                    <small style="opacity: 0.9; white-space: nowrap;">Karkas = 80% dari berat hidup</small>
+
+                        <!-- PROFITABILITAS -->
+                        <div style="margin-bottom: 12px;">
+                            <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">💎 Profitabilitas</div>
+                            <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                    <span style="font-size: 1.05em; font-weight: 600;">💰 Keuntungan Bersih:</span>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 1.5em; font-weight: bold; word-break: break-word; color: ${analytics.keuntungan_bersih >= 0 ? '#86efac' : '#fca5a5'};">Rp ${analytics.keuntungan_bersih.toLocaleString('id-ID')}</div>
+                                        <small style="opacity: 0.9; white-space: nowrap;">Margin: ${analytics.margin_keuntungan}%</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                             `;
-                    })()}
+                        })()}
                     </div>
                 </div>
 
