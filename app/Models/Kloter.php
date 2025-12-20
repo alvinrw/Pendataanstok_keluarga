@@ -94,13 +94,16 @@ class Kloter extends Model
      */
     public function getMarginKeuntunganAttribute()
     {
-        $totalPemasukan = $this->total_pemasukan;
+        // Total pengeluaran dari semua kategori
+        $totalPengeluaran = $this->pengeluarans()->sum('jumlah_pengeluaran');
 
-        if ($totalPemasukan <= 0) {
+        if ($totalPengeluaran <= 0) {
             return 0;
         }
 
-        return round(($this->keuntungan_bersih / $totalPemasukan) * 100, 1);
+        // Margin = (Keuntungan Bersih / Total Pengeluaran) × 100
+        // Ini adalah Markup/ROI, bukan Profit Margin
+        return round(($this->keuntungan_bersih / $totalPengeluaran) * 100, 1);
     }
 
     /**

@@ -59,43 +59,58 @@ class ManajemenKloterController extends Controller
     }
 
     /**
-     * Menyimpan kloter baru yang dibuat dari form pop-up.
+     * Menyimpan kloter baru ke database.
      */
     public function store(Request $request)
     {
+        // Validasi input yang lebih ketat
         $validated = $request->validate([
-            'nama_kloter' => 'required|string|max:255|unique:kloters,nama_kloter',
-            'tanggal_mulai' => 'required|date',
-            'jumlah_doc' => 'required|integer|min:1',
-            'harga_beli_doc' => 'required|integer|min:0',
+            'nama_kloter' => ['required', 'string', 'max:255', 'unique:kloters,nama_kloter'],
+            'jumlah_doc' => ['required', 'integer', 'min:1', 'max:100000'],
+            'tanggal_mulai' => ['required', 'date', 'before_or_equal:today'],
+            'harga_beli_doc' => ['required', 'numeric', 'min:0', 'max:999999999'],
+        ], [
+            'nama_kloter.required' => 'Nama kloter wajib diisi.',
+            'nama_kloter.unique' => 'Nama kloter sudah digunakan, pilih nama lain.',
+            'jumlah_doc.required' => 'Jumlah DOC wajib diisi.',
+            'jumlah_doc.min' => 'Jumlah DOC minimal 1 ekor.',
+            'jumlah_doc.max' => 'Jumlah DOC maksimal 100.000 ekor.',
+            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi.',
+            'tanggal_mulai.before_or_equal' => 'Tanggal mulai tidak boleh di masa depan.',
+            'harga_beli_doc.required' => 'Harga beli DOC wajib diisi.',
+            'harga_beli_doc.min' => 'Harga beli DOC tidak boleh negatif.',
         ]);
 
         DB::beginTransaction();
         try {
-            // Inisialisasi data saat kloter dibuat
-            $validated['stok_awal'] = 0;
-            $validated['stok_tersedia'] = 0;
-            $validated['sisa_ayam_hidup'] = $validated['jumlah_doc']; // Sisa ayam = jumlah awal
-            $validated['total_pengeluaran'] = $validated['harga_beli_doc']; // Include Modal DOC
+            // Buat kloter baru
+            $kloter = Kloter::create([
+                'nama_kloter' => $validated['nama_kloter'],
+                'jumlah_doc' => $validated['jumlah_doc'],
+                'tanggal_mulai' => $validated['tanggal_mulai'],
+                'sisa_ayam_hidup' => $validated['jumlah_doc'],
+                'total_pengeluaran' => 0,
+                'stok_tersedia' => 0,
+                'stok_awal' => 0, // Tambahkan ini untuk fix NOT NULL constraint
+            ]);
 
-            $kloter = Kloter::create($validated);
+            // Otomatis buat pengeluaran DOC
+            Pengeluaran::create([
+                'kloter_id' => $kloter->id,
+                'kategori' => 'DOC',
+                'jumlah_pengeluaran' => $validated['harga_beli_doc'],
+                'tanggal_pengeluaran' => $validated['tanggal_mulai'],
+                'catatan' => 'Pembelian DOC awal',
+                'jumlah_pakan_kg' => 0,
+            ]);
 
-            // Auto-create pengeluaran untuk Modal DOC
-            if ($validated['harga_beli_doc'] > 0) {
-                $kloter->pengeluarans()->create([
-                    'kategori' => 'DOC',
-                    'jumlah_pengeluaran' => $validated['harga_beli_doc'],
-                    'tanggal_pengeluaran' => $validated['tanggal_mulai'],
-                    'catatan' => 'Modal DOC (Pembelian ' . $validated['jumlah_doc'] . ' ekor)'
-                ]);
-            }
+            $this->updateKloterCalculations($kloter);
 
             DB::commit();
-            return redirect()->route('manajemen.kloter.index')
-                ->with('success', 'Kloter baru berhasil dibuat.');
+            return redirect()->route('manajemen.kloter.index')->with('success', 'Kloter berhasil ditambahkan!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menyimpan kloter. Silakan coba lagi.']);
+            return redirect()->back()->withErrors(['error' => 'Gagal menambahkan kloter: ' . $e->getMessage()])->withInput();
         }
     }
 

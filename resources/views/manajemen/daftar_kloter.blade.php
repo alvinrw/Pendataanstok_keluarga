@@ -538,17 +538,17 @@
 
                 const modalHtml = `
                 <div class="modal-content-grid">
-                    <div class="modal-card">
-                        <h3>📝 Input & Edit Data</h3>
-                        <div class="editable-item"><p><strong>DOC Awal:</strong> ${kloter.jumlah_doc} ekor</p> <button class="btn btn-sm btn-orange" onclick="openEditDocModal(${kloter.id}, ${kloter.jumlah_doc})" title="Edit">✏️</button></div>
-                        <div class="editable-item"><p><strong>Tgl Mulai:</strong> ${new Date(kloter.tanggal_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</p> <button class="btn btn-sm btn-orange" onclick="openEditTanggalModal(${kloter.id}, '${kloter.tanggal_mulai}')" title="Edit">✏️</button></div>
+                    <div class="modal-card" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15); border: 1px solid #e0e7ff;">
+                        <h3 style="color: #1e40af; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #dbeafe;">Manajemen Data</h3>
+                        <div class="editable-item"><p><strong>DOC Awal:</strong> ${kloter.jumlah_doc} ekor</p> <button class="btn btn-sm btn-orange" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; padding: 4px 10px; border-radius: 6px; font-weight: 500;" onclick="openEditDocModal(${kloter.id}, ${kloter.jumlah_doc})" title="Edit">Edit</button></div>
+                        <div class="editable-item"><p><strong>Tgl Mulai:</strong> ${new Date(kloter.tanggal_mulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</p> <button class="btn btn-sm btn-orange" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; padding: 4px 10px; border-radius: 6px; font-weight: 500;" onclick="openEditTanggalModal(${kloter.id}, '${kloter.tanggal_mulai}')" title="Edit">Edit</button></div>
                         <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
-                        <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openKematianModal(${kloter.id})">💀 Input Kematian</button>
-                        <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="openPengeluaranModal(${kloter.id})">💸 Input Pengeluaran</button>
-                        <button class="btn btn-green" style="width:100%;" onclick="openPanenModal(${kloter.id}, ${rekapan.sisa_ayam})">🚜 Input Panen</button>
+                        <button class="btn btn-blue" style="width:100%; margin-bottom:10px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onclick="openKematianModal(${kloter.id})">Input Kematian</button>
+                        <button class="btn btn-blue" style="width:100%; margin-bottom:10px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onclick="openPengeluaranModal(${kloter.id})">Input Pengeluaran</button>
+                        <button class="btn btn-green" style="width:100%; background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onclick="openPanenModal(${kloter.id}, ${rekapan.sisa_ayam})">Input Panen</button>
                     </div>
-                    <div class="modal-card">
-                        <h3>📜 Riwayat Data</h3>
+                    <div class="modal-card" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15); border: 1px solid #e0e7ff;">
+                        <h3 style="color: #1e40af; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #dbeafe;">Riwayat Data</h3>
                         <strong style="font-size: 0.9em;">Riwayat Panen:</strong>
                         <div style="max-height: 120px; overflow-y: auto; margin-bottom: 10px; border: 1px solid #eee; border-radius: 5px;">
                             <table class="modal-rekapan-table"><thead><tr><th>Tanggal</th><th>Jumlah</th><th>Aksi</th></tr></thead><tbody>${createHistoryHtml(kloter.panens, 'panen')}</tbody></table>
@@ -567,8 +567,8 @@
                 <!-- BUSINESS ANALYTICS SECTION -->
                 <div class="modal-content-grid" style="margin-top: 20px;">
                     <!-- Analisis Keuntungan Card -->
-                    <div class="modal-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
-                        <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">💰 Analisis Keuntungan</h3>
+                    <div class="modal-card" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3); border-radius: 12px;">
+                        <h3 style="color: white; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid rgba(255,255,255,0.2);">Analisis Keuntungan</h3>
                         <div style="margin: 15px 0; font-size: 0.95em;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;">
                                 <span style="opacity: 0.9;">Total Pengeluaran:</span>
@@ -589,13 +589,13 @@
                     </div>
 
                     <!-- Rasio Performa Card -->
-                    <div class="modal-card">
-                        <h3>📊 Rasio Performa</h3>
+                    <div class="modal-card" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15); border: 1px solid #e0e7ff;">
+                        <h3 style="color: #1e40af; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #dbeafe;">Metrik Performa</h3>
                         <div style="margin: 15px 0;">
                             <!-- FCR with Details -->
                             <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                    <span style="font-weight: 600;">🌾 FCR (Feed Conversion Ratio)</span>
+                                    <span style="font-weight: 600; color: #1e40af;">FCR (Rasio Konversi Pakan)</span>
                                     <strong style="font-size: 1.3em; color: ${analytics.fcr <= 1.7 ? '#10b981' : analytics.fcr <= 2.0 ? '#f59e0b' : '#ef4444'};">
                                         ${analytics.fcr > 0 ? analytics.fcr : '-'}
                                     </strong>
@@ -623,7 +623,7 @@
                             <!-- Margin Keuntungan -->
                             <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                    <span style="font-weight: 600;">💰 Margin Keuntungan</span>
+                                    <span style="font-weight: 600; color: #1e40af;">Margin Keuntungan</span>
                                     <strong style="font-size: 1.3em; color: ${analytics.margin_keuntungan >= 25 ? '#10b981' : analytics.margin_keuntungan >= 15 ? '#f59e0b' : '#ef4444'};">
                                         ${analytics.margin_keuntungan}%
                                     </strong>
@@ -633,47 +633,44 @@
                             <!-- Mortality Rate -->
                             <div style="padding: 12px; background: #f8f9fa; border-radius: 8px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                    <span style="font-weight: 600;">💀 Tingkat Kematian</span>
+                                    <span style="font-weight: 600; color: #1e40af;">Tingkat Kematian</span>
                                     <strong style="font-size: 1.3em; color: ${analytics.mortality_rate <= 5 ? '#10b981' : analytics.mortality_rate <= 10 ? '#f59e0b' : '#ef4444'};">
                                         ${analytics.mortality_rate}%
                                     </strong>
                                 </div>
-                                <small style="color: #666;">
-                                    ${analytics.mortality_rate <= 5 ? '✅ Sangat Baik!' : analytics.mortality_rate <= 10 ? '⚠️ Normal' : '❌ Perlu Perhatian'}
-                                </small>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Breakdown Pengeluaran Detail (Updated with 6 categories) -->
-                <div class="modal-card" style="margin-top: 20px;">
-                    <h3>📊 Breakdown Pengeluaran Detail</h3>
+                <div class="modal-card" style="margin-top: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15); border: 1px solid #e0e7ff;">
+                    <h3 style="color: #1e40af; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #dbeafe;">Rincian Pengeluaran</h3>
                     <div style="margin: 15px 0;">
                         ${Object.entries(analytics.breakdown_pengeluaran).map(([kategori, data]) => {
-                                    if (data.nominal === 0) return '';
-                                    const icons = {
-                                        'DOC': '🐣',
-                                        'Pakan': '🌾',
-                                        'Obat': '💊',
-                                        'Listrik/Air': '💡',
-                                        'Tenaga Kerja': '👷',
-                                        'Pemeliharaan Kandang': '🔧',
-                                        'Lainnya': '📦'
-                                    };
-                                    const colors = {
-                                        'DOC': '#f97316',
-                                        'Pakan': '#10b981',
-                                        'Obat': '#3b82f6',
-                                        'Listrik/Air': '#f59e0b',
-                                        'Tenaga Kerja': '#8b5cf6',
-                                        'Pemeliharaan Kandang': '#ef4444',
-                                        'Lainnya': '#6b7280'
-                                    };
-                                    return `
+                    if (data.nominal === 0) return '';
+                    const icons = {
+                        'DOC': '🐣',
+                        'Pakan': '🌾',
+                        'Obat': '💊',
+                        'Listrik/Air': '💡',
+                        'Tenaga Kerja': '👷',
+                        'Pemeliharaan Kandang': '🔧',
+                        'Lainnya': '📦'
+                    };
+                    const colors = {
+                        'DOC': '#f97316',
+                        'Pakan': '#10b981',
+                        'Obat': '#3b82f6',
+                        'Listrik/Air': '#f59e0b',
+                        'Tenaga Kerja': '#8b5cf6',
+                        'Pemeliharaan Kandang': '#ef4444',
+                        'Lainnya': '#6b7280'
+                    };
+                    return `
                                 <div style="margin-bottom: 12px;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <span>${icons[kategori]} ${kategori}</span>
+                                        <span style="font-weight: 500;">${kategori}</span>
                                         <strong>${data.persentase}%</strong>
                                     </div>
                                     <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
@@ -682,7 +679,7 @@
                                     <small style="color: #666;">Rp ${data.nominal.toLocaleString('id-ID')}</small>
                                 </div>
                             `;
-                                }).join('')}
+                }).join('')}
                     </div>
                 </div>
 
@@ -797,94 +794,106 @@
                     </div>
                 </div>
 
-                <!-- STATISTIK PENJUALAN & BISNIS -->
-                <div class="modal-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
-                    <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">📊 Resume Bisnis Kloter</h3>
-                    <div style="margin: 15px 0; font-size: 0.95em;">
+                <!-- RINGKASAN BISNIS -->
+                <div class="modal-card" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3); border-radius: 12px;">
+                    <h3 style="color: white; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid rgba(255,255,255,0.2);">Ringkasan Bisnis</h3>
+                    <div style="margin: 20px 0; font-size: 0.95em;">
                         ${(() => {
-                            const penjualans = kloter.data_penjualans || [];
-                            const jumlahCustomer = penjualans.length;
-                            const totalAyamTerjual = penjualans.reduce((sum, p) => sum + (p.jumlah_ayam_dibeli || 0), 0);
-                            const totalBeratGram = penjualans.reduce((sum, p) => sum + (p.berat_total || 0), 0);
-                            const rataAyam = jumlahCustomer > 0 ? (totalAyamTerjual / jumlahCustomer).toFixed(1) : 0;
-                            const rataBeratKg = jumlahCustomer > 0 ? ((totalBeratGram / 1000) / jumlahCustomer).toFixed(2) : 0;
-                            const totalPengeluaran = analytics.breakdown_pengeluaran.DOC.nominal + analytics.breakdown_pengeluaran.Pakan.nominal + analytics.breakdown_pengeluaran.Obat.nominal + analytics.breakdown_pengeluaran['Listrik/Air'].nominal + analytics.breakdown_pengeluaran['Tenaga Kerja'].nominal + analytics.breakdown_pengeluaran['Pemeliharaan Kandang'].nominal + analytics.breakdown_pengeluaran.Lainnya.nominal;
-                            const beratHidup = (analytics.total_berat_terjual / 0.8).toFixed(2);
-                            const totalKematian = kloter.kematian_ayams.reduce((sum, k) => sum + (k.jumlah_mati || 0), 0);
-                            
-                            return `
-                        <!-- PENJUALAN -->
-                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                            <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">📈 Penjualan</div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">👥 Jumlah Customer:</span>
-                                <strong>${jumlahCustomer} pembeli</strong>
+                        const penjualans = kloter.data_penjualans || [];
+                        const jumlahCustomer = penjualans.length;
+                        const totalAyamTerjual = penjualans.reduce((sum, p) => sum + (p.jumlah_ayam_dibeli || 0), 0);
+                        const totalBeratGram = penjualans.reduce((sum, p) => sum + (p.berat_total || 0), 0);
+                        const rataAyam = jumlahCustomer > 0 ? (totalAyamTerjual / jumlahCustomer).toFixed(1) : 0;
+                        const rataBeratKg = jumlahCustomer > 0 ? ((totalBeratGram / 1000) / jumlahCustomer).toFixed(2) : 0;
+                        const totalPengeluaran = analytics.breakdown_pengeluaran.DOC.nominal + analytics.breakdown_pengeluaran.Pakan.nominal + analytics.breakdown_pengeluaran.Obat.nominal + analytics.breakdown_pengeluaran['Listrik/Air'].nominal + analytics.breakdown_pengeluaran['Tenaga Kerja'].nominal + analytics.breakdown_pengeluaran['Pemeliharaan Kandang'].nominal + analytics.breakdown_pengeluaran.Lainnya.nominal;
+                        const beratHidup = (analytics.total_berat_terjual / 0.8).toFixed(2);
+                        const totalKematian = kloter.kematian_ayams.reduce((sum, k) => sum + (k.jumlah_mati || 0), 0);
+
+                        return `
+                        <!-- PERFORMA PENJUALAN -->
+                        <div style="background: rgba(255,255,255,0.12); border-radius: 10px; padding: 18px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.15);">
+                            <div style="font-size: 0.8em; font-weight: 600; margin-bottom: 14px; opacity: 0.9; letter-spacing: 0.5px;">Performa Penjualan</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                                    <div style="font-size: 0.75em; opacity: 0.85; margin-bottom: 6px;">Total Pelanggan</div>
+                                    <div style="font-size: 1.5em; font-weight: 700;">${jumlahCustomer}</div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                                    <div style="font-size: 0.75em; opacity: 0.85; margin-bottom: 6px;">Rata-rata/Pelanggan</div>
+                                    <div style="font-size: 1.2em; font-weight: 600;">${rataAyam} ekor</div>
+                                    <div style="font-size: 0.85em; opacity: 0.75;">${rataBeratKg} Kg</div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                                    <div style="font-size: 0.75em; opacity: 0.85; margin-bottom: 6px;">Total Terjual</div>
+                                    <div style="font-size: 1.2em; font-weight: 600;">${totalAyamTerjual} ekor</div>
+                                    <div style="font-size: 0.85em; opacity: 0.75;">${analytics.total_berat_terjual.toFixed(2)} Kg</div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                                    <div style="font-size: 0.75em; opacity: 0.85; margin-bottom: 6px;">Berat Hidup Est.</div>
+                                    <div style="font-size: 1.2em; font-weight: 600;">${beratHidup} Kg</div>
+                                </div>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">📦 Rata-rata/Customer:</span>
-                                <strong>${rataAyam} ekor (${rataBeratKg} Kg)</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">🐔 Total Terjual:</span>
-                                <strong>${totalAyamTerjual} ekor (${analytics.total_berat_terjual.toFixed(2)} Kg karkas)</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">🔬 Estimasi Berat Hidup:</span>
-                                <strong>${beratHidup} Kg</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">💵 Total Pemasukan:</span>
-                                <strong style="word-break: break-word;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</strong>
+                            <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15);">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 0.9em; opacity: 0.9;">Total Pemasukan</span>
+                                    <span style="font-size: 1.4em; font-weight: 700; color: #a5f3fc;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- OPERASIONAL -->
-                        <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                            <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">⚙️ Operasional</div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">💰 Total Pengeluaran:</span>
-                                <strong style="word-break: break-word;">Rp ${totalPengeluaran.toLocaleString('id-ID')}</strong>
+                        <!-- DATA OPERASIONAL -->
+                        <div style="background: rgba(255,255,255,0.12); border-radius: 10px; padding: 18px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.15);">
+                            <div style="font-size: 0.8em; font-weight: 600; margin-bottom: 14px; opacity: 0.9; letter-spacing: 0.5px;">Data Operasional</div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.88; font-size: 0.92em;">DOC Awal</span>
+                                <strong style="font-weight: 600;">${kloter.jumlah_doc} ekor</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">🌾 Total Pakan:</span>
-                                <strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.88; font-size: 0.92em;">Jumlah Kematian</span>
+                                <strong style="font-weight: 600; color: #fca5a5;">${totalKematian} ekor</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">💀 Total Kematian:</span>
-                                <strong style="color: #fca5a5;">${totalKematian} ekor</strong>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.88; font-size: 0.92em;">Total Terpanen</span>
+                                <strong style="font-weight: 600;">${kloter.panens.reduce((sum, p) => sum + (p.jumlah_panen || 0), 0)} ekor</strong>
                             </div>
-                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px;">
-                                <span style="opacity: 0.9;">📊 FCR (Pakan/Berat Hidup):</span>
-                                <strong style="color: ${analytics.fcr <= 1.8 ? '#86efac' : analytics.fcr <= 2.5 ? '#fde047' : '#fca5a5'};">${analytics.fcr}</strong>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.88; font-size: 0.92em;">Total Pengeluaran</span>
+                                <strong style="font-weight: 600;">Rp ${totalPengeluaran.toLocaleString('id-ID')}</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="opacity: 0.88; font-size: 0.92em;">Total Pakan</span>
+                                <strong style="font-weight: 600;">${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="opacity: 0.88; font-size: 0.92em;">FCR (Pakan/Berat Hidup)</span>
+                                <strong style="font-weight: 700; font-size: 1.15em; color: ${analytics.fcr <= 1.8 ? '#86efac' : analytics.fcr <= 2.5 ? '#fde047' : '#fca5a5'};">${analytics.fcr}</strong>
                             </div>
                         </div>
 
                         <!-- PROFITABILITAS -->
-                        <div style="margin-bottom: 12px;">
-                            <div style="font-size: 0.85em; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">💎 Profitabilitas</div>
-                            <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                                    <span style="font-size: 1.05em; font-weight: 600;">💰 Keuntungan Bersih:</span>
-                                    <div style="text-align: right;">
-                                        <div style="font-size: 1.5em; font-weight: bold; word-break: break-word; color: ${analytics.keuntungan_bersih >= 0 ? '#86efac' : '#fca5a5'};">Rp ${analytics.keuntungan_bersih.toLocaleString('id-ID')}</div>
-                                        <small style="opacity: 0.9; white-space: nowrap;">Margin: ${analytics.margin_keuntungan}%</small>
-                                    </div>
+                        <div style="background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%); border-radius: 10px; padding: 20px; border: 1px solid rgba(255,255,255,0.2);">
+                            <div style="font-size: 0.8em; font-weight: 600; margin-bottom: 14px; opacity: 0.9; letter-spacing: 0.5px;">Profitabilitas</div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.88em; opacity: 0.85; margin-bottom: 8px;">Keuntungan Bersih</div>
+                                <div style="font-size: 2.1em; font-weight: 700; margin-bottom: 6px; color: ${analytics.keuntungan_bersih >= 0 ? '#86efac' : '#fca5a5'};">Rp ${analytics.keuntungan_bersih.toLocaleString('id-ID')}</div>
+                                <div style="display: inline-block; background: rgba(255,255,255,0.25); padding: 8px 18px; border-radius: 20px; font-size: 0.95em; font-weight: 600;">
+                                    Margin: ${analytics.margin_keuntungan}%
                                 </div>
                             </div>
                         </div>
                             `;
-                        })()}
+                    })()}
                     </div>
                 </div>
 
-                <div class="modal-summary-box">
-                    <div class="summary-item"><span>💰 Total Pengeluaran</span><strong>Rp ${rekapan.total_pengeluaran.toLocaleString('id-ID')}</strong></div>
-                    <div class="summary-item"><span>🌾 Akumulasi Pakan</span><strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong></div>
-                    <div class="summary-item">
-                        <span>🐓 Sisa Ayam (di Kandang)</span>
+                <div class="modal-summary-box" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 10px; padding: 18px; box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);">
+                    <div class="summary-item" style="padding: 10px 0;"><span style="color: #1e40af; font-weight: 600;">Total Pengeluaran</span><strong style="color: #1e40af; font-size: 1.05em;">Rp ${rekapan.total_pengeluaran.toLocaleString('id-ID')}</strong></div>
+                    <div class="summary-item" style="padding: 10px 0;"><span style="color: #1e40af; font-weight: 600;">Akumulasi Pakan</span><strong style="color: #1e40af; font-size: 1.05em;">${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong></div>
+                    <div class="summary-item" style="padding: 10px 0;">
+                        <span style="color: #1e40af; font-weight: 600;">Sisa Ayam (di Kandang)</span>
                         <div class="editable-item">
-                            <strong>${rekapan.sisa_ayam} ekor</strong>
-                            <button class="btn btn-orange btn-sm" onclick="openKoreksiStokModal(${kloter.id}, ${rekapan.sisa_ayam})" title="Koreksi">🔧</button>
+                            <strong style="color: #1e40af; font-size: 1.05em;">${rekapan.sisa_ayam} ekor</strong>
+                            <button class="btn btn-orange btn-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; padding: 6px 14px; border-radius: 6px; font-weight: 500; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);" onclick="openKoreksiStokModal(${kloter.id}, ${rekapan.sisa_ayam})" title="Koreksi">Koreksi</button>
                         </div>
                     </div>
                 </div>`;

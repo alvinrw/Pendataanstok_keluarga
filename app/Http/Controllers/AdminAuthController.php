@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 use App\Models\Admin;
 
 class AdminAuthController extends Controller
@@ -14,31 +16,48 @@ class AdminAuthController extends Controller
     }
 
 
-public function login(Request $request)
-{
-    // 1. Validasi input dari form
-    $credentials = $request->validate([
-        'username' => ['required', 'string'],
-        'password' => ['required', 'string'],
-    ]);
+    public function login(Request $request)
+    {
+        // 1. Rate Limiting - Cegah brute force attack
+        $key = 'login:' . $request->ip();
 
-    // 2. Coba login dengan sistem Auth Laravel
-    // Fungsi ini otomatis mencari user & mengecek password yang sudah di-bcrypt
-    if (Auth::attempt($credentials)) {
-        // Jika berhasil...
-        $request->session()->regenerate(); // Regenerasi session untuk keamanan
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            throw ValidationException::withMessages([
+                'username' => ['Terlalu banyak percobaan login. Silakan coba lagi dalam ' . ceil($seconds / 60) . ' menit.'],
+            ]);
+        }
 
-        // Langsung arahkan ke halaman welcome
-        return redirect()->intended('welcome'); 
+        // 2. Validasi input yang lebih ketat
+        $credentials = $request->validate([
+            'username' => ['required', 'string', 'max:255', 'alpha_dash'],
+            'password' => ['required', 'string', 'min:6', 'max:255'],
+        ]);
+
+        // 3. Coba login dengan sistem Auth Laravel
+        if (Auth::attempt($credentials)) {
+            // Reset rate limiter jika berhasil
+            RateLimiter::clear($key);
+
+            // Regenerasi session untuk keamanan (mencegah session fixation)
+            $request->session()->regenerate();
+
+            // Regenerate CSRF token
+            $request->session()->regenerateToken();
+
+            // Langsung arahkan ke halaman welcome
+            return redirect()->intended('welcome');
+        }
+
+        // 4. Tambah counter untuk rate limiting
+        RateLimiter::hit($key, 300); // 5 menit lockout
+
+        // 5. Jika login gagal
+        return back()->withErrors([
+            'username' => 'Username atau password yang diberikan salah.',
+        ])->onlyInput('username');
     }
 
-    // 3. Jika login gagal...
-    return back()->withErrors([
-        'username' => 'Username atau password yang diberikan salah.',
-    ])->onlyInput('username');
-}
 
-
-    
 }
 
