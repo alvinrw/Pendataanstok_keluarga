@@ -45,11 +45,18 @@
         <!-- Header -->
         <header class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">Rekapan Transaksi</h1>
-            <a href="{{ route('welcome') }}"
-                class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-300">
-                <i class="fas fa-arrow-left"></i>
-                <span>Kembali</span>
-            </a>
+            <div class="flex gap-3">
+                <button onclick="downloadCSV()"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm transition-colors">
+                    <i class="fas fa-download"></i>
+                    <span>Download CSV</span>
+                </button>
+                <a href="{{ route('welcome') }}"
+                    class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors duration-300">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Kembali</span>
+                </a>
+            </div>
         </header>
 
         <!-- Summary & Filter Section -->
@@ -62,7 +69,8 @@
                 @if(request('tanggal_mulai') && request('tanggal_selesai'))
                     <p class="text-sm opacity-80 mt-2">Periode
                         {{ \Carbon\Carbon::parse(request('tanggal_mulai'))->format('d M Y') }} -
-                        {{ \Carbon\Carbon::parse(request('tanggal_selesai'))->format('d M Y') }}</p>
+                        {{ \Carbon\Carbon::parse(request('tanggal_selesai'))->format('d M Y') }}
+                    </p>
                 @else
                     <p class="text-sm opacity-80 mt-2">Semua transaksi tercatat</p>
                 @endif
@@ -389,6 +397,55 @@
                     });
             });
         });
+
+        // --- CSV Download Function ---
+        function downloadCSV() {
+            const transaksis = @json($transaksis);
+
+            if (!transaksis || transaksis.length === 0) {
+                alert('Tidak ada data untuk didownload');
+                return;
+            }
+
+            // Header CSV
+            const headers = ['Tanggal', 'Kategori', 'Jumlah', 'Deskripsi'];
+            let csvContent = headers.join(',') + '\n';
+
+            // Data rows
+            transaksis.forEach((item) => {
+                const tanggal = new Date(item.tanggal).toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                const row = [
+                    tanggal,
+                    `"${item.kategori}"`,
+                    item.jumlah,
+                    `"${(item.deskripsi || '-').replace(/"/g, '""')}"` // Escape quotes
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+
+            // Add summary row
+            const total = {{ $totalPengeluaran }};
+            csvContent += '\n';
+            csvContent += `Total Pengeluaran,,${total},\n`;
+
+            // Create download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            const filename = `Rekapan_Pengeluaran_Alvin_${new Date().toISOString().split('T')[0]}.csv`;
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 

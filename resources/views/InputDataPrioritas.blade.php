@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +13,8 @@
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             min-height: 100vh;
             padding: 20px;
             position: relative;
@@ -33,8 +34,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
         }
 
         .container {
@@ -81,8 +89,13 @@
         }
 
         @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
         }
 
         .header h1 {
@@ -131,7 +144,9 @@
             margin-left: 2px;
         }
 
-        input, textarea, select {
+        input,
+        textarea,
+        select {
             width: 100%;
             padding: 18px 20px;
             border: 2px solid #e8ecf4;
@@ -145,7 +160,9 @@
             box-sizing: border-box;
         }
 
-        input:focus, textarea:focus, select:focus {
+        input:focus,
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: #4facfe;
             box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.15);
@@ -153,7 +170,9 @@
             background: rgba(79, 172, 254, 0.02);
         }
 
-        input:hover, textarea:hover, select:hover {
+        input:hover,
+        textarea:hover,
+        select:hover {
             border-color: #c3d4e8;
             transform: translateY(-1px);
         }
@@ -203,23 +222,23 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
-        .priority-option input[type="radio"]:checked + .priority-label {
+        .priority-option input[type="radio"]:checked+.priority-label {
             color: white;
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .priority-low:checked + .priority-label {
+        .priority-low:checked+.priority-label {
             background: linear-gradient(135deg, #2ecc71, #27ae60);
             border-color: #2ecc71;
         }
 
-        .priority-medium:checked + .priority-label {
+        .priority-medium:checked+.priority-label {
             background: linear-gradient(135deg, #f39c12, #e67e22);
             border-color: #f39c12;
         }
 
-        .priority-high:checked + .priority-label {
+        .priority-high:checked+.priority-label {
             background: linear-gradient(135deg, #e74c3c, #c0392b);
             border-color: #e74c3c;
         }
@@ -249,7 +268,7 @@
             overflow: hidden;
             font-family: inherit;
         }
-        
+
         .btn:disabled {
             cursor: not-allowed;
             opacity: 0.7;
@@ -335,8 +354,15 @@
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @media (max-width: 768px) {
@@ -379,10 +405,11 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
-            <h1>📅 Input Jadwal Baru</h1>
+            <h1>Input Jadwal Baru</h1>
             <p>Tambahkan kegiatan ke dalam jadwal Anda dengan mudah</p>
         </div>
 
@@ -393,7 +420,8 @@
 
                 <div class="form-group">
                     <label for="activityName">Nama Kegiatan <span class="required">*</span></label>
-                    <input type="text" id="activityName" name="activityName" required placeholder="Contoh: Meeting dengan klien">
+                    <input type="text" id="activityName" name="activityName" required
+                        placeholder="Contoh: Meeting dengan klien">
                     <div class="error-message">Nama kegiatan harus diisi</div>
                 </div>
 
@@ -407,7 +435,8 @@
                     <label>Waktu <span class="required">*</span></label>
                     <div class="time-group">
                         <div>
-                            <label for="startTime" style="font-size: 0.9rem; margin-bottom: 8px; color: #6c757d;">Waktu Mulai</label>
+                            <label for="startTime" style="font-size: 0.9rem; margin-bottom: 8px; color: #6c757d;">Waktu
+                                Mulai</label>
                             <input type="time" id="startTime" name="startTime" required>
                         </div>
                     </div>
@@ -421,7 +450,8 @@
 
                 <div class="form-group">
                     <label for="description">Deskripsi atau Catatan</label>
-                    <textarea id="description" name="description" placeholder="Tambahkan catatan atau detail kegiatan..."></textarea>
+                    <textarea id="description" name="description"
+                        placeholder="Tambahkan catatan atau detail kegiatan..."></textarea>
                 </div>
 
                 <div class="form-group">
@@ -432,7 +462,8 @@
                             <label for="low" class="priority-label">Rendah</label>
                         </div>
                         <div class="priority-option">
-                            <input type="radio" id="medium" name="priority" value="medium" class="priority-medium" checked>
+                            <input type="radio" id="medium" name="priority" value="medium" class="priority-medium"
+                                checked>
                             <label for="medium" class="priority-label">Sedang</label>
                         </div>
                         <div class="priority-option">
@@ -443,7 +474,7 @@
                 </div>
 
                 <div class="button-group">
-                   <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
+                    <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
                     <button type="submit" class="btn btn-primary" id="submitBtn">
                         💾 Simpan Jadwal
                     </button>
@@ -460,7 +491,7 @@
         const FormHandler = {
             // Cache DOM elements saat init
             elements: null,
-            
+
             // State untuk prevent double submission
             isSubmitting: false,
 
@@ -495,7 +526,7 @@
             bindEvents() {
                 // Form submission
                 this.elements.form.addEventListener('submit', this.handleSubmit.bind(this));
-                
+
                 // Real-time validation
                 this.requiredFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
@@ -511,7 +542,7 @@
 
                 const formGroup = field.closest('.form-group');
                 const isValid = field.value.trim() !== '';
-                
+
                 formGroup.classList.toggle('error', !isValid);
                 return isValid;
             },
@@ -527,7 +558,7 @@
             // Validate entire form
             validateForm() {
                 let isValid = true;
-                
+
                 this.requiredFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
                     if (field && !this.validateField(field)) {
@@ -541,10 +572,10 @@
             // Handle form submission dengan optimisasi
             async handleSubmit(e) {
                 e.preventDefault();
-                
+
                 // Prevent double submission
                 if (this.isSubmitting) return;
-                
+
                 // Validate form
                 if (!this.validateForm()) return;
 
@@ -553,7 +584,7 @@
                 try {
                     const formData = new FormData(this.elements.form);
                     const response = await this.submitToServer(formData);
-                    
+
                     if (response.ok) {
                         this.handleSuccess();
                     } else {
@@ -581,10 +612,10 @@
 
             // Handle success - simple redirect or alert
             handleSuccess() {
-                alert('✅ Jadwal berhasil disimpan!');
+                alert('Jadwal berhasil disimpan!');
                 // Option 1: Redirect ke halaman utama
                 window.location.href = "{{ route('welcome') }}";
-                
+
                 // Option 2: Reset form untuk input lagi
                 // this.resetForm();
             },
@@ -619,26 +650,26 @@
             setSubmittingState(isSubmitting) {
                 this.isSubmitting = isSubmitting;
                 this.elements.submitBtn.disabled = isSubmitting;
-                this.elements.submitBtn.textContent = isSubmitting ? 
-                    'Menyimpan...' : 
+                this.elements.submitBtn.textContent = isSubmitting ?
+                    'Menyimpan...' :
                     '💾 Simpan Jadwal';
             },
 
             // Show error message
             showError(message) {
-                alert(`❌ Gagal menyimpan jadwal!\n\n${message}\n\nSilakan coba lagi.`);
+                alert(`Gagal menyimpan jadwal!\n\n${message}\n\nSilakan coba lagi.`);
             },
 
             // Reset form untuk input lagi
             resetForm() {
                 this.elements.form.reset();
                 this.setDefaults();
-                
+
                 // Clear error states
                 document.querySelectorAll('.form-group.error').forEach(group => {
                     group.classList.remove('error');
                 });
-                
+
                 // Reset priority to medium
                 document.getElementById('medium').checked = true;
             }
@@ -653,4 +684,5 @@
     </script>
 
 </body>
+
 </html>

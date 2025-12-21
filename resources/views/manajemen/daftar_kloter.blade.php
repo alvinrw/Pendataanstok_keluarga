@@ -61,12 +61,12 @@
         }
 
         .btn-primary-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
         }
 
         .btn-primary-gradient:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
         }
 
         .back-btn {
@@ -77,7 +77,7 @@
         }
 
         .back-btn:hover {
-            color: #667eea;
+            color: #2563eb;
         }
 
         .kloter-grid {
@@ -105,7 +105,7 @@
             padding: 20px;
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
-            border-bottom: 4px solid #667eea;
+            border-bottom: 4px solid #2563eb;
         }
 
         .card-header h3 {
@@ -223,7 +223,7 @@
             margin-top: 0;
             font-size: 1.3em;
             color: #2c3e50;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid #2563eb;
             padding-bottom: 10px;
             margin-bottom: 15px;
         }
@@ -252,7 +252,7 @@
             padding: 25px;
             border-radius: 12px;
             margin-top: 20px;
-            border-top: 3px solid #667eea;
+            border-top: 3px solid #2563eb;
         }
 
         .summary-item {
@@ -378,7 +378,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🐔 Manajemen Kloter</h1>
+            <h1>Manajemen Kloter</h1>
         </div>
 
         <div class="header-actions">
@@ -407,27 +407,27 @@
                     </div>
                     <div class="card-body">
                         <div class="info-item">
-                            <span>🐓 Sisa di Kandang</span>
+                            <span>Sisa di Kandang</span>
                             <strong style="color: #007bff;">{{ $kloter->sisa_ayam_hidup }} ekor</strong>
                         </div>
                         <div class="info-item">
-                            <span>📦 Stok Siap Jual</span>
+                            <span>Stok Siap Jual</span>
                             <strong style="color: #28a745;">{{ $kloter->stok_tersedia }} ekor</strong>
                         </div>
                         <div class="info-item">
-                            <span>🐣 DOC Awal</span>
+                            <span> DOC Awal</span>
                             <strong>{{ $kloter->jumlah_doc }} ekor</strong>
                         </div>
                     </div>
                     <div class="card-footer">
                         <div class="actions">
-                            <button class="btn btn-sm btn-blue" onclick="openDetailModal({{ $kloter->id }})">⚙️ Detail &
+                            <button class="btn btn-sm btn-blue" onclick="openDetailModal({{ $kloter->id }})">Detail &
                                 Aksi</button>
                             <form action="{{ route('manajemen.kloter.destroy', $kloter->id) }}" method="POST"
                                 onsubmit="return confirm('Anda yakin ingin menghapus kloter ini? Semua data terkait (penjualan, pengeluaran, dll) akan hilang secara permanen.');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-red">🗑️ Hapus</button>
+                                <button type="submit" class="btn btn-sm btn-red">Hapus</button>
                             </form>
                         </div>
                     </div>
@@ -475,7 +475,7 @@
                     <label style="display: block; margin-bottom: 5px; margin-top: 10px;">DOC Awal (Jumlah Ayam)</label>
                     <input type="number" name="jumlah_doc" class="swal2-input" placeholder="Contoh: 100" required min="1">
 
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">💰 Total Harga Beli DOC (Wajib)</label>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Total Harga Beli DOC (Wajib)</label>
                     <input id="harga_beli_doc_formatted" type="text" class="swal2-input" placeholder="Contoh: 600.000 (untuk semua DOC)" required oninput="formatNumberInput(this)">
                 </form>
             `,
@@ -515,7 +515,7 @@
                         <td>
                             <form action="/${routeName}/${item.id}" method="POST" onsubmit="return confirm('Hapus data ${type} ini?')">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-red btn-sm" style="padding: 6px 10px; font-size: 1.1em;" title="Hapus">🗑️</button>
+                                <button type="submit" class="btn btn-red btn-sm" style="padding: 6px 10px; font-size: 1.1em;" title="Hapus">×</button>
                             </form>
                         </td>
                     </tr>`;
@@ -528,10 +528,10 @@
                     <td>${item.jumlah_pakan_kg ? item.jumlah_pakan_kg + ' Kg' : '-'}</td>
                     <td>Rp ${Number(item.jumlah_pengeluaran).toLocaleString('id-ID')}</td>
                     <td>
-                        <button class="btn btn-orange btn-sm" style="padding: 6px 10px; font-size: 1.1em; margin-right: 5px;" onclick="openEditPengeluaranModal(${item.id}, '${item.kategori}', ${item.jumlah_pengeluaran}, '${item.tanggal_pengeluaran}', '${item.catatan || ''}', ${item.jumlah_pakan_kg || 0})" title="Edit">✏️</button>
+                        <button class="btn btn-orange btn-sm" style="padding: 6px 10px; font-size: 1.1em; margin-right: 5px;" onclick="openEditPengeluaranModal(${item.id}, '${item.kategori}', ${item.jumlah_pengeluaran}, '${item.tanggal_pengeluaran}', '${item.catatan || ''}', ${item.jumlah_pakan_kg || 0})" title="Edit">✎</button>
                         <form action="/pengeluaran/${item.id}" method="POST" style="display:inline;" onsubmit="return confirm('Hapus data pengeluaran ini?')">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="_method" value="DELETE">
-                            <button type="submit" class="btn btn-red btn-sm" style="padding: 6px 10px; font-size: 1.1em;" title="Hapus">🗑️</button>
+                            <button type="submit" class="btn btn-red btn-sm" style="padding: 6px 10px; font-size: 1.1em;" title="Hapus">×</button>
                         </form>
                     </td>
                 </tr>`).join('');
@@ -608,12 +608,12 @@
                                         <strong>${rekapan.total_pakan_kg.toLocaleString('id-ID')} Kg</strong>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <span style="color: #666;">⚖️ Total Berat Hidup:</span>
+                                        <span style="color: #666;">Total Berat Hidup:</span>
                                         <strong>${(analytics.total_berat_terjual / 0.8).toFixed(2)} Kg</strong>
                                     </div>
                                     <div style="border-top: 1px solid #e5e7eb; margin: 8px 0; padding-top: 8px;">
                                         <div style="display: flex; justify-content: space-between;">
-                                            <span style="color: #666;">📊 Rumus:</span>
+                                            <span style="color: #666;">Rumus:</span>
                                             <span style="font-family: monospace; font-size: 0.85em;">${rekapan.total_pakan_kg} ÷ ${(analytics.total_berat_terjual / 0.8).toFixed(2)} = ${analytics.fcr}</span>
                                         </div>
                                     </div>
@@ -684,8 +684,8 @@
                 </div>
 
                 <!-- KESIMPULAN PERFORMA KLOTER -->
-                <div class="modal-card" style="margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                    <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">📋 Kesimpulan Performa Kloter</h3>
+                <div class="modal-card" style="margin-top: 20px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white;">
+                    <h3 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">Kesimpulan Performa Kloter</h3>
                     <div style="margin: 15px 0; font-size: 0.95em;">
                         ${(() => {
                         // Calculate overall performance score
@@ -742,19 +742,19 @@
 
                         if (score >= 85) {
                             rating = 'EXCELLENT';
-                            emoji = '🏆';
+                            emoji = '';
                             recommendation = 'Kloter ini berjalan sangat baik! Pertahankan manajemen yang sudah ada.';
                         } else if (score >= 70) {
                             rating = 'BAIK';
-                            emoji = '✅';
+                            emoji = '';
                             recommendation = 'Performa kloter baik, ada beberapa area yang bisa dioptimalkan.';
                         } else if (score >= 50) {
                             rating = 'CUKUP';
-                            emoji = '⚠️';
+                            emoji = '';
                             recommendation = 'Performa cukup, perlu perbaikan di beberapa aspek untuk meningkatkan profit.';
                         } else {
                             rating = 'PERLU PERBAIKAN';
-                            emoji = '❌';
+                            emoji = '';
                             recommendation = 'Performa kurang optimal, evaluasi menyeluruh diperlukan.';
                         }
 
@@ -769,7 +769,7 @@
                                 
                                 ${strengths.length > 0 ? `
                                     <div style="background: rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 10px;">
-                                        <strong style="display: block; margin-bottom: 8px;">✅ Kekuatan:</strong>
+                                        <strong style="display: block; margin-bottom: 8px;">Kekuatan:</strong>
                                         <ul style="margin: 0; padding-left: 20px;">
                                             ${strengths.map(s => '<li>' + s + '</li>').join('')}
                                         </ul>
@@ -778,7 +778,7 @@
                                 
                                 ${issues.length > 0 ? `
                                     <div style="background: rgba(239, 68, 68, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 10px;">
-                                        <strong style="display: block; margin-bottom: 8px;">⚠️ Perlu Perhatian:</strong>
+                                        <strong style="display: block; margin-bottom: 8px;">Perlu Perhatian:</strong>
                                         <ul style="margin: 0; padding-left: 20px;">
                                             ${issues.map(i => '<li>' + i + '</li>').join('')}
                                         </ul>
@@ -982,22 +982,22 @@
                     </select>
                     
                     <div style="background: #d1ecf1; border: 1px solid #0c5460; border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 0.9em;">
-                        <strong style="color: #0c5460;">ℹ️ Catatan:</strong>
+                        <strong style="color: #0c5460;">Catatan:</strong>
                         <p style="margin: 5px 0 0 0; color: #0c5460;">Modal DOC sudah otomatis tercatat sebagai pengeluaran "DOC" saat buat kloter.</p>
                     </div>
 
                     <div id="pakan-input-group" style="display: none; margin-top: 10px;">
-                        <label style="display: block; margin-bottom: 5px;">⚖️ Jumlah Pakan (Kg)</label>
+                        <label style="display: block; margin-bottom: 5px;">Jumlah Pakan (Kg)</label>
                         <input type="number" step="0.01" name="jumlah_pakan_kg" class="swal2-input" placeholder="Contoh: 50.5">
                     </div>
 
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">💰 Harga (Rp)</label>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Harga (Rp)</label>
                     <input id="jumlah_pengeluaran_formatted" type="text" class="swal2-input" placeholder="Masukkan jumlah pengeluaran" required oninput="formatNumberInput(this)">
                     
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📅 Tanggal Pengeluaran</label>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Tanggal Pengeluaran</label>
                     <input type="date" name="tanggal_pengeluaran" class="swal2-input" value="{{ date('Y-m-d') }}" required>
 
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📝 Keterangan (Opsional)</label>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Keterangan (Opsional)</label>
                     <textarea name="catatan" class="swal2-textarea" placeholder="Contoh: Pembelian pakan BR-1 2 karung"></textarea>
                 </form>
             `,
@@ -1072,17 +1072,17 @@
                     </select>
 
                     <div id="edit-pakan-input-group" style="display: ${kategori === 'Pakan' ? 'block' : 'none'}; margin-top: 10px;">
-                        <label style="display: block; margin-bottom: 5px;">⚖️ Jumlah Pakan (Kg)</label>
+                        <label style="display: block; margin-bottom: 5px;">Jumlah Pakan (Kg)</label>
                         <input type="number" step="0.01" name="jumlah_pakan_kg" id="edit-pakan-kg" class="swal2-input" value="${pakanKg}" placeholder="Contoh: 50.5">
                     </div>
 
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">💰 Harga (Rp)</label>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Harga (Rp)</label>
                     <input id="edit_jumlah_pengeluaran_formatted" type="text" class="swal2-input" value="${Number(jumlah).toLocaleString('id-ID')}" required oninput="formatNumberInput(this)">
                     
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📅 Tanggal Pengeluaran</label>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Tanggal Pengeluaran</label>
                     <input type="date" name="tanggal_pengeluaran" class="swal2-input" value="${tanggal}" required>
 
-                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">📝 Keterangan (Opsional)</label>
+                    <label style="display: block; margin-bottom: 5px; margin-top: 10px;">Keterangan (Opsional)</label>
                     <textarea name="catatan" class="swal2-textarea" placeholder="Contoh: Pembelian pakan BR-1 2 karung">${catatan}</textarea>
                 </form>
                 `,

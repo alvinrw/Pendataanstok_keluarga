@@ -13,8 +13,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             min-height: 100vh;
             padding: 20px;
             color: #34495e;
@@ -30,9 +30,9 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             color: white;
-            padding: 30px;
+            padding: 48px 32px;
             text-align: center;
         }
 
@@ -70,8 +70,15 @@
         }
 
         .btn-back {
-            background: linear-gradient(135deg, #6c5ce7 0%, #5a4fcf 100%);
-            margin-bottom: 25px;
+            background: #ffffff;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+            margin-bottom: 20px;
+        }
+
+        .btn-back:hover {
+            background: #2563eb;
+            color: #ffffff;
         }
 
         .action-btn {
@@ -133,8 +140,8 @@
 
         .filter-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .filter-buttons {
@@ -317,8 +324,8 @@
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .modal-buttons {
@@ -345,12 +352,18 @@
 
     <div class="container">
         <div class="header">
-            <h1>📊 Laporan Penjualan Toko</h1>
+            <h1>Laporan Penjualan Toko</h1>
             <p>Analisis data penjualan dengan filter tanggal</p>
         </div>
 
         <div class="content">
-            <a href="{{ route('welcome') }}" class="btn btn-back">← Kembali ke Menu Utama</a>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+                <a href="{{ route('welcome') }}" class="btn btn-back">← Kembali ke Menu Utama</a>
+                <button class="btn btn-filter" onclick="downloadCSV()"
+                    style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
+                    📥 Download CSV
+                </button>
+            </div>
 
 
             <!-- Filter Section -->
@@ -365,15 +378,15 @@
                         <input type="date" id="end-date">
                     </div>
                     <div class="filter-buttons">
-                        <button class="btn btn-filter" onclick="applyFilter()">🔍 Filter</button>
-                        <button class="btn btn-reset" onclick="resetFilter()">🔄 Reset</button>
+                        <button class="btn btn-filter" onclick="applyFilter()">Filter</button>
+                        <button class="btn btn-reset" onclick="resetFilter()">Reset</button>
                     </div>
                 </div>
             </div>
 
             <!-- Summary Section -->
             <div class="summary-section" id="summary-section">
-                <h3>💰 Total Akumulasi</h3>
+                <h3>Total Akumulasi</h3>
                 <div class="summary-amount" id="total-amount">Rp 0</div>
                 <div class="summary-info" id="summary-info">Dari seluruh data</div>
             </div>
@@ -588,8 +601,8 @@
                         <td>${formatCurrency(item.total_harga)}</td>
                         <td>${item.catatan || '-'}</td>
                         <td>
-                            <button class="btn action-btn btn-edit" onclick="editItem(${item.id})">✏️ Edit</button>
-                            <button class="btn action-btn btn-delete" onclick="deleteItem(${item.id})">🗑️ Hapus</button>
+                            <button class="btn action-btn btn-edit" onclick="editItem(${item.id})">Edit</button>
+                            <button class="btn action-btn btn-delete" onclick="deleteItem(${item.id})">Hapus</button>
                         </td>
                     </tr>
                 `;
@@ -615,6 +628,47 @@
             const date = new Date(dateString);
             const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
             return date.toLocaleDateString('id-ID', options);
+        }
+
+        // --- Fungsi Download CSV ---
+        function downloadCSV() {
+            if (!filteredData || filteredData.length === 0) {
+                alert('Tidak ada data untuk didownload');
+                return;
+            }
+
+            // Header CSV
+            const headers = ['No', 'Tanggal', 'Total Harga', 'Catatan'];
+            let csvContent = headers.join(',') + '\n';
+
+            // Data rows
+            filteredData.forEach((item, index) => {
+                const row = [
+                    index + 1,
+                    formatDate(item.tanggal),
+                    item.total_harga,
+                    `"${(item.catatan || '-').replace(/"/g, '""')}"` // Escape quotes in catatan
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+
+            // Add summary row
+            const total = filteredData.reduce((sum, item) => sum + parseFloat(item.total_harga || 0), 0);
+            csvContent += '\n';
+            csvContent += `Total,,,${total}\n`;
+
+            // Create download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Rekapan_Penjualan_Toko_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 

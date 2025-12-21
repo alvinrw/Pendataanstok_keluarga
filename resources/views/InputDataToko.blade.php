@@ -13,8 +13,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -30,9 +30,9 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #4a6741 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             color: white;
-            padding: 40px;
+            padding: 48px 32px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -45,13 +45,18 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             animation: rotate 20s linear infinite;
         }
 
         @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .header h1 {
@@ -74,23 +79,24 @@
         }
 
         .back-btn {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 1rem;
+            background: #ffffff;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
             cursor: pointer;
-            margin-bottom: 30px;
-            transition: all 0.3s ease;
+            margin-bottom: 24px;
+            transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
         }
 
         .back-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+            background: #2563eb;
+            color: #ffffff;
+            transform: translateY(-2px);
         }
 
         .form-section {
@@ -117,7 +123,7 @@
             transform: translateX(-50%);
             width: 60px;
             height: 3px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             border-radius: 2px;
         }
 
@@ -149,8 +155,8 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.15);
+            border-color: #2563eb;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.15);
             transform: translateY(-2px);
         }
 
@@ -216,8 +222,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .alert {
@@ -231,13 +242,14 @@
         }
 
         @keyframes slideInDown {
-            from { 
-                opacity: 0; 
-                transform: translateY(-20px); 
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
             }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -282,7 +294,7 @@
         }
 
         .success-celebration::before {
-            content: '🎉';
+            content: '';
             position: absolute;
             top: -10px;
             left: 20px;
@@ -291,7 +303,7 @@
         }
 
         .success-celebration::after {
-            content: '✨';
+            content: '';
             position: absolute;
             top: -10px;
             right: 20px;
@@ -300,9 +312,22 @@
         }
 
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
         }
 
         /* Enhanced input animations */
@@ -310,9 +335,9 @@
             position: relative;
         }
 
-        .form-group input:focus ~ .input-border,
-        .form-group select:focus ~ .input-border,
-        .form-group textarea:focus ~ .input-border {
+        .form-group input:focus~.input-border,
+        .form-group select:focus~.input-border,
+        .form-group textarea:focus~.input-border {
             transform: scaleX(1);
         }
 
@@ -322,7 +347,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
@@ -361,11 +386,11 @@
             body {
                 padding: 10px;
             }
-            
+
             .header {
                 padding: 25px;
             }
-            
+
             .form-section {
                 padding: 20px;
             }
@@ -377,8 +402,15 @@
         }
 
         @keyframes floating {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
     </style>
 </head>
@@ -386,7 +418,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><span class="floating-icon">🏪</span> Input Data Penjualan Toko</h1>
+            <h1>Input Data Penjualan Toko</h1>
             <p>Kelola transaksi penjualan dengan mudah dan efisien</p>
         </div>
 
@@ -397,32 +429,31 @@
 
             <!-- Form Section -->
             <div class="form-section">
-                <h3>📝 Form Input Penjualan</h3>
+                <h3>Form Input Penjualan</h3>
                 <form id="form-penjualan" method="POST" action="{{ route('penjualanToko.store') }}">
-    @csrf
+                    @csrf
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="tanggal">📅 Tanggal Pembelian:</label>
+                            <label for="tanggal">Tanggal Pembelian:</label>
                             <input type="date" id="tanggal" name="tanggal" required>
                         </div>
 
                     </div>
 
                     <div class="form-group">
-                        <label for="total_harga">💵 Total Pemasukan:</label>
-                        <input type="text" id="total_harga" name="total_harga" 
-                               placeholder="Rp 0" required>
+                        <label for="total_harga">Total Pemasukan:</label>
+                        <input type="text" id="total_harga" name="total_harga" placeholder="Rp 0" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="catatan">📋 Catatan (Opsional):</label>
-                        <textarea id="catatan" name="catatan" rows="3" 
-                                  placeholder="Tambahkan catatan jika diperlukan"></textarea>
+                        <label for="catatan">Catatan (Opsional):</label>
+                        <textarea id="catatan" name="catatan" rows="3"
+                            placeholder="Tambahkan catatan jika diperlukan"></textarea>
                     </div>
 
                     <button type="submit" class="submit-btn" id="submit-btn">
                         <span class="loading-spinner"></span>
-                        <span class="btn-text">💾 Simpan Data Penjualan</span>
+                        <span class="btn-text">Simpan Data Penjualan</span>
                     </button>
                 </form>
             </div>
@@ -458,15 +489,15 @@
             if (type === 'success') {
                 alertDiv.classList.add('success-celebration');
             }
-            
+
             alertDiv.innerHTML = `
                 ${message}
                 <button class="close-btn" onclick="closeAlert(this)">&times;</button>
             `;
-            
+
             alertSection.innerHTML = '';
             alertSection.appendChild(alertDiv);
-            
+
             // Auto hide after 8 seconds for success, 5 seconds for others
             const hideTime = type === 'success' ? 8000 : 5000;
             setTimeout(() => {
@@ -487,17 +518,17 @@
             const urlParams = new URLSearchParams(window.location.search);
             const success = urlParams.get('success');
             const message = urlParams.get('message');
-            
+
             if (success === '1' || success === 'true') {
-                const successMessage = message || 'Data penjualan berhasil disimpan! 🎉';
-                showAlert(`✅ <strong>Berhasil!</strong><br>${successMessage}`, 'success');
-                
+                const successMessage = message || 'Data penjualan berhasil disimpan!';
+                showAlert(`<strong>Berhasil!</strong><br>${successMessage}`, 'success');
+
                 // Clear the URL parameters
                 const url = new URL(window.location);
                 url.searchParams.delete('success');
                 url.searchParams.delete('message');
                 window.history.replaceState({}, document.title, url.pathname);
-                
+
                 // Reset form
                 document.getElementById('form-penjualan').reset();
                 document.getElementById('tanggal').valueAsDate = new Date();
@@ -509,15 +540,15 @@
             const form = document.getElementById('form-penjualan');
             const submitBtn = document.getElementById('submit-btn');
             const btnText = submitBtn.querySelector('.btn-text');
-            
-            form.addEventListener('submit', function(e) {
+
+            form.addEventListener('submit', function (e) {
                 // Show loading state
                 submitBtn.classList.add('loading');
                 submitBtn.disabled = true;
                 btnText.textContent = 'Menyimpan...';
-                
+
                 // Show processing alert
-                showAlert('⏳ Sedang menyimpan data penjualan...', 'warning');
+                showAlert('Sedang menyimpan data penjualan...', 'warning');
             });
         }
 
@@ -530,19 +561,19 @@
         document.getElementById('tanggal').valueAsDate = new Date();
 
         // Initialize on page load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             // Add floating animation to form
             document.querySelector('.form-section').style.animation = 'slideInDown 0.8s ease';
-            
+
             // Check for success message
             checkForSuccessMessage();
-            
+
             // Handle form submission
             handleFormSubmit();
         });
 
         // Handle browser back/forward navigation
-        window.addEventListener('popstate', function() {
+        window.addEventListener('popstate', function () {
             checkForSuccessMessage();
         });
     </script>

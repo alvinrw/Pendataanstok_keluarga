@@ -14,8 +14,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -30,16 +30,17 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             color: white;
-            padding: 30px;
+            padding: 48px 32px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 2.25rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
         }
 
         .header p {
@@ -52,32 +53,32 @@
         }
 
         .back-btn {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
+            background: #ffffff;
+            color: #2563eb;
+            border: 2px solid #2563eb;
+            padding: 10px 20px;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
             cursor: pointer;
-            margin-bottom: 30px;
-            transition: all 0.3s ease;
+            margin-bottom: 24px;
+            transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
         }
 
         .back-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: #2563eb;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
 
         .stock-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
         }
 
         .stock-section::before {
@@ -87,14 +88,16 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
         }
 
         .stock-section h3 {
-            color: #2c3e50;
+            color: #111827;
             font-size: 1.5rem;
-            margin-bottom: 25px;
-            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #2563eb;
             position: relative;
         }
 
@@ -106,7 +109,7 @@
             transform: translateX(-50%);
             width: 60px;
             height: 3px;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
             border-radius: 2px;
         }
 
@@ -229,8 +232,8 @@
         .filter-group input:focus,
         .filter-group select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .filter-btn,
@@ -248,7 +251,7 @@
         }
 
         .filter-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             color: white;
         }
 
@@ -363,7 +366,7 @@
 
         .filter-summary {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-top: 3px solid #667eea;
+            border-top: 3px solid #2563eb;
             padding: 20px;
             margin-top: 0;
             border-radius: 0 0 15px 15px;
@@ -433,7 +436,7 @@
 
     <div class="container">
         <div class="header">
-            <h1>📊 Laporan Penjualan Ayam</h1>
+            <h1>Laporan Penjualan Ayam</h1>
             <p>Analisis data penjualan dan performa bisnis</p>
         </div>
 
@@ -441,20 +444,20 @@
             <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
 
             <div class="stock-section">
-                <h3>📦 Ringkasan Penjualan Total</h3>
+                <h3>Ringkasan Penjualan Total</h3>
                 <div class="stock-grid">
                     <div class="stock-card total-ayam">
-                        <div class="icon">🐔</div>
+                        <div class="icon">▸</div>
                         <h4>Total Ayam Terjual</h4>
                         <p id="total-ayam">{{ $summary->total_ayam_terjual ?? 0 }}</p>
                     </div>
                     <div class="stock-card total-berat">
-                        <div class="icon">⚖️</div>
+                        <div class="icon">▸</div>
                         <h4>Total Berat Terjual</h4>
                         <p id="total-berat">{{ number_format($summary->total_berat_tertimbang ?? 0) }} gr</p>
                     </div>
                     <div class="stock-card estimasi-nilai">
-                        <div class="icon">💰</div>
+                        <div class="icon">▸</div>
                         <h4>Total Pemasukan</h4>
                         <p id="estimasi-nilai">Rp {{ number_format($summary->total_pemasukan ?? 0, 0, ',', '.') }}</p>
                     </div>
@@ -510,7 +513,7 @@
 
             <div class="table-section">
                 <div class="table-header">
-                    <h3>📋 Detail Penjualan</h3>
+                    <h3>Detail Penjualan</h3>
                 </div>
                 <div class="table-container">
                     <table>
@@ -556,7 +559,7 @@
                                                     onsubmit="return confirmDelete(this);">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="action-btn hapus-btn">🗑️ Hapus</button>
+                                                    <button type="submit" class="action-btn hapus-btn">Hapus</button>
                                                 </form>
                                             @endif
                                         </div>
@@ -576,11 +579,11 @@
 
                 <div id="filter-summary" class="filter-summary" style="display: none;">
                     <div class="filter-summary-content">
-                        <h4>📊 Ringkasan Hasil Filter</h4>
+                        <h4>Ringkasan Hasil Filter</h4>
                         <div class="filter-stats">
-                            <span class="filter-stat">🐔 <strong id="filter-total-ayam">0</strong> ayam</span>
-                            <span class="filter-stat">⚖️ <strong id="filter-total-berat">0</strong> gram</span>
-                            <span class="filter-stat">💰 <strong id="filter-total-uang">Rp 0</strong></span>
+                            <span class="filter-stat"><strong id="filter-total-ayam">0</strong> ayam</span>
+                            <span class="filter-stat"><strong id="filter-total-berat">0</strong> gram</span>
+                            <span class="filter-stat"><strong id="filter-total-uang">Rp 0</strong></span>
                         </div>
                     </div>
                 </div>
@@ -887,7 +890,7 @@
                 html: receiptHtmlForDisplay,
                 width: 400,
                 showCancelButton: true,
-                confirmButtonText: '🖨️ Cetak Struk',
+                confirmButtonText: 'Cetak Struk',
                 cancelButtonText: 'Tutup',
                 confirmButtonColor: '#3498db',
             }).then((result) => {

@@ -8,15 +8,15 @@
     <style>
         /* ... (CSS Anda yang sudah ada tetap sama, tidak perlu diubah) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); min-height: 100vh; padding: 20px; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); min-height: 100vh; padding: 20px; }
         .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
-        .header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 30px; text-align: center; }
-        .header h1 { font-size: 2.2rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }
+        .header { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 48px 32px; text-align: center; }
+        .header h1 { font-size: 2.25rem; margin-bottom: 8px; font-weight: 700; letter-spacing: -0.025em; }
         .header p { font-size: 1rem; opacity: 0.9; }
         .content { padding: 30px; }
-        .back-btn { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-bottom: 20px; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
-        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-        .stock-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 30px; text-align: center; display: none; }
+        .back-btn { background: #ffffff; color: #2563eb; border: 2px solid #2563eb; padding: 10px 20px; border-radius: 8px; font-size: 0.875rem; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: all 0.2s; text-decoration: none; display: inline-block; }
+        .back-btn:hover { background: #2563eb; color: #ffffff; transform: translateY(-1px); }
+        .stock-section { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; text-align: center; display: none; }
         .stock-section.empty { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
         .stock-section h3 { font-size: 1.5rem; margin-bottom: 15px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); }
@@ -30,7 +30,7 @@
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #4facfe; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         .form-group input.error { border-color: #e74c3c; background-color: #fdf2f2; }
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
         .discount-section { background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 10px; margin: 20px 0; }
@@ -42,7 +42,7 @@
         .calculation-section h4 { color: #155724; margin-bottom: 15px; }
         .calc-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 5px 0; }
         .calc-row.total { border-top: 2px solid #155724; padding-top: 10px; font-weight: bold; font-size: 1.1rem; }
-        .submit-btn { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; width: 100%; margin-top: 20px; }
+        .submit-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 20px; }
         .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
         .submit-btn:disabled { background: #95a5a6; cursor: not-allowed; transform: none; }
         .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; animation: slideIn 0.3s ease; }
@@ -55,7 +55,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🐔 Input Data Penjualan Ayam</h1>
+            <h1>Input Data Penjualan Ayam</h1>
             <p>Kelola transaksi penjualan ayam dengan mudah</p>
         </div>
 
@@ -63,7 +63,7 @@
             <a href="{{ route('welcome') }}" class="back-btn">← Kembali ke Menu Utama</a>
 
 
-            <div class="stock-section" style="display: block; background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); margin-bottom: 20px;">
+            <div class="stock-section" style="display: block; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); margin-bottom: 20px;">
         <h3>Total Stok Gabungan Saat Ini</h3>
         <div class="stock-info">
             <div class="stock-card">
@@ -99,7 +99,7 @@
 
             <!-- Stock Section (Initially Hidden) -->
             <div class="stock-section" id="stock-section">
-                <h3>📊 Info Stok Kloter</h3>
+                <h3>Info Stok Kloter</h3>
                 <div class="stock-info">
                     <div class="stock-card">
                         <h4 id="kloter-name-display">Nama Kloter</h4>
@@ -129,7 +129,7 @@
 
             <!-- Form Section (Disabled by default) -->
             <div class="form-section disabled" id="form-section">
-                <h3>📝 2. Form Input Penjualan</h3>
+                <h3>2. Form Input Penjualan</h3>
                 <form id="form-penjualan" method="POST" action="{{ route('penjualan.store') }}">
                     @csrf
                     <input type="hidden" name="kloter_id" id="kloter_id">
@@ -158,7 +158,7 @@
                     </div>
 
                     <div class="discount-section">
-                        <h4>🎯 Diskon Kustom</h4>
+                        <h4>Diskon Kustom</h4>
                         <div class="form-group" style="margin-bottom: 0;">
                             <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 1.1em;">
                                 <input type="checkbox" id="diskon-checkbox" style="width: 20px; height: 20px;"> Berikan Diskon?
@@ -172,7 +172,7 @@
                     </div>
 
                     <div class="calculation-section">
-                        <h4>🔢 Perhitungan Otomatis</h4>
+                        <h4>Perhitungan Otomatis</h4>
                         <div class="calc-row"><span>Berat per Ayam (Harga ÷ 75):</span><span id="berat-per-ayam">0 gram</span></div>
                         <div class="calc-row"><span>Total Berat:</span><span id="total-berat-calc">0 gram</span></div>
                         <div class="calc-row"><span>Harga Sebelum Diskon:</span><span id="harga-sebelum">Rp 0</span></div>
@@ -180,7 +180,7 @@
                         <div class="calc-row total"><span>Total Akhir:</span><span id="total-akhir">Rp 0</span></div>
                     </div>
 
-                    <button type="submit" class="submit-btn" id="submit-btn">💾 Simpan Data Penjualan</button>
+                    <button type="submit" class="submit-btn" id="submit-btn">Simpan Data Penjualan</button>
 
                     <!-- Hidden fields untuk dikirim ke Controller -->
                     <input type="hidden" name="berat_total" id="berat_total_hidden">
@@ -269,7 +269,7 @@
 
             if (jumlah > currentStock) {
                 jumlahAyamInput.classList.add('error');
-                stockWarning.textContent = `❌ Stok tidak cukup! Tersedia: ${currentStock} ayam`;
+                stockWarning.textContent = `Stok tidak cukup! Tersedia: ${currentStock} ayam`;
                 stockWarning.style.display = 'block';
                 submitBtn.disabled = true;
                 return false;
