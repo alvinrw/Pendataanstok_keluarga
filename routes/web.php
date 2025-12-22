@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// Import semua Controller di sini agar rapi
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DataPenjualanController;
@@ -13,6 +12,7 @@ use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\KloterController;
 use App\Http\Controllers\ManajemenKloterController;
+use App\Http\Controllers\ExportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +91,10 @@ Route::get('/penjualan/create', [DataPenjualanController::class, 'create'])->nam
 Route::post('/penjualan/store', [DataPenjualanController::class, 'store'])->name('penjualan.store');
 Route::get('/RekapanPenjualanAyam', [DataPenjualanController::class, 'rekapan'])->name('penjualan.rekapan');
 Route::delete('/RekapanPenjualanAyam/{id}', [DataPenjualanController::class, 'destroy'])->name('penjualan.destroy');
+
+// Export Routes
+Route::get('/export/rekapan-csv', [ExportController::class, 'exportRekapanCSV'])->name('export.rekapan.csv');
+Route::get('/export/kloter/{kloter}/csv', [ExportController::class, 'exportKloterCSV'])->name('export.kloter.csv');
 
 // =============================
 // Summary Ayam (API)

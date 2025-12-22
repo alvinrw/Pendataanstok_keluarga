@@ -12,33 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class ManajemenKloterController extends Controller
 {
-    /**
-     * "Kalkulator Utama" yang menghitung semua data kloter.
-     * Fungsi ini akan dipanggil setiap kali ada perubahan data.
-     */
-    private function updateKloterCalculations(Kloter $kloter)
-    {
-        // Muat ulang relasi untuk mendapatkan data terbaru
-        $kloter->load(['kematianAyams', 'panens', 'pengeluarans', 'dataPenjualans']);
 
-        $totalMati = $kloter->kematianAyams->sum('jumlah_mati');
-        $totalPanen = $kloter->panens->sum('jumlah_panen');
-        $totalPengeluaran = $kloter->pengeluarans->sum('jumlah_pengeluaran');
-        $totalTerjual = $kloter->dataPenjualans->sum('jumlah_ayam_dibeli');
-
-        // Rumus sisa ayam di kandang
-        $sisaAyamDiKandang = $kloter->jumlah_doc - $totalMati - $totalPanen;
-
-        // Rumus stok yang siap dijual di halaman summary
-        $stokSiapJual = $totalPanen - $totalTerjual;
-
-        // Simpan semua hasil perhitungan ke database
-        $kloter->sisa_ayam_hidup = $sisaAyamDiKandang;
-        $kloter->total_pengeluaran = $totalPengeluaran;
-        $kloter->stok_tersedia = $stokSiapJual;
-
-        $kloter->save();
-    }
 
     /**
      * Menampilkan halaman utama (daftar semua kloter).
@@ -90,8 +64,6 @@ class ManajemenKloterController extends Controller
                 'tanggal_mulai' => $validated['tanggal_mulai'],
                 'sisa_ayam_hidup' => $validated['jumlah_doc'],
                 'total_pengeluaran' => 0,
-                'stok_tersedia' => 0,
-                'stok_awal' => 0, // Tambahkan ini untuk fix NOT NULL constraint
             ]);
 
             // Otomatis buat pengeluaran DOC
@@ -104,7 +76,20 @@ class ManajemenKloterController extends Controller
                 'jumlah_pakan_kg' => 0,
             ]);
 
-            $this->updateKloterCalculations($kloter);
+            // Buat summary untuk kloter baru
+            DB::table('kloter_summaries')->insert([
+                'kloter_id' => $kloter->id,
+                'total_terjual' => 0,
+                'total_berat_kg' => 0,
+                'total_pemasukan' => 0,
+                'total_pengeluaran' => 0,
+                'total_mati' => 0,
+                'total_panen' => 0,
+                'stok_tersedia' => 0,
+                'last_calculated_at' => now(),
+            ]);
+
+
 
             DB::commit();
             return redirect()->route('manajemen.kloter.index')->with('success', 'Kloter berhasil ditambahkan!');
@@ -164,7 +149,7 @@ class ManajemenKloterController extends Controller
         $validated = $request->validate(['jumlah_doc' => 'required|integer|min:0']);
         $kloter->update(['jumlah_doc' => $validated['jumlah_doc']]);
 
-        $this->updateKloterCalculations($kloter);
+
 
         return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah DOC berhasil diperbarui.');
     }
@@ -186,7 +171,7 @@ class ManajemenKloterController extends Controller
     {
         $kloter = $pengeluaran->kloter;
         $pengeluaran->delete();
-        $this->updateKloterCalculations($kloter);
+
         return redirect()->back()->with('success', 'Data pengeluaran berhasil dihapus.');
     }
 
@@ -197,7 +182,7 @@ class ManajemenKloterController extends Controller
     {
         $kloter = $kematianAyam->kloter;
         $kematianAyam->delete();
-        $this->updateKloterCalculations($kloter);
+
         return redirect()->back()->with('success', 'Data kematian berhasil dihapus.');
     }
 
@@ -214,7 +199,7 @@ class ManajemenKloterController extends Controller
             'jumlah_pakan_kg' => 'required_if:kategori,Pakan|nullable|numeric|min:0',
         ]);
         $kloter->pengeluarans()->create($validated);
-        $this->updateKloterCalculations($kloter);
+
         return redirect()->back()->with('success', 'Data pengeluaran berhasil disimpan.');
     }
 
@@ -233,7 +218,7 @@ class ManajemenKloterController extends Controller
 
         $kloter = $pengeluaran->kloter;
         $pengeluaran->update($validated);
-        $this->updateKloterCalculations($kloter);
+
         return redirect()->back()->with('success', 'Data pengeluaran berhasil diperbarui.');
     }
 
@@ -249,7 +234,7 @@ class ManajemenKloterController extends Controller
             'catatan' => 'nullable|string',
         ]);
         $kloter->kematianAyams()->create($validated);
-        $this->updateKloterCalculations($kloter);
+
         return redirect()->back()->with('success', 'Data kematian berhasil dicatat.');
     }
 
@@ -265,7 +250,7 @@ class ManajemenKloterController extends Controller
         ]);
 
         $kloter->panens()->create($validated);
-        $this->updateKloterCalculations($kloter);
+
 
         return redirect()->back()->with('success', 'Data panen berhasil dicatat.');
     }
@@ -286,7 +271,7 @@ class ManajemenKloterController extends Controller
         }
 
         $panen->delete();
-        $this->updateKloterCalculations($kloter);
+
         return redirect()->back()->with('success', 'Data panen berhasil dihapus.');
     }
 
@@ -302,7 +287,7 @@ class ManajemenKloterController extends Controller
         $docAwalBaru = $sisaAyamBaru + $totalMati + $totalPanen;
         $kloter->jumlah_doc = $docAwalBaru;
         $kloter->save();
-        $this->updateKloterCalculations($kloter);
+
         return redirect()->route('manajemen.kloter.index')->with('success', 'Jumlah ayam berhasil dikoreksi.');
     }
 }

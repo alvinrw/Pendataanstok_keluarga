@@ -545,7 +545,8 @@
                         <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
                         <button class="btn btn-blue" style="width:100%; margin-bottom:10px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onclick="openKematianModal(${kloter.id})">Input Kematian</button>
                         <button class="btn btn-blue" style="width:100%; margin-bottom:10px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onclick="openPengeluaranModal(${kloter.id})">Input Pengeluaran</button>
-                        <button class="btn btn-green" style="width:100%; background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onclick="openPanenModal(${kloter.id}, ${rekapan.sisa_ayam})">Input Panen</button>
+                        <button class="btn btn-green" style="width:100%; margin-bottom:10px; background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onclick="openPanenModal(${kloter.id}, ${rekapan.sisa_ayam})">Input Panen</button>
+                        <a href="/export/kloter/${kloter.id}/csv" class="btn btn-orange" style="width:100%; display:block; text-align:center; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; font-weight: 500; padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2); text-decoration: none;">📥 Download Data CSV</a>
                     </div>
                     <div class="modal-card" style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15); border: 1px solid #e0e7ff;">
                         <h3 style="color: #1e40af; font-weight: 600; font-size: 1.1em; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #dbeafe;">Riwayat Data</h3>
@@ -576,7 +577,7 @@
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.3); flex-wrap: wrap; gap: 5px;">
                                 <span style="opacity: 0.9;">Total Pemasukan:</span>
-                                <strong style="word-break: break-word;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</strong>
+                                <strong style="word-break: break-word;">Rp ${Number(analytics.total_pemasukan).toLocaleString('id-ID')}</strong>
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; flex-wrap: wrap; gap: 10px;">
                                 <span style="font-size: 1.1em; font-weight: 600;">Keuntungan Bersih:</span>
@@ -836,7 +837,7 @@
                             <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15);">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <span style="font-size: 0.9em; opacity: 0.9;">Total Pemasukan</span>
-                                    <span style="font-size: 1.4em; font-weight: 700; color: #a5f3fc;">Rp ${analytics.total_pemasukan.toLocaleString('id-ID')}</span>
+                                    <span style="font-size: 1.4em; font-weight: 700; color: #a5f3fc;">Rp ${Number(analytics.total_pemasukan).toLocaleString('id-ID')}</span>
                                 </div>
                             </div>
                         </div>
@@ -1110,7 +1111,7 @@
                 pakanInput.required = false;
                 pakanInput.value = '';
             }
-        }
+    }
     </script>
 </body>
 

@@ -1,0 +1,4 @@
+id,nama_kloter,status,tanggal_mulai,jumlah_doc,sisa_ayam_hidup,harga_beli_doc,total_pengeluaran,stok_awal,stok_tersedia,total_terjual,total_berat,total_pemasukan,created_at,updated_at,tanggal_panen,harga_jual_total
+7,Kloter 1 perode panen 25 sep,Aktif,2025-07-29,100,0,600000,2112000,0,0,81,58.40,4377000.00,2025-09-21 21:46:06,2025-11-30 14:51:31,NULL,NULL
+,(8,Kloter 2 chickin 13 okt 2025,Aktif,2025-10-13,108,0,500000,2096000,0,89,12,9.27,695000.00,2025-10-21 05:19:23,2025-12-19 13:26:31,NULL,NULL
+,(9,Kloter 3,Aktif,2025-12-15,102,102,500000,1256000,0,0,0,0.00,0.00,2025-12-12 23:06:55,2025-12-17 19:08:23,NULL,NULL

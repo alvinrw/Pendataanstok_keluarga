@@ -14,17 +14,19 @@ class DataPenjualanController extends Controller
      * Menampilkan form untuk membuat data penjualan baru.
      * Ini adalah satu-satunya fungsi yang menampilkan view input.
      */
-public function create()
-{
-    // Ambil semua data kloter
-    $kloters = Kloter::orderBy('nama_kloter', 'asc')->get();
+    public function create()
+    {
+        // Ambil semua data kloter dengan summary
+        $kloters = Kloter::with('summary')->orderBy('nama_kloter', 'asc')->get();
 
-    // HITUNG TOTAL STOK GABUNGAN DARI SEMUA KLOTER
-    $grandTotalStock = $kloters->sum('stok_tersedia');
+        // HITUNG TOTAL STOK SIAP JUAL GABUNGAN DARI SEMUA KLOTER
+        $grandTotalStock = $kloters->sum(function ($kloter) {
+            return $kloter->summary->stok_tersedia ?? 0;
+        });
 
-    // Kirim kedua data tersebut ke view
-    return view('penjualan_ayam', compact('kloters', 'grandTotalStock'));
-}
+        // Kirim kedua data tersebut ke view
+        return view('penjualan_ayam', compact('kloters', 'grandTotalStock'));
+    }
 
     /**
      * Menyimpan data penjualan baru ke database.
@@ -40,7 +42,7 @@ public function create()
             'harga_total' => 'required|integer',
             'berat_total' => 'required|integer',
             'diskon' => 'required|boolean',
-            'kloter_id' => 'required|exists:kloters,id', // <-- Validasi kloter_id
+            'kloter_id' => 'required|exists:kloters,id',
         ]);
 
         // Gunakan transaksi database untuk memastikan konsistensi data
@@ -49,26 +51,23 @@ public function create()
             // 1. Cari kloter yang dipilih
             $kloter = Kloter::findOrFail($validated['kloter_id']);
 
-            // 2. Validasi stok di sisi server (keamanan tambahan)
-            if ($kloter->stok_tersedia < $validated['jumlah_ayam_dibeli']) {
+            // 2. Validasi stok siap jual (dari panen)
+            $stokTersedia = $kloter->summary->stok_tersedia ?? 0;
+
+            if ($stokTersedia < $validated['jumlah_ayam_dibeli']) {
                 // Jika stok tidak cukup, batalkan transaksi dan kembalikan error
                 DB::rollBack();
-                return back()->withInput()->withErrors(['jumlah_ayam_dibeli' => 'Stok untuk kloter ' . $kloter->nama_kloter . ' tidak mencukupi!']);
+                return back()->withInput()->withErrors([
+                    'jumlah_ayam_dibeli' => "Stok siap jual untuk kloter '{$kloter->nama_kloter}' hanya {$stokTersedia} ekor! " .
+                        "Silakan input panen terlebih dahulu jika ingin menjual lebih banyak."
+                ]);
             }
 
             // 3. Simpan data penjualan ke tabel `data_penjualans`
-            // Tambahkan kloter_id ke data yang akan disimpan
-            $validated['kloter_id'] = $kloter->id;
+            // Observer akan otomatis update kloter stock
             DataPenjualan::create($validated);
 
-            // 4. Update statistik pada kloter yang dipilih
-            $kloter->stok_tersedia -= $validated['jumlah_ayam_dibeli'];
-            $kloter->total_terjual += $validated['jumlah_ayam_dibeli'];
-            $kloter->total_berat += $validated['berat_total'] / 1000; // Asumsi berat dalam gram, ubah ke Kg
-            $kloter->total_pemasukan += $validated['harga_total'];
-            $kloter->save();
-
-            // 5. Update tabel ringkasan utama
+            // 4. Update tabel ringkasan utama
             $this->updateOverallSummary();
 
             // Jika semua berhasil, konfirmasi transaksi
@@ -91,19 +90,9 @@ public function create()
         DB::beginTransaction();
         try {
             $penjualan = DataPenjualan::findOrFail($id);
-            $kloter = Kloter::find($penjualan->kloter_id);
 
-            // Jika kloter terkait masih ada
-            if ($kloter) {
-                // Kembalikan stok dan kurangi statistik
-                $kloter->stok_tersedia += $penjualan->jumlah_ayam_dibeli;
-                $kloter->total_terjual -= $penjualan->jumlah_ayam_dibeli;
-                $kloter->total_berat -= $penjualan->berat_total / 1000;
-                $kloter->total_pemasukan -= $penjualan->harga_total;
-                $kloter->save();
-            }
-            
             // Hapus data penjualan
+            // Observer akan otomatis kembalikan kloter stock
             $penjualan->delete();
 
             // Update ringkasan utama
@@ -126,11 +115,11 @@ public function create()
         // Mengambil data dengan relasi kloter untuk ditampilkan
         $data = DataPenjualan::with('kloter')->latest()->get();
 
-        // Hitung summary dari data yang ada
+        // Hitung summary langsung dari database untuk menghindari type error
         $summary = (object) [
-            'total_ayam_terjual' => $data->sum('jumlah_ayam_dibeli'),
-            'total_berat_tertimbang' => $data->sum('berat_total'),
-            'total_pemasukan' => $data->sum('harga_total'),
+            'total_ayam_terjual' => (int) DataPenjualan::sum('jumlah_ayam_dibeli'),
+            'total_berat_tertimbang' => (float) DataPenjualan::sum('berat_total'),
+            'total_pemasukan' => (float) DataPenjualan::sum('harga_total'),
         ];
 
         return view('RekapanPenjualanAyam', compact('data', 'summary'));

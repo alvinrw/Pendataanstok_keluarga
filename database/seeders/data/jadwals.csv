@@ -1,0 +1,5 @@
+id,activity_name,date,start_time,location,description,priority,created_at,updated_at,status
+9,Ketemu cinta,2025-09-03,10:34:00,-,-,low,2025-09-02 20:33:54,2025-09-10 17:48:56,done
+,(10,Mengabari pak Dani,2025-09-12,06:32:00,Wa,NULL,high,2025-09-11 04:32:40,2025-09-11 04:32:40,ongoing
+,(11,Ketemu praktikan,2025-09-12,10:32:00,Menyusul,-,medium,2025-09-11 04:33:13,2025-09-11 04:33:13,ongoing
+,(12,Meeting asprak,2025-09-12,12:33:00,Ged A,-,high,2025-09-11 04:34:03,2025-09-11 04:34:03,ongoing

@@ -15,12 +15,10 @@ class Kloter extends Model
         'tanggal_mulai',
         'jumlah_doc',
         'harga_beli_doc',
-        'stok_awal',
-        'stok_tersedia',
         'tanggal_panen',
         'harga_jual_total',
-        'sisa_ayam_hidup',    // <-- TAMBAHKAN INI
-        'total_pengeluaran',  // <-- TAMBAHKAN INI
+        'sisa_ayam_hidup',
+        'total_pengeluaran',
     ];
 
     public function pengeluarans()
@@ -43,6 +41,11 @@ class Kloter extends Model
         return $this->hasMany(Panen::class);
     }
 
+    public function summary()
+    {
+        return $this->hasOne(KloterSummary::class);
+    }
+
     // ========================================
     // BUSINESS ANALYTICS ACCESSOR METHODS
     // ========================================
@@ -57,11 +60,35 @@ class Kloter extends Model
     }
 
     /**
-     * Calculate Total Pemasukan (total revenue from sales)
+     * Get Total Terjual from summary (backward compatibility)
+     */
+    public function getTotalTerjualAttribute()
+    {
+        return $this->summary->total_terjual ?? 0;
+    }
+
+    /**
+     * Get Stok Tersedia from summary (backward compatibility)
+     */
+    public function getStokTersediaAttribute()
+    {
+        return $this->summary->stok_tersedia ?? 0;
+    }
+
+    /**
+     * Get Total Berat from summary (backward compatibility)
+     */
+    public function getTotalBeratAttribute()
+    {
+        return $this->summary->total_berat_kg ?? 0;
+    }
+
+    /**
+     * Calculate Total Pemasukan from summary (backward compatibility)
      */
     public function getTotalPemasukanAttribute()
     {
-        return $this->dataPenjualans()->sum('harga_total');
+        return $this->summary->total_pemasukan ?? 0;
     }
 
     /**
