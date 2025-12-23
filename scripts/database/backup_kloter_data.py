@@ -2,19 +2,24 @@ import sqlite3
 import json
 from datetime import datetime
 import os
+import sys
+from pathlib import Path
 
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
-BACKUP_DIR = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\backups'
+# Add parent directory to path for config import
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
 
-# Create backup directory if not exists
+DB_PATH = get_db_path()
+BACKUP_DIR = Path(__file__).resolve().parent.parent / 'backups'
+
 os.makedirs(BACKUP_DIR, exist_ok=True)
 
 conn = sqlite3.connect(DB_PATH)
-conn.row_factory = sqlite3.Row  # Enable column access by name
+conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
 
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-backup_file = os.path.join(BACKUP_DIR, f'backup_kloter_{timestamp}.json')
+backup_file = BACKUP_DIR / f'backup_kloter_{timestamp}.json'
 
 print("=" * 60)
 print("CREATING COMPREHENSIVE BACKUP")
@@ -30,14 +35,12 @@ backup_data = {
     'kloters': []
 }
 
-# Get all kloters
 cursor.execute("SELECT * FROM kloters ORDER BY id")
 kloters = cursor.fetchall()
 
 for kloter in kloters:
     kloter_id = kloter['id']
     
-    # Get all related data
     cursor.execute("SELECT * FROM pengeluarans WHERE kloter_id = ? ORDER BY tanggal_pengeluaran", (kloter_id,))
     pengeluarans = [dict(row) for row in cursor.fetchall()]
     
@@ -54,7 +57,6 @@ for kloter in kloters:
     summary_row = cursor.fetchone()
     summary = dict(summary_row) if summary_row else {}
     
-    # Build kloter data
     kloter_data = {
         'info': dict(kloter),
         'summary': summary,
@@ -78,7 +80,6 @@ for kloter in kloters:
     print(f"  Panen: {len(panens)} records")
     print(f"  Penjualan: {len(penjualans)} records")
 
-# Save to JSON
 with open(backup_file, 'w', encoding='utf-8') as f:
     json.dump(backup_data, f, indent=2, ensure_ascii=False)
 
@@ -90,11 +91,11 @@ print("=" * 60)
 print(f"\nFile: {backup_file}")
 print(f"Total Kloters: {len(backup_data['kloters'])}")
 print(f"Size: {os.path.getsize(backup_file) / 1024:.2f} KB")
-print("\nBackup ini berisi:")
-print("  - Info kloter (DOC, tanggal mulai, dll)")
-print("  - Summary (stok, terjual, pemasukan, dll)")
-print("  - Semua pengeluaran per tanggal")
-print("  - Semua kematian per tanggal")
-print("  - Semua panen per tanggal")
-print("  - Semua penjualan per pembeli")
-print("\nBackup ini bisa di-restore kapan saja!")
+print("\nBackup contains:")
+print("  - Kloter info (DOC, start date, etc)")
+print("  - Summary (stock, sold, revenue, etc)")
+print("  - All expenses by date")
+print("  - All deaths by date")
+print("  - All harvests by date")
+print("  - All sales by buyer")
+print("\nThis backup can be restored anytime!")

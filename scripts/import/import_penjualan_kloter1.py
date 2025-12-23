@@ -1,8 +1,18 @@
 import sqlite3
 import csv
 
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
-CSV_FILE = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\cpanel-upload\csv_data\data_penjualans.csv'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
+
+DB_PATH = get_db_path()
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_csv_dir
+
+CSV_FILE = str(Path(get_csv_dir()) / 'data_penjualans.csv')
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -108,5 +118,5 @@ print(f"  Stok Siap Jual: {stok_tersedia} ekor")
 print(f"  Total Pemasukan: Rp {total_pemasukan:,.0f}")
 
 print("\n" + "=" * 60)
-print("DONE! Refresh browser to see data!")
+print("DONE! Refresh browser to see changes!")
 print("=" * 60)

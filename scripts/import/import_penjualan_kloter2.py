@@ -1,7 +1,12 @@
 import sqlite3
 from datetime import datetime
 
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
+
+DB_PATH = get_db_path()
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -146,5 +151,5 @@ print(f"  Stok Siap Jual: {stok_tersedia} ekor")
 print(f"  Total Pemasukan: Rp {total_pemasukan:,.0f}")
 
 print("\n" + "=" * 60)
-print("DONE! Refresh browser to see data!")
+print("DONE! Refresh browser to see changes!")
 print("=" * 60)

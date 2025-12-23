@@ -22,3 +22,12 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Database files - do not commit production data
+*.sqlite
+*.sqlite-journal
+*.sql
+database/database.sqlite
+
+# Script configuration - local paths
+/scripts/config.py

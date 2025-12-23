@@ -8,7 +8,12 @@ import sqlite3
 import re
 
 SQL_FILE = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\supergin_db.sql'
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
+
+DB_PATH = get_db_path()
 
 def clean_sql_for_sqlite(sql_content):
     """Convert MySQL SQL to SQLite compatible SQL"""

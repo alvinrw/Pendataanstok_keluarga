@@ -10,7 +10,12 @@ import os
 from datetime import datetime
 
 # Path ke database SQLite
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
+
+DB_PATH = get_db_path()
 CSV_DIR = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\seeders\data'
 
 def connect_db():

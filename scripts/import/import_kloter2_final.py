@@ -1,8 +1,18 @@
 import sqlite3
 import csv
 
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
-CSV_FILE = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\cpanel-upload\csv_data\data_penjualans.csv'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
+
+DB_PATH = get_db_path()
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_csv_dir
+
+CSV_FILE = str(Path(get_csv_dir()) / 'data_penjualans.csv')
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -11,40 +21,19 @@ print("=" * 60)
 print("IMPORTING PENJUALAN DATA FOR KLOTER 2 (ID=8)")
 print("=" * 60)
 
-# Get Kloter 2 ID from database (assuming it's already created)
-cursor.execute("SELECT id, nama_kloter FROM kloters ORDER BY id")
-kloters = cursor.fetchall()
-
-print("\nKLOTERS IN DATABASE:")
-for k in kloters:
-    print(f"  ID={k[0]}: {k[1]}")
-
-# Find kloter with "chickin 13 okt" or similar
-cursor.execute("SELECT id, nama_kloter FROM kloters WHERE nama_kloter LIKE '%chickin%' OR nama_kloter LIKE '%13 okt%' OR nama_kloter LIKE '%Kloter 2%' ORDER BY id LIMIT 1")
+# Get Kloter 2 by ID=15 (Klotter 2)
+cursor.execute("SELECT id, nama_kloter FROM kloters WHERE id = 15")
 kloter_row = cursor.fetchone()
 
 if not kloter_row:
-    print("\n[INFO] Kloter 2 not found by name, checking if user created it manually...")
-    # Maybe user created with different name, let's check latest kloter
-    cursor.execute("SELECT id, nama_kloter FROM kloters ORDER BY id DESC LIMIT 1")
-    kloter_row = cursor.fetchone()
-    
-    if kloter_row:
-        print(f"\n[USING] Latest Kloter: ID={kloter_row[0]}, Name={kloter_row[1]}")
-        confirm = input("Is this Kloter 2? (y/n): ")
-        if confirm.lower() != 'y':
-            print("[ABORTED] Please create Kloter 2 first!")
-            conn.close()
-            exit()
-    else:
-        print("[ERROR] No kloters found in database!")
-        conn.close()
-        exit()
+    print("[ERROR] Kloter 2 (ID=15) not found in database!")
+    conn.close()
+    exit()
 
 kloter_id_in_db = kloter_row[0]
 kloter_name = kloter_row[1]
 
-print(f"\n[IMPORTING TO] Kloter: ID={kloter_id_in_db}, Name={kloter_name}")
+print(f"Found Kloter: ID={kloter_id_in_db}, Name={kloter_name}")
 
 # Read CSV and import penjualan for kloter_id = 8 (from old database)
 with open(CSV_FILE, 'r', encoding='utf-8') as f:
@@ -65,7 +54,7 @@ with open(CSV_FILE, 'r', encoding='utf-8') as f:
                                             created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                kloter_id_in_db,  # Use new kloter ID
+                kloter_id_in_db,  # Use new kloter ID (15)
                 row['tanggal'],
                 row['nama_pembeli'],
                 row['jumlah_ayam_dibeli'],
@@ -129,5 +118,5 @@ print(f"  Stok Siap Jual: {stok_tersedia} ekor")
 print(f"  Total Pemasukan: Rp {total_pemasukan:,.0f}")
 
 print("\n" + "=" * 60)
-print("DONE! Refresh browser to see data!")
+print("DONE! Refresh browser to see changes!")
 print("=" * 60)

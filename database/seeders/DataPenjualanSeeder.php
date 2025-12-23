@@ -17,11 +17,11 @@ class DataPenjualanSeeder extends Seeder
         $csvFile = database_path('seeders/data/data_penjualans.csv');
 
         if (!file_exists($csvFile)) {
-            $this->command->error("❌ CSV file not found: {$csvFile}");
+            $this->command->error("CSV file not found: {$csvFile}");
             return;
         }
 
-        $this->command->info("📂 Importing data from: {$csvFile}");
+        $this->command->info("Importing data from: {$csvFile}");
 
         DB::beginTransaction();
         try {
@@ -64,14 +64,14 @@ class DataPenjualanSeeder extends Seeder
             fclose($file);
             DB::commit();
 
-            $this->command->info("✅ Successfully imported {$count} records!");
+            $this->command->info("Successfully imported {$count} records!");
             if ($skipped > 0) {
-                $this->command->warn("⚠ Skipped {$skipped} records (duplicates or errors)");
+                $this->command->warn("Skipped {$skipped} records (duplicates or errors)");
             }
 
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->command->error("❌ Error: " . $e->getMessage());
+            $this->command->error("Error: " . $e->getMessage());
         }
     }
 }

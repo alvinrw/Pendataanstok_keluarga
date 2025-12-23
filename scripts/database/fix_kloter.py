@@ -5,7 +5,12 @@ Script untuk insert kloter 8 dan 9 yang gagal import
 
 import sqlite3
 
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
+
+DB_PATH = get_db_path()
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()

@@ -1,6 +1,11 @@
 import sqlite3
 
-DB_PATH = r'c:\Users\alvin\Documents\vscode_apin\Web_branchku\apin\database\database.sqlite'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.config import get_db_path
+
+DB_PATH = get_db_path()
 
 conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
@@ -65,6 +70,6 @@ conn.close()
 print("\n" + "=" * 60)
 print("CLEAR COMPLETED!")
 print("=" * 60)
-print("\nSemua data ayam sudah dihapus.")
-print("Data toko, transaksi, jadwal, dan admin tetap aman.")
-print("\nRefresh browser untuk melihat database kosong!")
+print("\nAll chicken data has been cleared.")
+print("Store, transaction, schedule, and admin data remains safe.")
+print("\nRefresh browser to see empty database!")
