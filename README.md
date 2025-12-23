@@ -1,16 +1,16 @@
-# Chicken Farm Management System
+# Family Management System
 
-Laravel-based application for managing chicken farming operations including batch tracking, sales, expenses, and automated reporting.
+Laravel-based application for managing family business operations including chicken farm, store sales, cashflow tracking, meeting schedules, and expense monitoring.
 
 ## Features
 
-- Batch (Kloter) management with DOC tracking
-- Sales and revenue tracking
-- Expense monitoring
-- Harvest and mortality tracking
+- Chicken batch (Kloter) management with DOC tracking
+- Store sales and revenue tracking
+- Transaction and cashflow management
+- Meeting schedule management
+- Expense monitoring across business units
 - Automated summaries and calculations
 - CSV export functionality
-- Store and transaction management
 
 ## Quick Start
 
